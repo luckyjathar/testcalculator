@@ -160,15 +160,13 @@
         <button onclick="toggleSidebar(); openCustomerMessageModal()" class="sidebar-btn" style="background: #27ae60; color: white;"><span>💬</span> SEND EMI DETAILS</button>
         <button onclick="toggleSidebar(); openDealerSearchModal()" class="sidebar-btn" style="background: var(--bajaj-blue); color: white;"><span>🔗</span> DEALER LINKS</button>
         <button onclick="toggleSidebar(); openDictionaryModal()" class="sidebar-btn" style="background: var(--indigo); color: white;"><span>🔍</span> SMART SCHEME DICTIONARY</button>
-        <button onclick="setupAdminToken()" class="sidebar-btn" style="background: #2c3e50 !important; color: #fff; margin-top:15px; border-top: 2px dashed #555;"><span>⚙️</span> ADMIN SETUP (GITHUB)</button>
-    
     </div>
 </aside>
 
 <header>
     <div style="display: flex; align-items: center; gap: 10px;">
         <button class="menu-toggle-btn" onclick="toggleSidebar()">☰ MENU</button>
-        <h1>🚀 Persistent Portal Master</h1>
+        <h1 onclick="secretAdminAccess()" style="cursor:pointer; user-select:none;">🚀 Persistent Portal Master</h1>
     </div>
 </header>
 
@@ -656,6 +654,25 @@
     </div>
 </footer>
 <script>
+    // --- Secret Admin Access Logic ---
+let adminClickCount = 0;
+let adminClickTimer;
+
+function secretAdminAccess() {
+    adminClickCount++;
+    clearTimeout(adminClickTimer);
+    
+    if (adminClickCount === 5) {
+        setupAdminToken(); // ५ वेळा क्लिक केल्यावर टोकन बॉक्स उघडेल
+        adminClickCount = 0; 
+    }
+    
+    // जर युजरने हळू क्लिक केले, तर २ सेकंदांनी काऊंट झिरो होईल
+    adminClickTimer = setTimeout(() => {
+        adminClickCount = 0;
+    }, 2000);
+}
+// ---------------------------------
     // १. GitHub Token सेट करण्यासाठी फंक्शन
 function setupAdminToken() {
     let token = prompt("Enter your GitHub Personal Access Token (PAT):");
