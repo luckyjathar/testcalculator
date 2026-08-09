@@ -160,6 +160,8 @@
         <button onclick="toggleSidebar(); openCustomerMessageModal()" class="sidebar-btn" style="background: #27ae60; color: white;"><span>💬</span> SEND EMI DETAILS</button>
         <button onclick="toggleSidebar(); openDealerSearchModal()" class="sidebar-btn" style="background: var(--bajaj-blue); color: white;"><span>🔗</span> DEALER LINKS</button>
         <button onclick="toggleSidebar(); openDictionaryModal()" class="sidebar-btn" style="background: var(--indigo); color: white;"><span>🔍</span> SMART SCHEME DICTIONARY</button>
+        <button onclick="setupAdminToken()" class="sidebar-btn" style="background: #2c3e50 !important; color: #fff; margin-top:15px; border-top: 2px dashed #555;"><span>⚙️</span> ADMIN SETUP (GITHUB)</button>
+    
     </div>
 </aside>
 
@@ -654,6 +656,82 @@
     </div>
 </footer>
 <script>
+    // १. GitHub Token सेट करण्यासाठी फंक्शन
+function setupAdminToken() {
+    let token = prompt("Enter your GitHub Personal Access Token (PAT):");
+    if (token) {
+        localStorage.setItem("gh_pat_token", token.trim());
+        showToast("✅ GitHub Token Securely Saved!", "success");
+    }
+}
+
+// २. Excel फाईल GitHub वर अपडेट करणारे फंक्शन
+async function updateExcelOnGitHub(newScheme) {
+    let token = localStorage.getItem("gh_pat_token");
+    if (!token) {
+        showToast("⚠️ Admin Token नाही! टोकन सेटअप करा.", "warning");
+        return;
+    }
+    
+    showToast("⏳ GitHub वर Excel अपडेट होत आहे, कृपया थांबा...", "warning");
+    
+    try {
+        const repo = "luckyjathar/testcalculator"; // तुमचे नवीन रेपो नाव
+        const path = "master_data.xlsx";
+        const apiUrl = `https://api.github.com/repos/${repo}/contents/${path}`;
+        
+        let res = await fetch(apiUrl, { headers: { "Authorization": `token ${token}` } });
+        let fileData = await res.json();
+        let sha = fileData.sha;
+        
+        let rawRes = await fetch(fileData.download_url);
+        let arrayBuffer = await rawRes.arrayBuffer();
+        
+        let wb = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
+        let sheetName = wb.SheetNames[0]; 
+        let ws = wb.Sheets[sheetName];
+        
+        let jsonData = XLSX.utils.sheet_to_json(ws);
+        
+        let newRow = {
+            "BRAND": newScheme.brand || "CUSTOM",
+            "MODEL": newScheme.model,
+            "CATEGORY": newScheme.category || "MANUAL",
+            "MRP": newScheme.mrp || 0,
+            "TENURE": newScheme.tenure || 0,
+            "ADV": newScheme.advEmi || 0,
+            "DBD%": newScheme.dbd || 0,
+            "PF": newScheme.pf || 0,
+            "ROI%": newScheme.roi || 0,
+            "FIXED": newScheme.fixedEmi || 0
+        };
+        jsonData.push(newRow);
+        
+        let newWs = XLSX.utils.json_to_sheet(jsonData);
+        wb.Sheets[sheetName] = newWs;
+        let base64Data = XLSX.write(wb, { type: 'base64', bookType: 'xlsx' });
+        
+        let pushRes = await fetch(apiUrl, {
+            method: 'PUT',
+            headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+                message: `Portal Auto-Update: Added new scheme for ${newScheme.model}`,
+                content: base64Data,
+                sha: sha,
+                branch: "main" 
+            })
+        });
+        
+        if (pushRes.ok) {
+            showToast("✅ Master Data Successfully Updated on GitHub!", "success");
+        } else {
+            throw new Error("GitHub API Push Rejected");
+        }
+    } catch (error) {
+        console.error("GitHub Update Error:", error);
+        showToast("⚠️ GitHub अपडेट फेल झाले! (Console तपासा)", "error");
+    }
+}
     /* === TOAST NOTIFICATION FUNCTION === */
     let toastTimeout;
     function showToast(message, type = 'success') {
@@ -1758,11 +1836,39 @@ function openRecycleBin() { let list = document.getElementById('recycleBinList')
     async function toggleInactive(pIdx, dIdx) { let prod = current_products[pIdx]; let scheme = prod.schemes[dIdx]; scheme.inactive = !scheme.inactive; recalcModel(pIdx); customerQueue[activeCustomerIndex].products = current_products; await saveQueueToLocal(); }
 
     async function executeManualAction() {
-        let mode = document.getElementById('targetPIdx').value; 
-        let scheme = { tenure: parseInt(document.getElementById('manTen').value), advEmi: parseInt(document.getElementById('manAdv').value), dbd: parseFloat(document.getElementById('manDbd').value)||0, pf: parseInt(document.getElementById('manPf').value)||0, roi: parseFloat(document.getElementById('manRoi').value)||0, fixedEmi: parseInt(document.getElementById('manFixed').value)||0, minLoan: 0, maxLoan: 9999999, category: "MANUAL", inactive: false, isExpired: false, expiryDateStr: "" };
-        let cCap = customerQueue[activeCustomerIndex]?.cap || "";
-        if(mode === "NEW") { let name = document.getElementById('manName').value.toUpperCase() || "MANUAL MODEL"; let comp = customerQueue[activeCustomerIndex].components || {}; current_products.push({ name: name, schemes: [scheme], category: "MANUAL", inputs: { mrp: "", inv: "", mtCap: cCap, target: "", gtl: 0, rfc: 0, exw: comp.exw||"", margin: comp.margin||"", dealer: comp.dealer||"", surch: 0, manualLoans: {} }, isManual: true }); sortConfigs.push({ key: 'dp', dir: 'asc' }); customerQueue[activeCustomerIndex].products = current_products; customerQueue[activeCustomerIndex].sortConfigs = sortConfigs; await saveQueueToLocal(); renderMatrix(); } else { current_products[mode].schemes.push(scheme); recalcModel(parseInt(mode)); } closeManualModal();
+    let mode = document.getElementById('targetPIdx').value; 
+    let scheme = { tenure: parseInt(document.getElementById('manTen').value), advEmi: parseInt(document.getElementById('manAdv').value), dbd: parseFloat(document.getElementById('manDbd').value)||0, pf: parseInt(document.getElementById('manPf').value)||0, roi: parseFloat(document.getElementById('manRoi').value)||0, fixedEmi: parseInt(document.getElementById('manFixed').value)||0, minLoan: 0, maxLoan: 9999999, category: "MANUAL", inactive: false, isExpired: false, expiryDateStr: "" };
+    let cCap = customerQueue[activeCustomerIndex]?.cap || "";
+
+    let globalSchemeData = null;
+
+    if(mode === "NEW") { 
+        let name = document.getElementById('manName').value.toUpperCase() || "MANUAL MODEL"; 
+        let comp = customerQueue[activeCustomerIndex].components || {}; 
+        current_products.push({ name: name, schemes: [scheme], category: "MANUAL", inputs: { mrp: "", inv: "", mtCap: cCap, target: "", gtl: 0, rfc: 0, exw: comp.exw||"", margin: comp.margin||"", dealer: comp.dealer||"", surch: 0, manualLoans: {} }, isManual: true }); 
+        sortConfigs.push({ key: 'dp', dir: 'asc' }); 
+        customerQueue[activeCustomerIndex].products = current_products; 
+        customerQueue[activeCustomerIndex].sortConfigs = sortConfigs; 
+        await saveQueueToLocal(); 
+        renderMatrix(); 
+        
+        globalSchemeData = { ...scheme, model: name, brand: "CUSTOM", mrp: 0, category: "MANUAL" };
+    } else { 
+        current_products[mode].schemes.push(scheme); 
+        recalcModel(parseInt(mode)); 
+        
+        let prodName = current_products[mode].name;
+        let prodCat = current_products[mode].category;
+        globalSchemeData = { ...scheme, model: prodName, brand: "CUSTOM", mrp: 0, category: prodCat };
+    } 
+
+    closeManualModal();
+
+    if(globalSchemeData) {
+        db_records.push(globalSchemeData); 
+        await updateExcelOnGitHub(globalSchemeData); 
     }
+}
     
     function openQuoteSelectionModal() {
         if(current_products.length === 0) { showToast("⚠️ Kripya pehle matrix mein koi product add karein!", "warning"); return; }
