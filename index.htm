@@ -673,16 +673,23 @@ function secretAdminAccess() {
     }, 2000);
 }
 // ---------------------------------
-    // १. GitHub Token सेट करण्यासाठी फंक्शन
+    // १. GitHub Token सेट करण्यासाठी फंक्शन (सर्वात सोपे)
 function setupAdminToken() {
-    let token = prompt("Enter your GitHub Personal Access Token (PAT):");
-    if (token) {
+    let existingToken = localStorage.getItem("gh_pat_token");
+    
+    // जर टोकन आधीच असेल तर मेसेज थोडा बदलेल
+    let msg = existingToken 
+        ? "GitHub Token आधीपासून सेव्ह आहे. नवीन टाकायचा असेल तर पेस्ट करा (नाहीतर Cancel दाबा):" 
+        : "Enter your GitHub Personal Access Token (PAT):";
+        
+    let token = prompt(msg);
+    
+    // जर नवीन टोकन टाकला आणि OK दाबलं, तरच तो सेव्ह होईल
+    if (token && token.trim() !== "") {
         localStorage.setItem("gh_pat_token", token.trim());
         showToast("✅ GitHub Token Securely Saved!", "success");
     }
-}
-
-// २. Excel फाईल GitHub वर अपडेट करणारे फंक्शन
+}// २. Excel फाईल GitHub वर अपडेट करणारे फंक्शन
 async function updateExcelOnGitHub(newScheme) {
     let token = localStorage.getItem("gh_pat_token");
     if (!token) {
