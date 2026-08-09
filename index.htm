@@ -692,7 +692,7 @@ function setupAdminToken() {
         showToast("✅ GitHub Token Securely Saved!", "success");
     }
 }
-}// २. Excel फाईल GitHub वर अपडेट करणारे फंक्शन
+// २. Excel फाईल GitHub वर अपडेट करणारे फंक्शन
 async function updateExcelOnGitHub(newScheme) {
     let token = localStorage.getItem("gh_pat_token");
     if (!token) {
