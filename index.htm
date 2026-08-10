@@ -692,7 +692,7 @@ function setupAdminToken() {
         showToast("✅ GitHub Token Securely Saved!", "success");
     }
 }
-// २. Excel फाईल GitHub वर अपडेट करणारे फंक्शन
+}// २. Excel फाईल GitHub वर अपडेट करणारे फंक्शन
 async function updateExcelOnGitHub(newScheme) {
     let token = localStorage.getItem("gh_pat_token");
     if (!token) {
@@ -2182,6 +2182,70 @@ function openRecycleBin() { let list = document.getElementById('recycleBinList')
             showToast('⚠️ Is dealer ke liye Bitly link available nahi hai!', 'warning'); 
         } 
     }
+    /* =========================================
+   OVERALL UI & POPUP ENLARGEMENT PATCH
+   ========================================= */
+
+/* 1. Global Scale & Max Width */
+body { 
+    font-size: 16px !important; 
+    max-width: 1400px; /* Expands the overall layout */
+}
+
+/* 2. Bigger Inputs, Selects, and Buttons */
+input, select { 
+    font-size: 15px !important; 
+    height: 42px !important; 
+    padding: 8px 12px !important; 
+}
+button { 
+    font-size: 14px !important; 
+    padding: 10px 15px !important; 
+}
+label { 
+    font-size: 13px !important; 
+    margin-bottom: 5px !important; 
+}
+
+/* 3. Enlarge Popup (Modal) Windows */
+.modal-content { 
+    max-width: 550px !important; /* Increased from 400px to 550px */
+    padding: 25px !important; 
+}
+
+/* Expand the heavy-data modals specifically */
+#multiStackModal .modal-content, 
+#dictionarySearchModal .modal-content, 
+#customerMessageGenModal .modal-content, 
+#draftsModal .modal-content { 
+    max-width: 1100px !important; /* Extra wide for tables and forms */
+    padding: 25px !important; 
+}
+
+/* Expand inline error warnings (Keeping them on-the-spot but readable) */
+#mobileDupWarning, .toast-notification {
+    font-size: 14px !important;
+    padding: 8px 12px !important;
+}
+
+/* 4. Table Readability Adjustments */
+table { font-size: 15px !important; }
+th, td { 
+    padding: 10px 8px !important; 
+    font-size: 14px !important; 
+}
+
+/* 5. Force override all inline small font styles */
+div[style*="font-size"], 
+span[style*="font-size"] { 
+    font-size: 15px !important; 
+}
+strong[style*="font-size"] { 
+    font-size: 16px !important; 
+}
+h3[style*="font-size"] { 
+    font-size: 20px !important; 
+}
 </script>
 </body>
 </html>
