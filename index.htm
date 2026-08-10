@@ -2247,5 +2247,38 @@ h3[style*="font-size"] {
     font-size: 20px !important; 
 }
 </script>
+<!-- 🚀 UI MASTER ENLARGER SCRIPT -->
+<script>
+    setTimeout(() => {
+        // १. पूर्ण लेआऊट १५% ने मोठा करा (Global Zoom Scale)
+        document.body.style.zoom = "1.15"; 
+        
+        // २. सर्व छोट्या पॉपअप (Modal) विंडोज मोठ्या करा
+        let modals = document.querySelectorAll('.modal-content');
+        for(let i = 0; i < modals.length; i++) {
+            let m = modals[i];
+            let w = parseInt(m.style.maxWidth || "0");
+            // जर पॉपअप 300px, 320px, 350px किंवा 480px असेल, तर थेट 600px करा
+            if(w > 0 && w <= 480) { 
+                m.style.setProperty('max-width', '600px', 'important');
+            }
+            m.style.setProperty('padding', '25px', 'important');
+        }
+
+        // ३. खूप लहान फॉन्ट साईझ (10px, 11px, 12px) जबरदस्तीने वाचण्यायोग्य करा
+        document.querySelectorAll('*').forEach(el => {
+            let fs = el.style.fontSize;
+            if(fs && (fs.includes('10px') || fs.includes('11px') || fs.includes('12px'))) {
+                el.style.setProperty('font-size', '14px', 'important');
+            }
+        });
+        
+        // ४. इनपुट बॉक्सेसची उंची आणि फॉन्ट वाढवा
+        document.querySelectorAll('input, select').forEach(el => {
+            el.style.setProperty('height', '38px', 'important');
+            el.style.setProperty('font-size', '14px', 'important');
+        });
+    }, 500);
+</script>
 </body>
 </html>
