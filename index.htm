@@ -2280,5 +2280,48 @@ h3[style*="font-size"] {
         });
     }, 500);
 </script>
+<!-- 🚀 UI MASTER ENLARGER SCRIPT (FINAL FIX) -->
+<script>
+    setTimeout(() => {
+        // १. सर्व पॉपअप विंडोजची (Modals) रुंदी वाढवा आणि मोकळी जागा द्या
+        document.querySelectorAll('.modal-content').forEach(m => {
+            m.style.setProperty('max-width', '600px', 'important');
+            m.style.setProperty('padding', '25px', 'important');
+        });
+
+        // २. नवीन स्टाईल्स थेट सिस्टीममध्ये इंजेक्ट करा (यामुळे लेआऊट ब्रेक होणार नाही आणि मेनू चालेल)
+        let style = document.createElement('style');
+        style.innerHTML = `
+            /* पूर्ण बॉडीचा बेस फॉन्ट साईझ */
+            body { font-size: 15px !important; }
+            
+            /* इनपुट्स आणि बटन्सची साईझ वाढवा */
+            input, select { height: 40px !important; font-size: 14px !important; padding: 8px !important; }
+            button { font-size: 14px !important; padding: 10px !important; }
+            label { font-size: 13px !important; margin-bottom: 5px !important; }
+            
+            /* टेबल व्यवस्थित वाचता यावे म्हणून पॅडिंग वाढवा */
+            table th, table td { font-size: 14px !important; padding: 10px 8px !important; }
+            
+            /* मेनू मधील बटन्स मोठी करा */
+            .sidebar-btn { font-size: 14px !important; padding: 15px !important; }
+            
+            /* CSS मध्ये हार्डकोड केलेले लहान फॉन्ट्स जबरदस्तीने मोठे करा */
+            div[style*="font-size: 10px"], div[style*="font-size: 11px"], div[style*="font-size: 12px"], div[style*="font-size: 13px"],
+            span[style*="font-size: 10px"], span[style*="font-size: 11px"], span[style*="font-size: 12px"], span[style*="font-size: 13px"] {
+                font-size: 14px !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // ३. इनलाईन स्टाईल्समधील (Inline Styles) लहान फॉन्ट साईझ शोधा आणि रिप्लेस करा
+        document.querySelectorAll('*').forEach(el => {
+            let fs = el.style.fontSize;
+            if(fs && (fs.includes('10px') || fs.includes('11px') || fs.includes('12px') || fs.includes('13px'))) {
+                el.style.setProperty('font-size', '14px', 'important');
+            }
+        });
+    }, 500);
+</script>
 </body>
 </html>
