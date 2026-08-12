@@ -503,37 +503,36 @@ function renderTableModel() {
                     finalLoan = Math.min(finalLoan, Math.max(0, Math.floor(solvedLoan)));
                 }
 
-                let minLoanFor900Emi = 900 * s.tenure;
-                if (finalLoan < minLoanFor900Emi) {
-                    finalLoan = minLoanFor900Emi;
-                }
-                
-                // 🔥 FIX: पण लोन इन्व्हॉइसपेक्षा जास्त नसावे
                 if (invoice > 0 && finalLoan > invoice) {
                     finalLoan = invoice;
                 }
                 
+                // 🔥 FIX: बेस EMI
+                let baseEmi = finalLoan / s.tenure;
+                if (baseEmi > 0 && baseEmi < 900) baseEmi = 900; 
+
                 let roiInEmi = finalLoan * roiRate;
-                emi = (finalLoan / s.tenure) + (gtl / inst) + roiInEmi;
+                emi = baseEmi + (gtl / inst) + roiInEmi;
                 
                 if (emiCap > 0 && emi > emiCap) {
                     finalLoan = (emiCap - (gtl / inst)) / ((1 / s.tenure) + roiRate);
                     if(finalLoan < 0) finalLoan = 0;
-                    if (finalLoan < minLoanFor900Emi) finalLoan = minLoanFor900Emi; 
-                    if (invoice > 0 && finalLoan > invoice) finalLoan = invoice; // Re-check
+                    if (invoice > 0 && finalLoan > invoice) finalLoan = invoice; 
+                    
+                    baseEmi = finalLoan / s.tenure;
+                    if (baseEmi > 0 && baseEmi < 900) baseEmi = 900;
+
                     roiInEmi = finalLoan * roiRate;
-                    emi = (finalLoan / s.tenure) + (gtl / inst) + roiInEmi;
+                    emi = baseEmi + (gtl / inst) + roiInEmi;
                 }
 
                 let roiInDp = finalLoan * roiRateDP;
-                dp = invoice - finalLoan + ((finalLoan / s.tenure) * s.advEmi) + s.pf + fee + (finalLoan * dbdRate) + margin + roiInDp;
+                dp = invoice - finalLoan + (baseEmi * s.advEmi) + s.pf + fee + (finalLoan * dbdRate) + margin + roiInDp;
                 s.currentTenure = s.tenure;
                 s.calcInst = inst;
             }
             
             s.calcLoan = finalLoan;
-            
-            // 🔥 FIX: फक्त ५०% पेक्षा कमी असल्यास ब्लॉक करा
             s.isInvalidLoan = (isCalculatedMode && invoice > 0 && (finalLoan < (invoice * 0.5)));
 
             diff = invoice - finalLoan;
@@ -1037,11 +1036,6 @@ function recalcModel(pIdx) {
         }
 
         if (!isFixed) {
-            let minLoanFor900Emi = 900 * s.tenure;
-            if (loan < minLoanFor900Emi) {
-                loan = minLoanFor900Emi;
-            }
-            // 🔥 FIX: पण लोन इन्व्हॉइसपेक्षा जास्त नसावे
             if (effectivePrice > 0 && loan > effectivePrice) {
                 loan = effectivePrice;
             }
@@ -1051,19 +1045,27 @@ function recalcModel(pIdx) {
             inst = currentTenure - s.advEmi; if(inst < 1) inst = 1; let insTotal = (parseFloat(inp.gtl)||0) + (parseFloat(inp.rfc)||0) + (parseFloat(inp.exw)||0); let roiInEmi = loan * roiRate; emi = s.fixedEmi + (insTotal / inst) + roiInEmi;
             let roiInDp = loan * roiRateDP; dpExact = effectivePrice - loan + (s.fixedEmi * s.advEmi) + (loan * dbdRate) + dynamicPf + totalFees + roiInDp;
         } else {
-            inst = s.tenure - s.advEmi; if(inst < 1) inst = 1; let insTotal = (parseFloat(inp.gtl)||0)+(parseFloat(inp.rfc)||0)+(parseFloat(inp.exw)||0); let roiInEmi = loan * roiRate; emi = (loan / s.tenure) + (insTotal / inst) + roiInEmi;
+            inst = s.tenure - s.advEmi; if(inst < 1) inst = 1; let insTotal = (parseFloat(inp.gtl)||0)+(parseFloat(inp.rfc)||0)+(parseFloat(inp.exw)||0); 
+            
+            // 🔥 FIX: बेस EMI
+            let baseEmi = loan / s.tenure;
+            if (baseEmi > 0 && baseEmi < 900) baseEmi = 900; 
+
+            let roiInEmi = loan * roiRate; emi = baseEmi + (insTotal / inst) + roiInEmi;
             if(!isManuallyOverridden && emi > parseFloat(inp.cap) && parseFloat(inp.cap) > 0) { 
                 loan = (parseFloat(inp.cap) - (insTotal/inst)) / ( (1/s.tenure) + roiRate ); 
-                if (loan < (900 * s.tenure)) loan = (900 * s.tenure); 
-                if (effectivePrice > 0 && loan > effectivePrice) loan = effectivePrice; // Re-check
-                roiInEmi = loan * roiRate; emi = (loan / s.tenure) + (insTotal / inst) + roiInEmi; 
+                if (effectivePrice > 0 && loan > effectivePrice) loan = effectivePrice; 
+                
+                baseEmi = loan / s.tenure;
+                if (baseEmi > 0 && baseEmi < 900) baseEmi = 900; 
+
+                roiInEmi = loan * roiRate; emi = baseEmi + (insTotal / inst) + roiInEmi; 
             } 
-            let roiInDp = loan * roiRateDP; dpExact = effectivePrice - loan + ((loan / s.tenure) * s.advEmi) + (loan * dbdRate) + dynamicPf + totalFees + roiInDp;
+            let roiInDp = loan * roiRateDP; dpExact = effectivePrice - loan + (baseEmi * s.advEmi) + (loan * dbdRate) + dynamicPf + totalFees + roiInDp;
         }
 
         if(dpExact > 0) dpRounded = Math.ceil(dpExact / 10) * 10; else dpRounded = dpExact; let extraVal = effectivePrice > 0 ? (((emi * inst) + dpRounded) - effectivePrice) : 0; let dbdAmt = loan * dbdRate; let roiAmt = (loan * roiRateDP) + (loan * roiRate * inst); let curLTV = currentTenure > 0 ? ((currentTenure - s.advEmi) / currentTenure) * 100 : 0; let marginMoney = parseFloat(inp.margin) || 0; let roundupAdj = (dpRounded > dpExact) ? (dpRounded - dpExact) : 0; let netDisb = effectivePrice > 0 ? (effectivePrice - dpRounded - marginMoney - roundupAdj) : 0;
 
-        // 🔥 FIX: आता इथे फक्त < 50% वाला नियम तपासा
         let isInv50Breach = effectivePrice > 0 && (loan < minAllowedLoanByInvoice);
 
         return { ...s, pf: dynamicPf, currentTenure, nbfcMaxL, loan, dp: dpRounded, emi, inst, daily: emi/30, dIdx, isFixed, curLTV, extra: extraVal, dbdAmt, roiAmt, netDisb, inactive: s.inactive || false, expiryDateStr: s.expiryDateStr, isInv50Breach: isInv50Breach };
@@ -1124,15 +1126,6 @@ function manual(pIdx, dIdx) {
         showToast("⚠️ लोन अमाऊंट इन्व्हॉइसच्या ५०% पेक्षा कमी असू शकत नाही!", "error");
     }
 
-    if (!d.isFixed) {
-        let minLoanFor900Emi = 900 * d.tenure;
-        if (loan < minLoanFor900Emi) {
-            loan = minLoanFor900Emi;
-            showToast("⚠️ बेस EMI 900 पेक्षा कमी असू शकत नाही!", "warning");
-        }
-    }
-
-    // 🔥 FIX: मॅन्युअल मध्ये पण लोन इन्व्हॉइसपेक्षा जास्त नसावे
     if (effectivePrice > 0 && loan > effectivePrice) {
         loan = effectivePrice;
         showToast("⚠️ लोन इन्व्हॉइसपेक्षा जास्त असू शकत नाही!", "warning");
@@ -1175,11 +1168,6 @@ function manual(pIdx, dIdx) {
             loan = minAllowedLoanByInvoice;
         }
 
-        let minLoanFor900Emi = 900 * d.tenure;
-        if (loan < minLoanFor900Emi) {
-            loan = minLoanFor900Emi;
-        }
-
         if (effectivePrice > 0 && loan > effectivePrice) {
             loan = effectivePrice;
         }
@@ -1190,7 +1178,12 @@ function manual(pIdx, dIdx) {
         dpE = effectivePrice - loan + ((loan/d.tenure) * d.advEmi) + (loan * dbdRate) + appliedPf + totalFees + roiInDp; 
         dpR = Math.ceil(dpE / 10) * 10; let inst = d.tenure - d.advEmi; if(inst < 1) inst = 1; 
         let insTotal = (parseFloat(inp.gtl)||0)+(parseFloat(inp.rfc)||0)+(parseFloat(inp.exw)||0); 
-        let emi = (loan / d.tenure) + (insTotal / inst) + roiInEmi; 
+        
+        // 🔥 FIX: बेस EMI
+        let baseEmi = loan / d.tenure;
+        if (baseEmi > 0 && baseEmi < 900) baseEmi = 900; 
+
+        let emi = baseEmi + (insTotal / inst) + roiInEmi; 
         d.loan = loan; d.dp = dpR; d.emi = emi; 
     }
     
