@@ -298,7 +298,18 @@ window.onload = async function() {
     if(loggedInUserEmail) { let savedName = localStorage.getItem('persistent_user_name') || "User"; updateLoginUI(savedName, true); } generateStackCards(); 
     try {
         await initDB(); 
-        let savedDB = await getFromDB("persistent_db"); if (savedDB && savedDB.length > 0) { db_records = savedDB; }
+        let savedDB = await getFromDB("persistent_db"); 
+        if (savedDB && savedDB.length > 0) { 
+            // 🔥 नवीन लॉजिक: रोज सकाळी पोर्टल उघडल्यावर काल एक्सपायर झालेल्या स्कीम्स आपोआप गायब होतील
+            let today = new Date(); today.setHours(0,0,0,0);
+            db_records = savedDB.filter(r => {
+                if(!r.expiryDateStr) return true;
+                let p = r.expiryDateStr.split('/');
+                if(p.length !== 3) return true;
+                let expD = new Date(p[2], p[1]-1, p[0]);
+                return expD >= today;
+            });
+        }
         let savedDealers = await getFromDB("persistent_dealers"); if (savedDealers && savedDealers.length > 0) { dealer_records = savedDealers; }
         await fetchFromMasterStream();
         let savedQ = await getFromDB('persistent_queue'); if (!savedQ || savedQ.length === 0) { let lsQ = localStorage.getItem('persistent_queue_backup'); if (lsQ) savedQ = JSON.parse(lsQ); }
@@ -310,7 +321,6 @@ window.onload = async function() {
         renderCustomerQueue(); updateUniversalActionButtons();
     } catch(e) { console.error("Local Data Initialization Failure", e); }
 };
-
 function openFlyerGenModal() { document.getElementById('fgSalesName').value = ''; document.getElementById('fgSalesMobile').value = ''; document.getElementById('fgDealerSearch').value = ''; document.getElementById('fgDealerList').innerHTML = ''; tempFgDealerId = ""; tempFgDealerName = ""; tempFgBitly = ""; clearFgModel(); document.getElementById('fgOfferType').value = 'NONE'; toggleFgOfferInput(); document.getElementById('fgSelectedDealerBox').style.display = 'none'; document.getElementById('flyerGeneratedLinkBox').style.display = 'none'; document.getElementById('flyerGenModal').style.display = 'flex'; }
 function toggleFgOfferInput() { let type = document.getElementById('fgOfferType').value; let box = document.getElementById('fgOfferValBox'); let label = document.getElementById('fgOfferValLabel'); let inp = document.getElementById('fgOfferValue'); if(type === "NONE") { box.style.display = 'none'; inp.value = ''; } else if(type === "FREEBIE") { box.style.display = 'block'; label.innerText = "ENTER GIFT NAME"; inp.placeholder = "E.g. Earbuds / Smartwatch"; } else { box.style.display = 'block'; label.innerText = "ENTER UPTO AMOUNT (₹)"; inp.placeholder = "E.g. 2500"; } }
 function searchFgDealer() { let q = document.getElementById('fgDealerSearch').value.toLowerCase().trim(); let list = document.getElementById('fgDealerList'); if(!q) { list.innerHTML = ''; return; } let matches = dealer_records.map(d => parseDealerObj(d)).filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q) || p.city.toLowerCase().includes(q)).slice(0, 10); list.innerHTML = matches.map(p => { let displayStr = `${p.name}${p.city ? ' - ' + p.city : ''} (${p.code})`; return `<div onclick="selectFgDealer('${p.code}', '${p.name.replace(/'/g, "\\'")}', '${p.city.replace(/'/g, "\\'")}', '${encodeURIComponent(p.bitly||'')}')" style="padding:8px; border-bottom:1px solid #eee; cursor:pointer; background:#fff; font-size:12px; font-weight:bold; color:var(--bajaj-blue);">🏪 ${displayStr}</div>`; }).join(''); }
