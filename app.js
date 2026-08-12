@@ -17,7 +17,7 @@ function showCustomConfirm(msg, yesCallback, noCallback) {
     let newNoBtn = noBtn.cloneNode(true);
     yesBtn.replaceWith(newYesBtn);
     noBtn.replaceWith(newNoBtn);
-    
+
     newYesBtn.onclick = function() { document.getElementById('customConfirmModal').style.display = 'none'; if(yesCallback) yesCallback(); };
     newNoBtn.onclick = function() { document.getElementById('customConfirmModal').style.display = 'none'; if(noCallback) noCallback(); };
     document.getElementById('customConfirmModal').style.display = 'flex';
@@ -72,12 +72,12 @@ async function fetchCloudDataOnLogin(userName) {
     try {
         let res = await fetch(APPS_SCRIPT_URL + "?email=" + encodeURIComponent(loggedInUserEmail));
         let cloudData = await res.json();
-        
+
         if(cloudData && cloudData.length > 0) {
             let combined = [...cloudData, ...customerQueue];
             let uniqueQueue = [];
             let seen = new Set();
-            
+
             combined.forEach(c => {
                 let key = c.timestamp + "_" + c.name; 
                 if(!seen.has(key)) {
@@ -85,10 +85,10 @@ async function fetchCloudDataOnLogin(userName) {
                     uniqueQueue.push(c);
                 }
             });
-            
+
             customerQueue = uniqueQueue;
             await saveQueueToLocal(true); 
-            
+
             activeCustomerIndex = -1;
             renderCustomerQueue();
             updateUniversalActionButtons();
@@ -234,7 +234,7 @@ function renderEmiDrafts() {
 function toggleDraftDetails(index) { const detailsDiv = document.getElementById(`draftDetails_${index}`); const icon = document.getElementById(`toggleIcon_${index}`); if (detailsDiv.style.display === 'none') { detailsDiv.style.display = 'block'; icon.innerText = '▲'; } else { detailsDiv.style.display = 'none'; icon.innerText = '▼'; } }
 function sendDraftNow(index) { let drafts = JSON.parse(localStorage.getItem('persistent_emi_drafts') || '[]'); let d = drafts[index]; if (!d) return; let mobile = d.mobile || ''; let text = encodeURIComponent(d.finalMessage || ''); if(!text) { showToast("⚠️ हा जुना ड्राफ्ट आहे. कृपया आधी 'LOAD' वर क्लिक करा आणि मग मेसेज पाठवा.", "warning"); return; } let url = `https://api.whatsapp.com/send?text=${text}`; if (mobile && mobile.length === 10) { url = `https://api.whatsapp.com/send?phone=91${mobile}&text=${text}`; } window.open(url, '_blank'); }
 function loadEmiDraft(index) { let drafts = JSON.parse(localStorage.getItem('persistent_emi_drafts') || '[]'); let d = drafts[index]; if (!d) return; document.getElementById('msgShopName').value = d.shop || ''; document.getElementById('msgAssetCategory').value = d.asset || ''; document.getElementById('msgCustName').value = d.name || ''; document.getElementById('msgCustMobile').value = d.mobile || ''; document.getElementById('msgCustEMI').value = d.emi || ''; document.getElementById('msgCustTenure').value = d.tenure || ''; document.getElementById('msgLoanDate').value = d.loanDate || ''; document.getElementById('msgLang').value = d.lang || 'en'; calculateDates(); closeDraftsModal(); }
- 
+
 function markDraftAsSent(index) {
     showCustomConfirm("हा ड्राफ्ट लिस्ट मधून कायमचा डिलीट होईल. पुढे जायचे?", () => { let drafts = JSON.parse(localStorage.getItem('persistent_emi_drafts') || '[]'); drafts.splice(index, 1); localStorage.setItem('persistent_emi_drafts', JSON.stringify(drafts)); renderEmiDrafts(); showToast("🗑️ ड्राफ्ट डिलीट झाला!", "success"); });
 }
@@ -258,7 +258,7 @@ function standardizeCategoryName(cat) { if (!cat) return "OTHER"; let c = String
 function getRfcSlabValue(val) { let amount = parseFloat(val) || 0; if (amount < 8000) return 0; if (amount <= 10000) return 1109; if (amount <= 15000) return 1631; if (amount <= 20000) return 2147; if (amount <= 25000) return 2695; if (amount <= 30000) return 3215; if (amount <= 35000) return 3648; if (amount <= 40000) return 4219; if (amount <= 50000) return 5720; if (amount <= 60000) return 8686; if (amount <= 100000) return 11438; if (amount <= 200000) return 16677; return 0; }
 function getNonTieupPfValue(category, amount) { let cat = String(category || "").toUpperCase().replace(/\s+/g, '').trim(); let val = parseFloat(amount) || 0; if (cat.includes('DESKTOP') || cat.includes('LAPTOP')) { return 699; } if (cat === 'PHONE(WEB-MOBILE)' || cat.includes('PHONE') || cat.includes('TABLET') || cat.includes('WATCH') || cat.includes('PRINTER') || cat.includes('HEADPHONE') || cat === 'SMARTPHONES' || cat === 'MOBILE') { if (val <= 30000) return 499; if (val <= 50000) return 599; return 699; } return null; }
 
- 
+
 
 const GITHUB_RAW_URL = "https://raw.githubusercontent.com/luckyjathar/CALCULATOR/main/master_data.xlsx"; const GITHUB_API_URL = "https://api.github.com/repos/luckyjathar/CALCULATOR/commits?path=master_data.xlsx&page=1&per_page=1";
 const DB_NAME = "PersistentPortalDB"; const DB_VERSION = 2; const STORE_NAME = "dataStore"; let dbInstance;
@@ -329,7 +329,7 @@ function clearFgDealer() { tempFgDealerId = ""; tempFgDealerName = ""; tempFgBit
 function searchFgModel() { let q = document.getElementById('fgModelSearch').value.toUpperCase().trim(); let list = document.getElementById('fgModelList'); if(!q) { list.innerHTML = ''; return; } let matches = [...new Set(db_records.filter(r => r.model !== SPECIAL_MODEL).map(r => r.model))].filter(m => m.includes(q)).slice(0,8); list.innerHTML = matches.map(m => `<div onclick="selectFgModel('${m.replace(/'/g, "\\'")}')" style="padding:8px; border-bottom:1px solid #eee; cursor:pointer; background:#fff; font-size:12px;">📱 ${m}</div>`).join(''); }
 function selectFgModel(name) { tempFgModel = name; document.getElementById('fgModelSearch').value = ''; document.getElementById('fgModelList').innerHTML = ''; document.getElementById('fgSelectedModelBox').innerHTML = `📱 Locked: ${name} <span onclick="clearFgModel()" style="color:red; cursor:pointer; float:right;">✖</span>`; document.getElementById('fgSelectedModelBox').style.display = 'block'; }
 function clearFgModel() { tempFgModel = ""; document.getElementById('fgSelectedModelBox').style.display = 'none'; }
- 
+
 function generateFlyer() {
     let sName = document.getElementById('fgSalesName').value.trim(); let sMob = document.getElementById('fgSalesMobile').value.trim(); let oType = document.getElementById('fgOfferType').value; let oVal = document.getElementById('fgOfferValue').value.trim();
     if(!sName || !sMob || sMob.length !== 10) { showToast("⚠️ Kripya Salesman Name aur 10-Digit Mobile Number barabar dalein!", "error"); return; }
@@ -349,7 +349,7 @@ function openDictionaryModal() {
     document.getElementById('globalModelSearch').value = ''; 
     document.getElementById('globalModelDropdown').style.display = 'none'; 
     document.getElementById('schemeResultArea').style.display = 'none';
-    
+
     if (activeCustomerIndex !== -1 && customerQueue[activeCustomerIndex]) {
         let c = customerQueue[activeCustomerIndex];
         document.getElementById('calcCustType').value = c.type || "NEW";
@@ -362,7 +362,7 @@ function openDictionaryModal() {
         document.getElementById('calcLtv').value = "100";
         document.getElementById('calcCap').value = "";
     }
-    
+
     document.getElementById('dictionarySearchModal').style.display = 'flex'; 
     setTimeout(() => document.getElementById('globalModelSearch').focus(), 100); 
 }
@@ -390,16 +390,16 @@ function viewGlobalModel(name) {
     document.getElementById('globalModelSearch').value = name;
     document.getElementById('globalModelDropdown').style.display = 'none';
     currentViewedModel = name;
-    
+
     let rec = db_records.find(r => r.model === name);
     if(rec && rec.mrp > 0) {
         document.getElementById('calcInvoice').value = rec.mrp;
     } else {
         document.getElementById('calcInvoice').value = "";
     }
-    
+
     recalcCurrentModel();
-    
+
     setTimeout(() => {
         let resultArea = document.getElementById('schemeResultArea');
         if(resultArea) resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -415,9 +415,9 @@ function recalcCurrentModel() {
 function renderTableModel() {
     let schemes = db_records.filter(r => r.model === currentViewedModel);
     if(schemes.length === 0) return;
-    
+
     document.getElementById('globalViewerTitle').innerText = '📱 ' + currentViewedModel;
-    
+
     let custType = document.getElementById('calcCustType').value;
     let ltvLimit = parseFloat(document.getElementById('calcLtv').value) || 100;
     let limit = parseFloat(document.getElementById('calcLimit').value) || 0;
@@ -425,14 +425,14 @@ function renderTableModel() {
     let margin = parseFloat(document.getElementById('calcMargin').value) || 0;
     let targetDp = parseFloat(document.getElementById('calcTarget').value) || 0;
     let emiCap = parseFloat(document.getElementById('calcCap').value) || 0;
-    
+
     let gtl = invoice > 100000 ? 2398 : (invoice > 50000 ? 1799 : (invoice > 30000 ? 1499 : (invoice > 10000 ? 1199 : (invoice > 0 ? 699 : 0))));
-    
+
     let isCalculatedMode = (limit > 0 && invoice > 0);
     let fee = (custType === 'EMI CARD') ? 270 : (custType === 'W/O CARD' ? 320 : 850);
 
     let validSchemes = schemes.filter(s => s.tenure > 0 || s.fixedEmi > 0);
-    
+
     // 🔥 LIVE EXPIRY CHECK FOR DICTIONARY
     let today = new Date(); today.setHours(0,0,0,0);
     validSchemes = validSchemes.filter(s => {
@@ -444,7 +444,7 @@ function renderTableModel() {
         }
         return true;
     });
-    
+
     let thead = document.getElementById('tableHead');
     if (isCalculatedMode) {
         thead.innerHTML = `<tr><th style="background:#e3f2fd;">T/A</th><th style="background:#e3f2fd;">LTV%</th><th style="background:#e8f5e9; color:var(--success);">LOAN</th><th style="background:#fff3e0; color:#d35400;">DIFF (INV-LOAN)</th><th style="background:#e8f5e9; color:var(--success);">EST. DP</th><th style="background:#e3f2fd; color:var(--primary);">EMI</th><th style="background:#e3f2fd; color:var(--primary);">MONTHS</th><th>ACTION</th></tr>`;
@@ -454,7 +454,7 @@ function renderTableModel() {
 
     validSchemes.forEach(s => { 
         s.calcLTV = s.tenure > 0 ? ((s.tenure - s.advEmi)/s.tenure)*100 : 0; 
-        
+
         if (isCalculatedMode) {
             let nbfcMax = (limit * s.tenure) / (s.tenure - s.advEmi || 1);
             let finalLoan = 0, emi = 0, dp = 0, diff = 0;
@@ -463,15 +463,15 @@ function renderTableModel() {
             let roiRateDP = roiRate * s.advEmi;
             let inst = s.tenure - s.advEmi;
             if (inst < 1) inst = 1;
-            
+
             if (s.fixedEmi > 0) {
                 let maxTotalTenure = Math.floor(limit / s.fixedEmi) + s.advEmi;
                 let currentTenure = Math.floor(invoice / s.fixedEmi);
                 if(currentTenure > maxTotalTenure) currentTenure = maxTotalTenure;
                 if(currentTenure < 1) currentTenure = 1;
-                
+
                 finalLoan = currentTenure * s.fixedEmi;
-                
+
                 if (targetDp > 0) {
                     let numerator = targetDp - invoice - (s.fixedEmi * s.advEmi) - s.pf - fee - margin;
                     let denominator = dbdRate + roiRateDP - 1;
@@ -480,22 +480,22 @@ function renderTableModel() {
                     if (solvedTenure > maxTotalTenure) solvedTenure = maxTotalTenure;
                     finalLoan = Math.max(0, solvedTenure * s.fixedEmi);
                 }
-                
+
                 if (finalLoan > invoice) finalLoan = Math.floor(invoice/s.fixedEmi)*s.fixedEmi;
                 currentTenure = Math.floor(finalLoan / s.fixedEmi) || 1;
                 inst = currentTenure - s.advEmi;
                 if(inst < 1) inst = 1;
-                
+
                 let roiInEmi = finalLoan * roiRate;
                 emi = s.fixedEmi + (gtl / inst) + roiInEmi;
-                
+
                 let roiInDp = finalLoan * roiRateDP;
                 dp = invoice - finalLoan + (s.fixedEmi * s.advEmi) + s.pf + fee + (finalLoan * dbdRate) + margin + roiInDp;
                 s.currentTenure = currentTenure;
                 s.calcInst = inst;
             } else {
                 finalLoan = Math.min(nbfcMax, invoice);
-                
+
                 if (targetDp > 0) {
                     let advRate = s.advEmi / s.tenure; 
                     let numerator = targetDp - invoice - s.pf - fee - margin; 
@@ -503,10 +503,10 @@ function renderTableModel() {
                     let solvedLoan = numerator / denominator; 
                     finalLoan = Math.min(finalLoan, Math.max(0, Math.floor(solvedLoan)));
                 }
-                
+
                 let roiInEmi = finalLoan * roiRate;
                 emi = (finalLoan / s.tenure) + (gtl / inst) + roiInEmi;
-                
+
                 if (emiCap > 0 && emi > emiCap) {
                     finalLoan = (emiCap - (gtl / inst)) / ((1 / s.tenure) + roiRate);
                     if(finalLoan < 0) finalLoan = 0;
@@ -519,7 +519,7 @@ function renderTableModel() {
                 s.currentTenure = s.tenure;
                 s.calcInst = inst;
             }
-            
+
             s.calcLoan = finalLoan;
             diff = invoice - finalLoan;
             s.calcDiff = diff > 0 ? diff : 0;
@@ -535,7 +535,7 @@ function renderTableModel() {
     } else {
         validSchemes.sort((a,b) => b.calcLTV - a.calcLTV);
     }
-    
+
     let tbody = document.getElementById('globalViewerBody');
     tbody.innerHTML = validSchemes.map(s => {
         let displayTenure = s.currentTenure ? s.currentTenure : s.tenure;
@@ -564,7 +564,7 @@ function renderTableModel() {
             </tr>`;
         }
     }).join('');
-    
+
     document.getElementById('schemeResultArea').style.display = 'block';
 }
 function copySingleScheme(tenure, advEmi, loan, dp, emi, fixedEmi, dbd, roi, pf, btn) {
@@ -572,9 +572,9 @@ function copySingleScheme(tenure, advEmi, loan, dp, emi, fixedEmi, dbd, roi, pf,
     let invoice = parseFloat(document.getElementById('calcInvoice').value) || 0;
     let isCalculatedMode = (limit > 0 && invoice > 0);
     let inst = Math.max(1, parseInt(tenure) - parseInt(advEmi));
-    
+
     let textToCopy = `📱 *${currentViewedModel}*\n`;
-    
+
     if (isCalculatedMode) {
         textToCopy += `*INVOICE AMOUNT:* ₹${invoice}\n\n`;
         textToCopy += `✅ *Scheme:* ${tenure}/${advEmi}\n`;
@@ -587,7 +587,7 @@ function copySingleScheme(tenure, advEmi, loan, dp, emi, fixedEmi, dbd, roi, pf,
         textToCopy += `*DBD:* ${parseFloat(dbd).toFixed(2)}% | *ROI:* ${parseFloat(roi).toFixed(2)}%\n`;
         textToCopy += `*PF:* ₹${pf}`;
     }
-    
+
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(textToCopy).then(() => {
             let orig = btn.innerText;
@@ -601,7 +601,7 @@ function copySingleScheme(tenure, advEmi, loan, dp, emi, fixedEmi, dbd, roi, pf,
 function exportDictSchemeImage(action) {
     let titleText = document.getElementById('globalViewerTitle').innerText;
     let tableHtml = document.querySelector('#schemeResultArea table').outerHTML;
-    
+
     let ltvLimit = document.getElementById('calcLtv').value || 100;
     let limit = document.getElementById('calcLimit').value;
     let invoice = parseFloat(document.getElementById('calcInvoice').value) || 0;
@@ -609,7 +609,7 @@ function exportDictSchemeImage(action) {
     let targetDp = parseFloat(document.getElementById('calcTarget').value) || 0;
     let emiCap = parseFloat(document.getElementById('calcCap').value) || 0;
     let custType = document.getElementById('calcCustType').value;
-    
+
     let extraStr = `Customer: ${custType} | LTV: ${ltvLimit}% | Limit: ₹${limit} | Invoice: ₹${invoice}`;
     if (margin > 0) extraStr += ` | Margin: ₹${margin}`;
     if (targetDp > 0) extraStr += ` | Target DP: ₹${targetDp}`;
@@ -621,14 +621,14 @@ function exportDictSchemeImage(action) {
     exportDiv.style.width = "750px"; exportDiv.style.padding = "20px"; exportDiv.style.background = "#fff"; exportDiv.style.position = "absolute"; exportDiv.style.top = "-9999px";
     exportDiv.innerHTML = `<div style="border: 2px solid #2C3E50; border-radius: 10px; padding: 16px; background: #fff; font-family: sans-serif;"><div style="background: #2C3E50; color: white; padding: 12px; border-radius: 6px; margin-bottom: 14px; text-align: center;"><h3 style="margin:0; font-size: 17px; font-weight: 900;">${titleText}</h3></div>${extraInfo}${tableHtml}</div>`;
     document.body.appendChild(exportDiv);
-    
+
     let clonedTable = exportDiv.querySelector('table');
     let actionCells = clonedTable.querySelectorAll('th:last-child, td:last-child');
     actionCells.forEach(cell => cell.remove());
-    
+
     clonedTable.style.width = "100%"; clonedTable.style.borderCollapse = "collapse";
     exportDiv.querySelectorAll('th, td').forEach(cell => { cell.style.padding = "10px"; cell.style.borderBottom = "1px solid #ddd"; cell.style.textAlign = "center"; });
-    
+
     html2canvas(exportDiv, { scale: 2, useCORS: true }).then(canvas => {
         document.body.removeChild(exportDiv);
         if (action === 'download') {
@@ -645,7 +645,7 @@ function exportDictSchemeImage(action) {
 function resetFastCalc() { let fields = ['fcInv', 'fcLoanInput', 'fcTenure', 'fcAdv', 'fcDbd', 'fcRoi', 'fcPf', 'fcFixed', 'fcCap', 'fcTarget', 'fcExw', 'fcMargin', 'fcDealer']; fields.forEach(id => document.getElementById(id).value = ''); document.getElementById('fcGtl').value = '0'; let rfcOpt = document.getElementById('fcRfcOpt'); if(rfcOpt) { rfcOpt.value = '0'; rfcOpt.innerText = '0'; } document.getElementById('fcCustType').value = 'NEW'; document.getElementById('fcCat').value = 'OTHER'; fcCatChanged(); document.getElementById('fcResult').style.display = 'none'; }
 function copyFastCalcResult(btn) { let inv = document.getElementById('fcInv').value || 0; let loan = document.getElementById('fcResLoan').innerText; let dp = document.getElementById('fcResDp').innerText; let emi = document.getElementById('fcResEmi').innerText; let daily = document.getElementById('fcResDaily').innerText; let ta = document.getElementById('fcResTa').innerText; let text = `⚡ *Zatpat Calculation*\n`; if (inv > 0) text += `*Invoice:* ₹${inv}\n\n`; text += `*Loan:* ${loan}\n*DP:* ${dp}\n*EMI:* ${emi}\n*Daily:* ${daily}\n*Details:* ${ta}`; let orig = btn.innerText; btn.innerText = "COPIED!"; btn.style.background = "var(--success)"; btn.style.color = "white"; if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(() => { setTimeout(() => { btn.innerText = orig; btn.style.background = "var(--primary)"; btn.style.color = "white"; }, 2000); }).catch(() => fallbackCopy(text, () => { setTimeout(() => { btn.innerText = orig; btn.style.background = "var(--primary)"; btn.style.color = "white"; }, 2000); })); } else { fallbackCopy(text, () => { setTimeout(() => { btn.innerText = orig; btn.style.background = "var(--primary)"; btn.style.color = "white"; }, 2000); }); } }
 function fcCatChanged() { let isPhone = isMobileDeviceCat(document.getElementById('fcCat').value); let rSelect = document.getElementById('fcRfc'); let exwInput = document.getElementById('fcExw'); if(isPhone) { rSelect.disabled = false; rSelect.style.background = '#fff'; rSelect.style.cursor = 'default'; exwInput.value = ""; exwInput.disabled = true; exwInput.style.background = '#e9ecef'; exwInput.style.cursor = 'not-allowed'; fcInvChanged(); } else { rSelect.value = "0"; rSelect.disabled = true; rSelect.style.background = '#e9ecef'; rSelect.style.cursor = 'not-allowed'; exwInput.disabled = false; exwInput.style.background = '#fff'; exwInput.style.cursor = 'text'; calculateFastData(); } }
- 
+
 function fcInvChanged() { 
     let inv = parseFloat(document.getElementById('fcInv').value) || 0; 
     document.getElementById('fcLoanInput').value = inv > 0 ? inv : '';
@@ -673,14 +673,14 @@ function validateFastLoanMin() {
 function calculateFastData() {
     let inv = parseFloat(document.getElementById('fcInv').value) || 0; let loanInput = parseFloat(document.getElementById('fcLoanInput').value) || 0; let tenure = parseInt(document.getElementById('fcTenure').value) || 0; let adv = parseInt(document.getElementById('fcAdv').value) || 0; let roi = parseFloat(document.getElementById('fcRoi').value) || 0; let pf = parseFloat(document.getElementById('fcPf').value) || 0; let dbd = parseFloat(document.getElementById('fcDbd').value) || 0; let custType = document.getElementById('fcCustType').value; let fixedEmi = parseFloat(document.getElementById('fcFixed').value) || 0; let cap = parseFloat(document.getElementById('fcCap').value) || 0; let target = parseFloat(document.getElementById('fcTarget').value) || 0; let gtl = parseFloat(document.getElementById('fcGtl').value) || 0; let rfc = parseFloat(document.getElementById('fcRfc').value) || 0; let exw = parseFloat(document.getElementById('fcExw').value) || 0; let margin = parseFloat(document.getElementById('fcMargin').value) || 0; let dealer = parseFloat(document.getElementById('fcDealer').value) || 0;
     if (inv <= 0 && loanInput <= 0) { document.getElementById('fcResult').style.display = 'none'; return; }
-    
+
     let minFastLoan = inv > 0 ? inv * 0.50 : 0;
     if (loanInput > 0 && loanInput < minFastLoan) {
         loanInput = minFastLoan;
     }
-    
+
     let fee = (custType === 'EMI CARD') ? 270 : (custType === 'W/O CARD' ? 320 : 850); let totalFees = fee + margin + dealer; let insTotal = gtl + rfc + exw; let dbdRate = (dbd * 1.18 / 100); let roiRate = roi / 1200; let roiRateDP = roiRate * adv; let loan = loanInput > 0 ? loanInput : inv;
-    
+
     let emi = 0; let dpRounded = 0; let inst = 0; let finalTenure = tenure;
     if (fixedEmi > 0) { 
         finalTenure = Math.floor(loan / fixedEmi) || 1; 
@@ -730,9 +730,9 @@ function checkDuplicateMobile(val) {
     let addBtn = document.getElementById('addToQueueBtn');
     let queueSearchInp = document.getElementById('queueSearch');
     if (!warningEl || !mobileInp || !addBtn) return;
-    
+
     let cleanVal = val.trim();
-    
+
     if (cleanVal.length === 10) {
         let existingCust = customerQueue.find(c => c.mobile && c.mobile === cleanVal);
         if (existingCust) {
@@ -740,12 +740,12 @@ function checkDuplicateMobile(val) {
             warningEl.style.display = 'block';
             mobileInp.style.borderColor = 'var(--danger)';
             mobileInp.style.background = '#fff0f0';
-            
+
             addBtn.disabled = true;
             addBtn.style.opacity = '0.5';
             addBtn.style.cursor = 'not-allowed';
             addBtn.style.background = 'gray';
-            
+
             if (queueSearchInp) {
                 queueSearchInp.value = cleanVal;
                 renderCustomerQueue();
@@ -759,12 +759,12 @@ function checkDuplicateMobile(val) {
             warningEl.style.display = 'block';
             mobileInp.style.borderColor = 'var(--warning)';
             mobileInp.style.background = '#fffbf0';
-            
+
             addBtn.disabled = true;
             addBtn.style.opacity = '0.5';
             addBtn.style.cursor = 'not-allowed';
             addBtn.style.background = 'gray';
-            
+
             if (queueSearchInp && queueSearchInp.value === cleanVal) {
                 queueSearchInp.value = '';
                 renderCustomerQueue();
@@ -772,16 +772,16 @@ function checkDuplicateMobile(val) {
             return;
         }
     }
-    
+
     warningEl.style.display = 'none';
     mobileInp.style.borderColor = '#ccc';
     mobileInp.style.background = '#fff';
-    
+
     addBtn.disabled = false;
     addBtn.style.opacity = '1';
     addBtn.style.cursor = 'pointer';
     addBtn.style.background = 'var(--success)';
-    
+
     if (queueSearchInp && queueSearchInp.value === cleanVal) {
         queueSearchInp.value = '';
         renderCustomerQueue();
@@ -796,20 +796,20 @@ async function addCustomerToQueue() {
     customerQueue.unshift(newCustObj); silentLeadDispatcher(newCustObj);
     if (activeCustomerIndex !== -1) activeCustomerIndex++; if (selectedQueueIndex !== -1) selectedQueueIndex++;
     await saveQueueToLocal(); 
-    
+
     document.getElementById('cqName').value = ''; document.getElementById('cqMobile').value = ''; document.getElementById('cqLimit').value = ''; document.getElementById('cqCap').value = '';
-    
+
     let warnEl = document.getElementById('mobileDupWarning'); if(warnEl) warnEl.style.display = 'none';
     let mobInp = document.getElementById('cqMobile'); if(mobInp) { mobInp.style.borderColor = '#ccc'; mobInp.style.background = '#fff'; }
     let addBtn = document.getElementById('addToQueueBtn'); if(addBtn) { addBtn.disabled = false; addBtn.style.opacity = '1'; addBtn.style.cursor = 'pointer'; addBtn.style.background = 'var(--success)'; }
-    
+
     renderCustomerQueue(); updateUniversalActionButtons();
 }
 
 function copyCustomerDetails(idx, btnElement) { let c = customerQueue[idx]; let cappingLine = (c.cap && c.cap !== "") ? `\nEMI CAPPING- ${c.cap}` : ""; let textToCopy = `CUSTOMER NAME- ${c.name}\nNUMBER- ${c.mobile || ''}\nLIMIT- ${c.limit}\nLTV- ${c.ltv}${cappingLine}`; function showSuccess() { let originalText = btnElement.innerText; btnElement.innerText = "COPIED!"; btnElement.style.background = "var(--success)"; btnElement.style.color = "white"; setTimeout(() => { btnElement.innerText = originalText; btnElement.style.background = "var(--warning)"; btnElement.style.color = "#000"; }, 2000); } if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(textToCopy).then(showSuccess).catch(() => fallbackCopy(textToCopy, showSuccess)); } else { fallbackCopy(textToCopy, showSuccess); } }
 function maskName(str) { if (!str || str === "-") return str; return str.split(' ').map(word => { if (word.length <= 2) return word; return word[0] + '*'.repeat(word.length - 2) + word[word.length - 1]; }).join(' '); }
 function selectQueueItem(idx) { selectedQueueIndex = idx; renderCustomerQueue(); updateUniversalActionButtons(); }
- 
+
 function updateUniversalActionButtons() {
     let copyB = document.getElementById('uniCopyBtn'); let selB = document.getElementById('uniSelectBtn'); let editB = document.getElementById('uniEditBtn'); let delB = document.getElementById('uniDeleteBtn'); let invB = document.getElementById('uniInviteBtn');
     if (selectedQueueIndex !== -1 && customerQueue[selectedQueueIndex]) { copyB.style.opacity = '1'; copyB.style.pointerEvents = 'auto'; selB.style.opacity = '1'; selB.style.pointerEvents = 'auto'; editB.style.opacity = '1'; editB.style.pointerEvents = 'auto'; delB.style.opacity = '1'; delB.style.pointerEvents = 'auto'; invB.style.opacity = '1'; invB.style.pointerEvents = 'auto'; } 
@@ -822,7 +822,7 @@ function uniEdit() { if(selectedQueueIndex === -1) return; let c = customerQueue
 function uniInvite() { if(selectedQueueIndex === -1) return; let c = customerQueue[selectedQueueIndex]; if(!c.mobile || c.mobile.length < 10) { showToast("⚠️ Kripya pehle Customer ka valid 10 digit mobile number update karein!", "error"); return; } document.getElementById('invSenderName').value = localStorage.getItem('portal_sales_name') || ""; document.getElementById('invSenderMobile').value = localStorage.getItem('portal_sales_mobile') || ""; document.getElementById('inviteModal').style.display = 'flex'; }
 function sendWhatsAppInvite() { let sName = document.getElementById('invSenderName').value.trim(); let sMobile = document.getElementById('invSenderMobile').value.trim(); if(!sName || !sMobile) { showToast("⚠️ Kripya apna Naam aur Number dalein!", "error"); return; } localStorage.setItem('portal_sales_name', sName); localStorage.setItem('portal_sales_mobile', sMobile); let c = customerQueue[selectedQueueIndex]; let msg = `Namaskar ${c.name} sir/madam! 🎉\n\nAapki Bajaj Finance ki *₹${c.limit}* ki limit approve ho gayi hai! 🥳\n\nAb intezaar kis baat ka? Aaj hi apni pasand ki cheez (Mobile, TV, Laptop etc.) kharidne ke liye dukan par zaroor visit karein. 🛍️✨\n\nKoi bhi dikkat ya jankari chahiye toh mujhe is number par contact karein:\n\n👤 *${sName}*\n📞 ${sMobile}\n\nAapke aane ka hum intezaar kar rahe hain! 🙏`; let encMsg = encodeURIComponent(msg); window.open(`https://wa.me/91${c.mobile}?text=${encMsg}`, '_blank'); document.getElementById('inviteModal').style.display = 'none'; }
 function closeCustomerEdit() { document.getElementById('editCustomerModal').style.display='none'; }
- 
+
 async function saveCustomerEdit() { if(selectedQueueIndex === -1) return; let c = customerQueue[selectedQueueIndex]; c.name = document.getElementById('ecName').value || 'Customer'; c.mobile = document.getElementById('ecMobile').value; c.limit = parseFloat(document.getElementById('ecLimit').value) || 0; c.ltv = parseFloat(document.getElementById('ecLtv').value) || 100; c.type = document.getElementById('ecType').value; let cap = parseFloat(document.getElementById('ecCap').value); c.cap = cap > 0 ? cap : ''; await saveQueueToLocal(); renderCustomerQueue(); if(activeCustomerIndex === selectedQueueIndex) { updateMatrixTopCard(); current_products.forEach((_, idx) => recalcModel(idx)); } closeCustomerEdit(); }
 async function uniDelete() { if(selectedQueueIndex !== -1) await removeCustomer(selectedQueueIndex); }
 async function removeCustomer(idx) { let c = customerQueue[idx]; recycleBin.push(c); await saveToDB('persistent_recycle', recycleBin); localStorage.setItem('persistent_recycle_backup', JSON.stringify(recycleBin)); if(activeCustomerIndex === idx) activeCustomerIndex = -1; else if (activeCustomerIndex > idx) activeCustomerIndex--; customerQueue.splice(idx, 1); if (selectedQueueIndex === idx) selectedQueueIndex = -1; else if (selectedQueueIndex > idx) selectedQueueIndex--; if(customerQueue.length > 0 && activeCustomerIndex === -1) activeCustomerIndex = 0; await saveQueueToLocal(); renderCustomerQueue(); updateUniversalActionButtons(); }
@@ -972,7 +972,7 @@ function updateVal(pIdx, field, val) {
 
 function recalcModel(pIdx) {
     if(!current_products[pIdx]) return; 
-    
+
     // 🔥 LIVE EXPIRY CHECK: कॅल्क्युलेशनच्या आधी आजची तारीख तपासा आणि एक्सपायर झालेल्या स्कीम्स काढून टाका
     let today = new Date(); today.setHours(0,0,0,0);
     current_products[pIdx].schemes = current_products[pIdx].schemes.filter(s => {
@@ -984,7 +984,7 @@ function recalcModel(pIdx) {
     });
 
     let prod = current_products[pIdx], limit = customerQueue[activeCustomerIndex]?.limit || 0, type = customerQueue[activeCustomerIndex]?.type || 'NEW'; let fee = (type === 'EMI CARD') ? 270 : (type === 'W/O CARD' ? 320 : 850), inp = prod.inputs; let totalFees = fee + (parseFloat(inp.margin)||0) + (parseFloat(inp.dealer)||0); let currentLimit = limit > 0 ? limit : 9999999; let inputMrp = parseFloat(inp.mrp) || 0; let inputInv = parseFloat(inp.inv) || 0; let effectivePrice = inputInv > 0 ? inputInv : (inputMrp > 0 ? inputMrp : 0); let loanCapPrice = (inputMrp > 0 && inputInv > 0) ? Math.min(inputMrp, inputInv) : effectivePrice;
-    
+
     let minAllowedLoanByInvoice = effectivePrice > 0 ? effectivePrice * 0.50 : 0;
 
     prod.calculatedData = prod.schemes.map((s, dIdx) => {
@@ -993,11 +993,11 @@ function recalcModel(pIdx) {
         if (isFixed) {
             let maxRemainingEmis = Math.floor(currentLimit / s.fixedEmi); let maxTotalTenure = maxRemainingEmis + s.advEmi; nbfcMaxL = maxTotalTenure * s.fixedEmi; 
             if (effectivePrice > 0) { currentTenure = Math.floor(effectivePrice / s.fixedEmi); if (currentTenure > maxTotalTenure) currentTenure = maxTotalTenure; if (currentTenure < 1) currentTenure = 1; loan = currentTenure * s.fixedEmi; if (loan > loanCapPrice) loan = loanCapPrice;
-            
+
             if (parseFloat(inp.target) > 0) { let numerator = parseFloat(inp.target) - effectivePrice - (s.fixedEmi * s.advEmi) - dynamicPf - totalFees; let denominator = dbdRate + roiRateDP - 1; let solvedLoan = numerator / denominator; let solvedTenure = Math.floor(solvedLoan / s.fixedEmi); if (solvedTenure > maxTotalTenure) solvedTenure = maxTotalTenure; loan = Math.max(0, solvedTenure * s.fixedEmi); if (loan > loanCapPrice) loan = loanCapPrice; currentTenure = Math.floor(loan / s.fixedEmi) || 1; } } else { currentTenure = s.tenure || 1; if (currentTenure > maxTotalTenure) currentTenure = maxTotalTenure; loan = currentTenure * s.fixedEmi; }
         } else {
             let checkPrice = effectivePrice > 0 ? loanCapPrice : 50000; let absoluteMax = Math.min(checkPrice, nbfcMaxL); if (prod.isNonTieup) { if (s.maxLoan < 9999999) absoluteMax = Math.min(absoluteMax, s.maxLoan); } loan = absoluteMax;
-            
+
             if(parseFloat(inp.target) > 0 && effectivePrice > 0) { let advRate = s.advEmi / s.tenure; let numerator = parseFloat(inp.target) - effectivePrice - dynamicPf - totalFees; let denominator = advRate + dbdRate + roiRateDP - 1; let solvedLoan = numerator / denominator; loan = Math.min(loan, Math.max(0, Math.floor(solvedLoan))); } 
         }
 
@@ -1016,7 +1016,7 @@ function recalcModel(pIdx) {
         }
 
         if(dpExact > 0) dpRounded = Math.ceil(dpExact / 10) * 10; else dpRounded = dpExact; let extraVal = effectivePrice > 0 ? (((emi * inst) + dpRounded) - effectivePrice) : 0; let dbdAmt = loan * dbdRate; let roiAmt = (loan * roiRateDP) + (loan * roiRate * inst); let curLTV = currentTenure > 0 ? ((currentTenure - s.advEmi) / currentTenure) * 100 : 0; let marginMoney = parseFloat(inp.margin) || 0; let roundupAdj = (dpRounded > dpExact) ? (dpRounded - dpExact) : 0; let netDisb = effectivePrice > 0 ? (effectivePrice - dpRounded - marginMoney - roundupAdj) : 0;
-        
+
         let isInv50Breach = effectivePrice > 0 && loan < minAllowedLoanByInvoice;
 
         return { ...s, pf: dynamicPf, currentTenure, nbfcMaxL, loan, dp: dpRounded, emi, inst, daily: emi/30, dIdx, isFixed, curLTV, extra: extraVal, dbdAmt, roiAmt, netDisb, inactive: s.inactive || false, expiryDateStr: s.expiryDateStr, isInv50Breach: isInv50Breach };
@@ -1055,7 +1055,7 @@ function renderRows(pIdx) {
         return `<tr id="row_${pIdx}_${d.dIdx}" class="${rowClass}">
             <td class="hidden-col">${d.category}</td><td class="hidden-col">${+parseFloat(d.dbd).toFixed(3)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.dbdAmt||0).toLocaleString()}</span></td><td class="hidden-col">₹${d.pf}</td><td class="hidden-col">${+parseFloat(d.roi).toFixed(2)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.roiAmt||0).toLocaleString()}</span></td><td class="hidden-col">${d.fixedEmi > 0 ? '₹'+d.fixedEmi : 'N/A'}</td><td class="hidden-col" id="ltv_${pIdx}_${d.dIdx}">${Math.round(d.curLTV)}%</td><td class="hidden-col" id="nd_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--bajaj-blue);">₹${Math.round(d.netDisb).toLocaleString()}</td><td class="hidden-col" id="extra_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--danger);">₹${Math.round(d.extra).toLocaleString()}</td>
             ${isNT ? `<td class="bound-col">${d.minLoan > 0 ? '₹' + d.minLoan : '0'}</td><td class="bound-col">${d.maxLoan < 9999999 ? '₹' + d.maxLoan : 'NO'}</td>` : `<td style="color:#777;">₹${Math.floor(d.nbfcMaxL)}</td>`}
-            <td><div class="stepper"><button class="step-btn" onclick="step(${pIdx},${d.dIdx},-${d.isFixed ? d.fixedEmi : 1000})">-</button><input id="l_${pIdx}_${d.dIdx}" type="number" value="${Math.floor(d.loan)}" class="step-inp" oninput="manual(${pIdx},${d.dIdx})"><button class="step-btn" onclick="step(${pIdx},${d.dIdx},${d.isFixed ? d.fixedEmi : 1000})">+</button></div></td>
+            <td><div class="stepper"><button class="step-btn" onclick="step(${pIdx},${d.dIdx},-${d.isFixed ? d.fixedEmi : 1000})">-</button><input id="l_${pIdx}_${d.dIdx}" type="number" value="${Math.floor(d.loan)}" class="step-inp" onchange="manual(${pIdx},${d.dIdx})" onblur="manual(${pIdx},${d.dIdx})"><button class="step-btn" onclick="step(${pIdx},${d.dIdx},${d.isFixed ? d.fixedEmi : 1000})">+</button></div></td>
             <td id="ta_${pIdx}_${d.dIdx}" style="font-weight:900;">${d.currentTenure}/${d.advEmi}${expInfo}${expiredWarning}</td>
             <td id="dp_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td><td id="emi_${pIdx}_${d.dIdx}" style="color:var(--primary); font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td><td id="inst_${pIdx}_${d.dIdx}" style="font-weight:900;">${d.inst}</td><td id="day_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950;">₹${Math.round(d.daily).toLocaleString()}</td>
             <td><div style="display:flex; flex-direction:column; gap:2px; min-width: 40px;"><button class="action-btn btn-copy" onclick="copySchemeText(${pIdx}, ${d.dIdx}, this)">COPY</button><button class="action-btn" style="background:var(--warning); color:#000;" onclick="openEditSchemeModal(${pIdx}, ${d.dIdx})">EDIT</button>${toggleBtnHTML}</div></td>
@@ -1070,7 +1070,7 @@ function manual(pIdx, dIdx) {
     let ltvLimit = customerQueue[activeCustomerIndex]?.ltv || 100; let limit = customerQueue[activeCustomerIndex]?.limit || 0; 
     let currentLimit = limit > 0 ? limit : 9999999; let inputMrp = parseFloat(inp.mrp) || 0; let inputInv = parseFloat(inp.inv) || 0; 
     let effectivePrice = inputInv > 0 ? inputInv : (inputMrp > 0 ? inputMrp : 0); let loanCapPrice = (inputMrp > 0 && inputInv > 0) ? Math.min(inputMrp, inputInv) : effectivePrice;
-    
+
     let minAllowedLoanByInvoice = effectivePrice > 0 ? effectivePrice * 0.50 : 0;
     if (effectivePrice > 0 && loan < minAllowedLoanByInvoice) {
         loan = minAllowedLoanByInvoice;
@@ -1080,14 +1080,14 @@ function manual(pIdx, dIdx) {
     syncInsurance(pIdx, inputMrp, loan, 'LOAN'); 
     let appliedPf = d.pf; if (prod.isNonTieup) { let checkAmount = effectivePrice > 0 ? effectivePrice : loan; let slabPf = getNonTieupPfValue(prod.category, checkAmount); if (slabPf !== null) appliedPf = slabPf; d.pf = appliedPf; let pfCell = document.querySelector(`#row_${pIdx}_${dIdx} td:nth-child(3)`); if(pfCell) pfCell.innerText = `₹${appliedPf}`; }
     let dbdRate = (d.dbd * 1.18 / 100); let roiRate = d.roi / 1200; let roiRateDP = roiRate * d.advEmi; let dpE = 0; let dpR = 0;
-    
+
     if (d.isFixed) { 
         let calcTenure = Math.floor(loan / d.fixedEmi) || 1; 
-        
+
         if (effectivePrice > 0 && (calcTenure * d.fixedEmi) < minAllowedLoanByInvoice) {
             calcTenure = Math.ceil(minAllowedLoanByInvoice / d.fixedEmi);
         }
-        
+
         loan = calcTenure * d.fixedEmi; 
 
         let maxBoundary = Math.min(d.nbfcMaxL, prod.isNonTieup ? d.maxLoan : 9999999, loanCapPrice > 0 ? loanCapPrice : 9999999); 
@@ -1096,7 +1096,7 @@ function manual(pIdx, dIdx) {
             calcTenure = Math.floor(loan / d.fixedEmi) || 1; 
         } 
         el.value = loan; 
-        
+
         let roiInEmi = loan * roiRate; let roiInDp = loan * roiRateDP; 
         dpE = effectivePrice - loan + (d.fixedEmi * d.advEmi) + (loan * dbdRate) + appliedPf + totalFees + roiInDp; dpR = Math.ceil(dpE / 10) * 10; 
         let inst = calcTenure - d.advEmi; if(inst < 1) inst = 1; 
@@ -1109,13 +1109,13 @@ function manual(pIdx, dIdx) {
         let nbfcMaxL = (currentLimit * d.tenure) / (d.tenure - d.advEmi || 1); 
         let maxBoundary = Math.min(loanCapPrice > 0 ? loanCapPrice : 999999, nbfcMaxL, prod.isNonTieup ? d.maxLoan : 9999999); 
         if(loan > maxBoundary) { loan = maxBoundary; } 
-        
+
         if (effectivePrice > 0 && loan < minAllowedLoanByInvoice) {
             loan = minAllowedLoanByInvoice;
         }
-        
+
         el.value = Math.floor(loan); 
-        
+
         let roiInEmi = loan * roiRate; let roiInDp = loan * roiRateDP; 
         dpE = effectivePrice - loan + ((loan/d.tenure) * d.advEmi) + (loan * dbdRate) + appliedPf + totalFees + roiInDp; 
         dpR = Math.ceil(dpE / 10) * 10; let inst = d.tenure - d.advEmi; if(inst < 1) inst = 1; 
@@ -1123,11 +1123,11 @@ function manual(pIdx, dIdx) {
         let emi = (loan / d.tenure) + (insTotal / inst) + roiInEmi; 
         d.loan = loan; d.dp = dpR; d.emi = emi; 
     }
-    
+
     d.extra = effectivePrice > 0 ? (((d.emi * d.inst) + d.dp) - effectivePrice) : 0; d.dbdAmt = loan * dbdRate; d.roiAmt = (loan * roiRateDP) + (loan * roiRate * d.inst); 
     let marginMoney = parseFloat(inp.margin) || 0; let roundupAdj = (dpR > dpE) ? (dpR - dpE) : 0; 
     d.netDisb = effectivePrice > 0 ? (effectivePrice - dpR - marginMoney - roundupAdj) : 0;
-    
+
     prod.inputs.manualLoans = prod.inputs.manualLoans || {};
     prod.inputs.manualLoans[dIdx] = loan;
 
@@ -1137,18 +1137,18 @@ function manual(pIdx, dIdx) {
     d.curLTV = d.currentTenure > 0 ? ((d.currentTenure - d.advEmi) / d.currentTenure) * 100 : 0; 
     let ltvCell = document.getElementById(`ltv_${pIdx}_${dIdx}`); if(ltvCell) ltvCell.innerText = Math.round(d.curLTV) + "%"; 
     let extraCell = document.getElementById(`extra_${pIdx}_${dIdx}`); if(extraCell) extraCell.innerText = "₹" + Math.round(d.extra).toLocaleString();
-    
+
     let isB = (d.curLTV > ltvLimit) || (prod.isNonTieup && loan > 0 && (loan < d.minLoan || loan > d.maxLoan)) || (effectivePrice > 0 && loan < minAllowedLoanByInvoice); 
     let rowEl = document.getElementById(`row_${pIdx}_${dIdx}`); 
     if(rowEl) { if (isB) { rowEl.classList.add('ltv-breach'); } else { rowEl.classList.remove('ltv-breach'); } }
-    
+
     let dbdCell = document.querySelector(`#row_${pIdx}_${dIdx} td:nth-child(2)`); if(dbdCell) dbdCell.innerHTML = `${+parseFloat(d.dbd).toFixed(3)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.dbdAmt||0).toLocaleString()}</span>`; 
     let roiCell = document.querySelector(`#row_${pIdx}_${dIdx} td:nth-child(4)`); if(roiCell) roiCell.innerHTML = `${+parseFloat(d.roi).toFixed(2)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.roiAmt||0).toLocaleString()}</span>`;
     customerQueue[activeCustomerIndex].products = current_products; saveQueueToLocal(); 
 }
 
 function sortM(pIdx, key) { let conf = sortConfigs[pIdx]; conf.dir = (conf.key === key && conf.dir === 'asc') ? 'desc' : 'asc'; conf.key = key; renderRows(pIdx); customerQueue[activeCustomerIndex].products = current_products; saveQueueToLocal(); }
- 
+
 function copySchemeText(pIdx, dIdx, btnElement) {
     let prod = current_products[pIdx], d = prod.calculatedData.find(x => x.dIdx === dIdx); let invAmt = prod.inputs.inv > 0 ? prod.inputs.inv : prod.inputs.mrp; let c = customerQueue[activeCustomerIndex]; let cappingLine = (c.cap && c.cap !== "") ? `\nEMI CAPPING- ${c.cap}` : ""; let custDetails = `Customer Name- ${c.name}\nNumber- ${c.mobile || ''}\nLimit- ${c.limit}\nLTV- ${c.ltv}${cappingLine}\n\n`;
     let textToCopy = `${custDetails}📱 *${prod.name}*\n${invAmt > 0 ? `*INVOICE AMOUNT:* ₹${invAmt}\n\n` : "" }✅ *Scheme:* ${d.currentTenure}/${d.advEmi}\n💰 *DP:* ₹${Math.round(d.dp).toLocaleString()}\n🗓️ *EMI:* ₹${Math.round(d.emi).toLocaleString()} x ${d.inst}\n✨ *Daily EMI:* ₹${Math.round(d.daily).toLocaleString()}`;
@@ -1169,7 +1169,7 @@ async function executeManualAction() {
     let cCap = customerQueue[activeCustomerIndex]?.cap || "";
     if(mode === "NEW") { let name = document.getElementById('manName').value.toUpperCase() || "MANUAL MODEL"; let comp = customerQueue[activeCustomerIndex].components || {}; current_products.push({ name: name, schemes: [scheme], category: "MANUAL", inputs: { mrp: "", inv: "", mtCap: cCap, target: "", gtl: 0, rfc: 0, exw: comp.exw||"", margin: comp.margin||"", dealer: comp.dealer||"", surch: 0, manualLoans: {} }, isManual: true }); sortConfigs.push({ key: 'dp', dir: 'asc' }); customerQueue[activeCustomerIndex].products = current_products; customerQueue[activeCustomerIndex].sortConfigs = sortConfigs; await saveQueueToLocal(); renderMatrix(); } else { current_products[mode].schemes.push(scheme); recalcModel(parseInt(mode)); } closeManualModal();
 }
- 
+
 function openQuoteSelectionModal() {
     if(current_products.length === 0) { showToast("⚠️ Kripya pehle matrix mein koi product add karein!", "warning"); return; }
     let html = current_products.map((p, idx) => ` <div style="display:flex; align-items:center; gap:8px; padding:8px; background:#f8f9fa; border:1px solid #ddd; border-radius:4px;"> <input type="checkbox" id="qchk_${idx}" class="quote-model-chk" value="${idx}" style="width:16px; height:16px; cursor:pointer;"> <label for="qchk_${idx}" style="font-size:14px; font-weight:bold; cursor:pointer; flex:1; margin:0;">${p.name}</label> </div> `).join('');
@@ -1180,7 +1180,7 @@ function promptForSelectedImageGeneration() {
     let chks = document.querySelectorAll('.quote-model-chk:checked'); if(chks.length === 0) { showToast("⚠️ Kripya image generate karne ke liye kam se kam ek model select karein!", "warning"); return; }
     window.tempImageGenIndices = Array.from(chks).map(c => parseInt(c.value)); document.getElementById('quoteSelectionModal').style.display = 'none'; requestWhatsAppDispatch = false; doGenerateCustomerImage();
 }
- 
+
 let requestWhatsAppDispatch = false;
 function proceedGenerateImage() { requestWhatsAppDispatch = false; document.getElementById('custInfoPromptModal').style.display = 'none'; doGenerateCustomerImage(); }
 function proceedGenerateImageAndWhatsAppCopy() { requestWhatsAppDispatch = true; document.getElementById('custInfoPromptModal').style.display = 'none'; doGenerateCustomerImage(); }
@@ -1189,12 +1189,12 @@ function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); quoteDiv.style.width = "560px"; quoteDiv.style.padding = "25px"; quoteDiv.style.background = "#fff"; quoteDiv.style.position = "absolute"; quoteDiv.style.top = "-9999px"; quoteDiv.style.fontFamily = "'Segoe UI', sans-serif";
     let c = customerQueue[activeCustomerIndex]; let headerText = c?.name && c.name !== "-" ? c.name.toUpperCase() : "CUSTOMER QUOTATION"; let ltvLimit = c?.ltv || 100;
     let html = ` <div style="background: linear-gradient(135deg, var(--bajaj-blue) 0%, var(--indigo) 100%); border-radius: 12px; padding: 25px; color: white; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);"> <h2 style="margin:0; font-size:28px; font-weight:900; letter-spacing: 1px; color:#fff;">🎉 EXCLUSIVE OFFERS FOR YOU!</h2> <h3 style="margin:8px 0 18px 0; color:#87c3f7; font-size:22px;">👤 ${headerText} ${c?.mobile ? `| 📞 ${c.mobile}` : ''}</h3> <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.4); display: inline-block; width: 90%;"> <div style="font-size: 14px; color: #e0e0e0; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px;">Your Approved Eligibility</div> <div style="display:flex; justify-content:center; gap:20px; font-weight:900; font-size: 17px;"> <span style="color:#00e676;">LIMIT: ₹${c?.limit || 0}</span> <span style="color:#ffd54f;">MAX LTV: ${ltvLimit}%</span> <span style="color:#fff;">TYPE: ${c?.type || 'NEW'}</span> ${c?.cap ? `<span style="color:#ff8a65;">EMI CAP: ₹${c.cap}</span>` : ''} </div> </div> </div>`;
-    
+
     let hasV = false; let productsToRender = window.tempImageGenIndices.map(idx => current_products[idx]);
     productsToRender.forEach((prod) => {
         let validS = prod.calculatedData.filter(d => { let isLtvB = (d.curLTV > ltvLimit); let isBoundB = false; if (prod.isNonTieup && prod.inputs.mrp > 0) { if (d.loan < d.minLoan || d.loan > d.maxLoan) isBoundB = true; } return !isLtvB && !isBoundB && !d.inactive && !d.isInv50Breach && d.loan > 0; });
         if(validS.length === 0) return; hasV = true; let invAmt = prod.inputs.inv > 0 ? prod.inputs.inv : prod.inputs.mrp;
-        
+
         let winDp = [...validS].sort((a,b) => a.dp - b.dp)[0]; let winEmi = [...validS].sort((a,b) => a.emi - b.emi)[0]; let winPop = [...validS].filter(s => s.roi === 0 || s.isFixed).sort((a,b) => a.dp - b.dp)[0] || validS[0]; let winBalance = [...validS].sort((a,b) => (a.dp + (a.emi * 2)) - (b.dp + (b.emi * 2)))[0] || validS[0];
         let schemeMap = new Map(); validS.forEach(s => schemeMap.set(s.dIdx, { scheme: s, badges: [], badgeColors: [] }));
 
@@ -1285,12 +1285,12 @@ function doGenerateCustomerImage() {
             </div>
         </div>`;
     });
-    
+
     if(!hasV) { showToast("⚠️ Eligibility ke anusar is customer ke liye is model mein koi bhi Scheme nahi baith rahi hai!", "error"); return; }
-    
+
     html += `<div style="text-align:center; margin-top: 15px; color:#aaa; font-size: 14px; font-weight: bold; border-top: 1px dashed #ddd; padding-top: 15px;">Generated securely via Persistent Portal</div>`;
     quoteDiv.innerHTML = html; document.body.appendChild(quoteDiv);
-    
+
     html2canvas(quoteDiv, {scale: 2}).then(canvas => { 
         let imgDataUrl = canvas.toDataURL("image/png"); document.getElementById('generatedImage').src = imgDataUrl; document.getElementById('imageViewerModal').style.display = 'flex'; document.body.removeChild(quoteDiv); 
         if(requestWhatsAppDispatch) {
@@ -1349,7 +1349,7 @@ function showOnlyStarredDealers() {
 function copyThreeDealerItems(dId, dName, bitlyUrl, btnEl, event) {
     if(event) event.stopPropagation();
     let textToCopy = `${dId} - ${dName} - ${bitlyUrl}`;
-    
+
     function showSuccess() {
         let originalText = btnEl.innerText;
         btnEl.innerText = "COPIED! ✓";
@@ -1379,7 +1379,7 @@ function openDealerSearchModal() {
     document.getElementById('dealerSearchModal').style.display = 'flex'; 
     setTimeout(() => document.getElementById('dealerSearchInput').focus(), 100); 
 }
- 
+
 function closeDealerSearchModal() { 
     document.getElementById('dealerSearchModal').style.display = 'none'; 
 }
@@ -1387,7 +1387,7 @@ function closeDealerSearchModal() {
 function searchDealer() {
     let q = document.getElementById('dealerSearchInput').value.toLowerCase().trim(); 
     let resultsDiv = document.getElementById('dealerSearchResults');
-    
+
     if (dealer_records.length === 0) { 
         resultsDiv.innerHTML = '<div style="text-align:center; color:var(--danger); padding: 15px;">⚠️ Dealer data abhi load nahi hua hai.</div>'; 
         return; 
@@ -1405,14 +1405,14 @@ function searchDealer() {
     let matches = parsedDealers.filter(p => { 
         if (showingOnlyStarred && !starredIds.includes(p.code)) return false;
         if (!q && !showingOnlyStarred) return true;
-        
+
         return p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q) || p.city.toLowerCase().includes(q); 
     });
 
     matches.sort((a, b) => {
         let isStarA = starredIds.includes(a.code);
         let isStarB = starredIds.includes(b.code);
-        
+
         if (isStarA && !isStarB) return -1;
         if (!isStarA && isStarB) return 1;
         return 0;
@@ -1430,7 +1430,7 @@ function searchDealer() {
         let dId = m.code || '-'; 
         let dName = m.name + (m.city ? ` - ${m.city}` : ''); 
         let isStarred = starredIds.includes(dId);
-        
+
         let favBtnHtml = isStarred 
             ? `<button onclick="toggleDealerStar('${dId}', event)" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">⭐ FAVORITED</button>`
             : `<button onclick="toggleDealerStar('${dId}', event)" style="background:#f8f9fa; color:#555; border:1px solid #ccc; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">☆ ADD FAV</button>`;
