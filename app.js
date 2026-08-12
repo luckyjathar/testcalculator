@@ -415,9 +415,9 @@ function recalcCurrentModel() {
 function renderTableModel() {
     let schemes = db_records.filter(r => r.model === currentViewedModel);
     if(schemes.length === 0) return;
-
+    
     document.getElementById('globalViewerTitle').innerText = '📱 ' + currentViewedModel;
-
+    
     let custType = document.getElementById('calcCustType').value;
     let ltvLimit = parseFloat(document.getElementById('calcLtv').value) || 100;
     let limit = parseFloat(document.getElementById('calcLimit').value) || 0;
@@ -425,15 +425,14 @@ function renderTableModel() {
     let margin = parseFloat(document.getElementById('calcMargin').value) || 0;
     let targetDp = parseFloat(document.getElementById('calcTarget').value) || 0;
     let emiCap = parseFloat(document.getElementById('calcCap').value) || 0;
-
+    
     let gtl = invoice > 100000 ? 2398 : (invoice > 50000 ? 1799 : (invoice > 30000 ? 1499 : (invoice > 10000 ? 1199 : (invoice > 0 ? 699 : 0))));
-
+    
     let isCalculatedMode = (limit > 0 && invoice > 0);
     let fee = (custType === 'EMI CARD') ? 270 : (custType === 'W/O CARD' ? 320 : 850);
 
     let validSchemes = schemes.filter(s => s.tenure > 0 || s.fixedEmi > 0);
-
-    // 🔥 LIVE EXPIRY CHECK FOR DICTIONARY
+    
     let today = new Date(); today.setHours(0,0,0,0);
     validSchemes = validSchemes.filter(s => {
         if(!s.expiryDateStr) return true;
@@ -444,7 +443,7 @@ function renderTableModel() {
         }
         return true;
     });
-
+    
     let thead = document.getElementById('tableHead');
     if (isCalculatedMode) {
         thead.innerHTML = `<tr><th style="background:#e3f2fd;">T/A</th><th style="background:#e3f2fd;">LTV%</th><th style="background:#e8f5e9; color:var(--success);">LOAN</th><th style="background:#fff3e0; color:#d35400;">DIFF (INV-LOAN)</th><th style="background:#e8f5e9; color:var(--success);">EST. DP</th><th style="background:#e3f2fd; color:var(--primary);">EMI</th><th style="background:#e3f2fd; color:var(--primary);">MONTHS</th><th>ACTION</th></tr>`;
@@ -454,7 +453,7 @@ function renderTableModel() {
 
     validSchemes.forEach(s => { 
         s.calcLTV = s.tenure > 0 ? ((s.tenure - s.advEmi)/s.tenure)*100 : 0; 
-
+        
         if (isCalculatedMode) {
             let nbfcMax = (limit * s.tenure) / (s.tenure - s.advEmi || 1);
             let finalLoan = 0, emi = 0, dp = 0, diff = 0;
@@ -463,15 +462,15 @@ function renderTableModel() {
             let roiRateDP = roiRate * s.advEmi;
             let inst = s.tenure - s.advEmi;
             if (inst < 1) inst = 1;
-
+            
             if (s.fixedEmi > 0) {
                 let maxTotalTenure = Math.floor(limit / s.fixedEmi) + s.advEmi;
                 let currentTenure = Math.floor(invoice / s.fixedEmi);
                 if(currentTenure > maxTotalTenure) currentTenure = maxTotalTenure;
                 if(currentTenure < 1) currentTenure = 1;
-
+                
                 finalLoan = currentTenure * s.fixedEmi;
-
+                
                 if (targetDp > 0) {
                     let numerator = targetDp - invoice - (s.fixedEmi * s.advEmi) - s.pf - fee - margin;
                     let denominator = dbdRate + roiRateDP - 1;
@@ -480,22 +479,22 @@ function renderTableModel() {
                     if (solvedTenure > maxTotalTenure) solvedTenure = maxTotalTenure;
                     finalLoan = Math.max(0, solvedTenure * s.fixedEmi);
                 }
-
+                
                 if (finalLoan > invoice) finalLoan = Math.floor(invoice/s.fixedEmi)*s.fixedEmi;
                 currentTenure = Math.floor(finalLoan / s.fixedEmi) || 1;
                 inst = currentTenure - s.advEmi;
                 if(inst < 1) inst = 1;
-
+                
                 let roiInEmi = finalLoan * roiRate;
                 emi = s.fixedEmi + (gtl / inst) + roiInEmi;
-
+                
                 let roiInDp = finalLoan * roiRateDP;
                 dp = invoice - finalLoan + (s.fixedEmi * s.advEmi) + s.pf + fee + (finalLoan * dbdRate) + margin + roiInDp;
                 s.currentTenure = currentTenure;
                 s.calcInst = inst;
             } else {
                 finalLoan = Math.min(nbfcMax, invoice);
-
+                
                 if (targetDp > 0) {
                     let advRate = s.advEmi / s.tenure; 
                     let numerator = targetDp - invoice - s.pf - fee - margin; 
@@ -504,12 +503,19 @@ function renderTableModel() {
                     finalLoan = Math.min(finalLoan, Math.max(0, Math.floor(solvedLoan)));
                 }
 
+                // 🔥 NEW RULE: Base EMI 900 च्या खाली नसावा
+                let minLoanFor900Emi = 900 * s.tenure;
+                if (finalLoan < minLoanFor900Emi) {
+                    finalLoan = minLoanFor900Emi;
+                }
+                
                 let roiInEmi = finalLoan * roiRate;
                 emi = (finalLoan / s.tenure) + (gtl / inst) + roiInEmi;
-
+                
                 if (emiCap > 0 && emi > emiCap) {
                     finalLoan = (emiCap - (gtl / inst)) / ((1 / s.tenure) + roiRate);
                     if(finalLoan < 0) finalLoan = 0;
+                    if (finalLoan < minLoanFor900Emi) finalLoan = minLoanFor900Emi; // Re-check
                     roiInEmi = finalLoan * roiRate;
                     emi = (finalLoan / s.tenure) + (gtl / inst) + roiInEmi;
                 }
@@ -519,7 +525,7 @@ function renderTableModel() {
                 s.currentTenure = s.tenure;
                 s.calcInst = inst;
             }
-
+            
             s.calcLoan = finalLoan;
             diff = invoice - finalLoan;
             s.calcDiff = diff > 0 ? diff : 0;
@@ -535,7 +541,7 @@ function renderTableModel() {
     } else {
         validSchemes.sort((a,b) => b.calcLTV - a.calcLTV);
     }
-
+    
     let tbody = document.getElementById('globalViewerBody');
     tbody.innerHTML = validSchemes.map(s => {
         let displayTenure = s.currentTenure ? s.currentTenure : s.tenure;
@@ -564,7 +570,7 @@ function renderTableModel() {
             </tr>`;
         }
     }).join('');
-
+    
     document.getElementById('schemeResultArea').style.display = 'block';
 }
 function copySingleScheme(tenure, advEmi, loan, dp, emi, fixedEmi, dbd, roi, pf, btn) {
@@ -673,14 +679,14 @@ function validateFastLoanMin() {
 function calculateFastData() {
     let inv = parseFloat(document.getElementById('fcInv').value) || 0; let loanInput = parseFloat(document.getElementById('fcLoanInput').value) || 0; let tenure = parseInt(document.getElementById('fcTenure').value) || 0; let adv = parseInt(document.getElementById('fcAdv').value) || 0; let roi = parseFloat(document.getElementById('fcRoi').value) || 0; let pf = parseFloat(document.getElementById('fcPf').value) || 0; let dbd = parseFloat(document.getElementById('fcDbd').value) || 0; let custType = document.getElementById('fcCustType').value; let fixedEmi = parseFloat(document.getElementById('fcFixed').value) || 0; let cap = parseFloat(document.getElementById('fcCap').value) || 0; let target = parseFloat(document.getElementById('fcTarget').value) || 0; let gtl = parseFloat(document.getElementById('fcGtl').value) || 0; let rfc = parseFloat(document.getElementById('fcRfc').value) || 0; let exw = parseFloat(document.getElementById('fcExw').value) || 0; let margin = parseFloat(document.getElementById('fcMargin').value) || 0; let dealer = parseFloat(document.getElementById('fcDealer').value) || 0;
     if (inv <= 0 && loanInput <= 0) { document.getElementById('fcResult').style.display = 'none'; return; }
-
+    
     let minFastLoan = inv > 0 ? inv * 0.50 : 0;
     if (loanInput > 0 && loanInput < minFastLoan) {
         loanInput = minFastLoan;
     }
-
+    
     let fee = (custType === 'EMI CARD') ? 270 : (custType === 'W/O CARD' ? 320 : 850); let totalFees = fee + margin + dealer; let insTotal = gtl + rfc + exw; let dbdRate = (dbd * 1.18 / 100); let roiRate = roi / 1200; let roiRateDP = roiRate * adv; let loan = loanInput > 0 ? loanInput : inv;
-
+    
     let emi = 0; let dpRounded = 0; let inst = 0; let finalTenure = tenure;
     if (fixedEmi > 0) { 
         finalTenure = Math.floor(loan / fixedEmi) || 1; 
@@ -706,11 +712,19 @@ function calculateFastData() {
             let advRate = adv / tenure; let numerator = target - inv - pf - totalFees; let denominator = advRate + dbdRate + roiRateDP - 1; 
             let solvedLoan = numerator / denominator; loan = Math.min(inv, Math.max(minFastLoan, Math.floor(solvedLoan))); 
         } 
+
+        // 🔥 NEW RULE: Base EMI 900 च्या खाली नसावा 
+        let minLoanFor900Emi = 900 * tenure;
+        if (loan < minLoanFor900Emi) {
+            loan = minLoanFor900Emi;
+        }
+
         inst = tenure - adv; if (inst < 1) inst = 1; 
         let roiInEmi = loan * roiRate; emi = (loan / tenure) + (insTotal / inst) + roiInEmi; 
         if (cap > 0 && emi > cap) { 
             loan = (cap - (insTotal / inst)) / ((1 / tenure) + roiRate); 
             if (loan < minFastLoan) loan = minFastLoan; 
+            if (loan < minLoanFor900Emi) loan = minLoanFor900Emi; // Re-check
             roiInEmi = loan * roiRate; emi = (loan / tenure) + (insTotal / inst) + roiInEmi; 
         } 
         let roiInDp = loan * roiRateDP; let dpExact = inv - loan + ((loan / tenure) * adv) + (loan * dbdRate) + pf + totalFees + roiInDp; 
@@ -1030,12 +1044,12 @@ function renderRows(pIdx) {
     prod.calculatedData.sort((a,b) => conf.dir==='asc' ? a[conf.key]-b[conf.key] : b[conf.key]-a[conf.key]); 
     let ltvLimit = customerQueue[activeCustomerIndex]?.ltv || 100; 
     let isNT = prod.isNonTieup;
-    
+
     // 🔥 LIVE EXPIRY CHECK: आजची तारीख काढा
     let today = new Date(); today.setHours(0,0,0,0);
 
     document.getElementById(`body_${pIdx}`).innerHTML = prod.calculatedData.map(d => {
-        
+
         // 🚀 कोणतीही स्कीम एक्सपायर झाली असेल तर तिला थेट लपवा (Hide)
         if(d.expiryDateStr) {
             let p = d.expiryDateStr.trim().split('/');
@@ -1046,7 +1060,7 @@ function renderRows(pIdx) {
         }
 
         let curLTV = d.curLTV; let isLtvB = (curLTV > ltvLimit); let isBoundB = false; if (isNT && prod.inputs.mrp > 0) { if (d.loan < d.minLoan || d.loan > d.maxLoan) isBoundB = true; } let isInactive = d.inactive; 
-        
+
         if (d.isInv50Breach) { isBoundB = true; }
 
         let rowClass = (d.isFixed ? "fixed-row " : "") + (isLtvB || isBoundB ? "ltv-breach " : "") + (d.isExpired && !isInactive ? "expired-row " : "") + (isInactive ? "inactive-row " : "");
@@ -1070,24 +1084,33 @@ function manual(pIdx, dIdx) {
     let ltvLimit = customerQueue[activeCustomerIndex]?.ltv || 100; let limit = customerQueue[activeCustomerIndex]?.limit || 0; 
     let currentLimit = limit > 0 ? limit : 9999999; let inputMrp = parseFloat(inp.mrp) || 0; let inputInv = parseFloat(inp.inv) || 0; 
     let effectivePrice = inputInv > 0 ? inputInv : (inputMrp > 0 ? inputMrp : 0); let loanCapPrice = (inputMrp > 0 && inputInv > 0) ? Math.min(inputMrp, inputInv) : effectivePrice;
-
+    
     let minAllowedLoanByInvoice = effectivePrice > 0 ? effectivePrice * 0.50 : 0;
     if (effectivePrice > 0 && loan < minAllowedLoanByInvoice) {
         loan = minAllowedLoanByInvoice;
         showToast("⚠️ लोन अमाऊंट इन्व्हॉइसच्या ५०% पेक्षा कमी असू शकत नाही!", "error");
     }
 
+    // 🔥 NEW RULE: Base EMI 900 च्या खाली नसावा (मॅन्युअल एन्ट्री करताना सुद्धा)
+    if (!d.isFixed) {
+        let minLoanFor900Emi = 900 * d.tenure;
+        if (loan < minLoanFor900Emi) {
+            loan = minLoanFor900Emi;
+            showToast("⚠️ बेस EMI 900 पेक्षा कमी असू शकत नाही!", "warning");
+        }
+    }
+
     syncInsurance(pIdx, inputMrp, loan, 'LOAN'); 
     let appliedPf = d.pf; if (prod.isNonTieup) { let checkAmount = effectivePrice > 0 ? effectivePrice : loan; let slabPf = getNonTieupPfValue(prod.category, checkAmount); if (slabPf !== null) appliedPf = slabPf; d.pf = appliedPf; let pfCell = document.querySelector(`#row_${pIdx}_${dIdx} td:nth-child(3)`); if(pfCell) pfCell.innerText = `₹${appliedPf}`; }
     let dbdRate = (d.dbd * 1.18 / 100); let roiRate = d.roi / 1200; let roiRateDP = roiRate * d.advEmi; let dpE = 0; let dpR = 0;
-
+    
     if (d.isFixed) { 
         let calcTenure = Math.floor(loan / d.fixedEmi) || 1; 
-
+        
         if (effectivePrice > 0 && (calcTenure * d.fixedEmi) < minAllowedLoanByInvoice) {
             calcTenure = Math.ceil(minAllowedLoanByInvoice / d.fixedEmi);
         }
-
+        
         loan = calcTenure * d.fixedEmi; 
 
         let maxBoundary = Math.min(d.nbfcMaxL, prod.isNonTieup ? d.maxLoan : 9999999, loanCapPrice > 0 ? loanCapPrice : 9999999); 
@@ -1096,7 +1119,7 @@ function manual(pIdx, dIdx) {
             calcTenure = Math.floor(loan / d.fixedEmi) || 1; 
         } 
         el.value = loan; 
-
+        
         let roiInEmi = loan * roiRate; let roiInDp = loan * roiRateDP; 
         dpE = effectivePrice - loan + (d.fixedEmi * d.advEmi) + (loan * dbdRate) + appliedPf + totalFees + roiInDp; dpR = Math.ceil(dpE / 10) * 10; 
         let inst = calcTenure - d.advEmi; if(inst < 1) inst = 1; 
@@ -1109,13 +1132,19 @@ function manual(pIdx, dIdx) {
         let nbfcMaxL = (currentLimit * d.tenure) / (d.tenure - d.advEmi || 1); 
         let maxBoundary = Math.min(loanCapPrice > 0 ? loanCapPrice : 999999, nbfcMaxL, prod.isNonTieup ? d.maxLoan : 9999999); 
         if(loan > maxBoundary) { loan = maxBoundary; } 
-
+        
         if (effectivePrice > 0 && loan < minAllowedLoanByInvoice) {
             loan = minAllowedLoanByInvoice;
         }
 
+        // Re-check for bounds if manual input dropped it below 900 EMI equivalent
+        let minLoanFor900Emi = 900 * d.tenure;
+        if (loan < minLoanFor900Emi) {
+            loan = minLoanFor900Emi;
+        }
+        
         el.value = Math.floor(loan); 
-
+        
         let roiInEmi = loan * roiRate; let roiInDp = loan * roiRateDP; 
         dpE = effectivePrice - loan + ((loan/d.tenure) * d.advEmi) + (loan * dbdRate) + appliedPf + totalFees + roiInDp; 
         dpR = Math.ceil(dpE / 10) * 10; let inst = d.tenure - d.advEmi; if(inst < 1) inst = 1; 
@@ -1123,11 +1152,11 @@ function manual(pIdx, dIdx) {
         let emi = (loan / d.tenure) + (insTotal / inst) + roiInEmi; 
         d.loan = loan; d.dp = dpR; d.emi = emi; 
     }
-
+    
     d.extra = effectivePrice > 0 ? (((d.emi * d.inst) + d.dp) - effectivePrice) : 0; d.dbdAmt = loan * dbdRate; d.roiAmt = (loan * roiRateDP) + (loan * roiRate * d.inst); 
     let marginMoney = parseFloat(inp.margin) || 0; let roundupAdj = (dpR > dpE) ? (dpR - dpE) : 0; 
     d.netDisb = effectivePrice > 0 ? (effectivePrice - dpR - marginMoney - roundupAdj) : 0;
-
+    
     prod.inputs.manualLoans = prod.inputs.manualLoans || {};
     prod.inputs.manualLoans[dIdx] = loan;
 
@@ -1137,11 +1166,11 @@ function manual(pIdx, dIdx) {
     d.curLTV = d.currentTenure > 0 ? ((d.currentTenure - d.advEmi) / d.currentTenure) * 100 : 0; 
     let ltvCell = document.getElementById(`ltv_${pIdx}_${dIdx}`); if(ltvCell) ltvCell.innerText = Math.round(d.curLTV) + "%"; 
     let extraCell = document.getElementById(`extra_${pIdx}_${dIdx}`); if(extraCell) extraCell.innerText = "₹" + Math.round(d.extra).toLocaleString();
-
+    
     let isB = (d.curLTV > ltvLimit) || (prod.isNonTieup && loan > 0 && (loan < d.minLoan || loan > d.maxLoan)) || (effectivePrice > 0 && loan < minAllowedLoanByInvoice); 
     let rowEl = document.getElementById(`row_${pIdx}_${dIdx}`); 
     if(rowEl) { if (isB) { rowEl.classList.add('ltv-breach'); } else { rowEl.classList.remove('ltv-breach'); } }
-
+    
     let dbdCell = document.querySelector(`#row_${pIdx}_${dIdx} td:nth-child(2)`); if(dbdCell) dbdCell.innerHTML = `${+parseFloat(d.dbd).toFixed(3)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.dbdAmt||0).toLocaleString()}</span>`; 
     let roiCell = document.querySelector(`#row_${pIdx}_${dIdx} td:nth-child(4)`); if(roiCell) roiCell.innerHTML = `${+parseFloat(d.roi).toFixed(2)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.roiAmt||0).toLocaleString()}</span>`;
     customerQueue[activeCustomerIndex].products = current_products; saveQueueToLocal(); 
