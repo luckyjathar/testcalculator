@@ -628,24 +628,25 @@
         <button onclick="openAddProductModal()" style="width: 100%; background:var(--warning); color:#000; padding:10px; border-radius:6px; font-weight:900; margin-bottom:8px; border: 1.5px solid #d35400; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor:pointer;">➕ ADD NEW PRODUCT (SEARCH / NON-TIEUP / MANUAL)</button>
         <div id="multiModelContainer"></div>
     </div>
+    
     <!-- DEALER SEARCH MODAL -->
-<div id="dealerSearchModal" class="modal">
-    <div class="modal-content" style="max-width: 500px; padding: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bajaj-blue); padding-bottom: 8px; margin-bottom: 15px;">
-            <h3 style="margin:0; color:var(--bajaj-blue);">🔗 Dealer Links Search</h3>
-            <button onclick="closeDealerSearchModal()" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px;">✖</button>
-        </div>
-        
-        <div style="display:flex; gap:8px; margin-bottom:12px;">
-            <input type="text" id="dealerSearchInput" placeholder="Type Dealer Name, City or Code..." oninput="searchDealer()" style="flex:1;">
-            <button id="filterStarBtn" onclick="showOnlyStarredDealers()" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba; font-weight:bold; padding:0 10px; border-radius:4px; font-size:11px !important;">★ FAVORITES</button>
-        </div>
-        
-        <div id="dealerSearchResults" class="custom-scroll" style="display:flex; flex-direction:column; gap:8px; max-height:350px; overflow-y:auto; padding-right:5px;">
-            <!-- JavaScript will populate the results here -->
+    <div id="dealerSearchModal" class="modal">
+        <div class="modal-content" style="max-width: 500px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bajaj-blue); padding-bottom: 8px; margin-bottom: 15px;">
+                <h3 style="margin:0; color:var(--bajaj-blue);">🔗 Dealer Links Search</h3>
+                <button onclick="closeDealerSearchModal()" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px;">✖</button>
+            </div>
+            
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+                <input type="text" id="dealerSearchInput" placeholder="Type Dealer Name, City or Code..." oninput="searchDealer()" style="flex:1;">
+                <button id="filterStarBtn" onclick="showOnlyStarredDealers()" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba; font-weight:bold; padding:0 10px; border-radius:4px; font-size:11px !important;">★ FAVORITES</button>
+            </div>
+            
+            <div id="dealerSearchResults" class="custom-scroll" style="display:flex; flex-direction:column; gap:8px; max-height:350px; overflow-y:auto; padding-right:5px;">
+                <!-- JavaScript will populate the results here -->
+            </div>
         </div>
     </div>
-</div>
 </main>
 
 <footer>
@@ -1078,7 +1079,7 @@
         let isCalculatedMode = (limit > 0 && invoice > 0);
         let fee = (custType === 'EMI CARD') ? 270 : (custType === 'W/O CARD' ? 320 : 850);
 
-        let validSchemes = schemes.filter(s => s.tenure > 0 || s.fixedEmi > 0);
+        let validSchemes = schemes.filter(s => (s.tenure > 0 || s.fixedEmi > 0) && !s.isExpired);
         
         let thead = document.getElementById('tableHead');
         if (isCalculatedMode) {
@@ -1488,7 +1489,24 @@ function openRecycleBin() { let list = document.getElementById('recycleBinList')
     }
 
     function findValLocal(row, targets) { let key = Object.keys(row).find(k => targets.includes(k.toUpperCase().replace(/\s/g, ''))); return key ? row[key] : null; }
-    function mapData(row, type) { if(!row) return null; let expVal = findValLocal(row, ['EXPIRY', 'EXPIRYDATE', 'VALIDTILL', 'SCHEMEEXPIRY', 'ENDDATE']); let expDate = parseExcelDate(expVal); let isExp = false; let expiryDateStr = ""; if(expDate) { let today = new Date(); today.setHours(0,0,0,0); if(expDate < today) isExp = true; let dd = String(expDate.getDate()).padStart(2, '0'); let mm = String(expDate.getMonth() + 1).padStart(2, '0'); let yyyy = expDate.getFullYear(); expiryDateStr = `${dd}/${mm}/${yyyy}`; } return { model: type === SPECIAL_MODEL ? SPECIAL_MODEL : String(findValLocal(row,['MODEL','BRANDMODEL'])||"").toUpperCase(), brand: String(findValLocal(row, ['BRAND', 'MAKE', 'MANUFACTURER'])||"").toUpperCase(), mrp: parseFloat(findValLocal(row, ['MRP', 'PRICE', 'M.R.P'])) || 0, tenure: parseInt(findValLocal(row, ['TOTALTENURE', 'TENURE', 'TA'])) || 0, advEmi: parseInt(findValLocal(row, ['ADVANCEEMI', 'ADV'])) || 0, dbd: parseFloat(findValLocal(row,['DBD','DBD%'])||0), pf: parseInt(findValLocal(row,['PF','PROCESSINGFEE'])||0), roi: parseFloat(findValLocal(row,['ROI','ROI%'])||0), fixedEmi: parseFloat(findValLocal(row,['FIXEDEMI', 'FIXED'])||0), category: standardizeCategoryName(findValLocal(row,['CATEGORY','CAT'])||""), minLoan: parseFloat(findValLocal(row, ['MINLOAN', 'MINL'])) || 0, maxLoan: parseFloat(findValLocal(row, ['MAXLOAN', 'MAXL'])) || 9999999, isExpired: isExp, expiryDateStr: expiryDateStr, inactive: false }; }
+    function mapData(row, type) {
+        if(!row) return null;
+        let expVal = findValLocal(row, ['EXPIRY', 'EXPIRYDATE', 'VALIDTILL', 'SCHEMEEXPIRY', 'ENDDATE']);
+        let expDate = parseExcelDate(expVal);
+        let isExp = false;
+        let expiryDateStr = "";
+        if(expDate) {
+            let today = new Date(); today.setHours(0,0,0,0);
+            if(expDate < today) isExp = true;
+            let dd = String(expDate.getDate()).padStart(2, '0');
+            let mm = String(expDate.getMonth() + 1).padStart(2, '0');
+            let yyyy = expDate.getFullYear();
+            expiryDateStr = `${dd}/${mm}/${yyyy}`;
+        }
+        if(isExp) return null; // ADDED: Block expired schemes completely
+        return { model: type === SPECIAL_MODEL ? SPECIAL_MODEL : String(findValLocal(row,['MODEL','BRANDMODEL'])||"").toUpperCase(), brand: String(findValLocal(row, ['BRAND', 'MAKE', 'MANUFACTURER'])||"").toUpperCase(), mrp: parseFloat(findValLocal(row, ['MRP', 'PRICE', 'M.R.P'])) || 0, tenure: parseInt(findValLocal(row, ['TOTALTENURE', 'TENURE', 'TA'])) || 0, advEmi: parseInt(findValLocal(row, ['ADVANCEEMI', 'ADV'])) || 0, dbd: parseFloat(findValLocal(row,['DBD','DBD%'])||0), pf: parseInt(findValLocal(row,['PF','PROCESSINGFEE'])||0), roi: parseFloat(findValLocal(row,['ROI','ROI%'])||0), fixedEmi: parseFloat(findValLocal(row,['FIXEDEMI', 'FIXED'])||0), category: standardizeCategoryName(findValLocal(row,['CATEGORY','CAT'])||""), minLoan: parseFloat(findValLocal(row, ['MINLOAN', 'MINL'])) || 0, maxLoan: parseFloat(findValLocal(row, ['MAXLOAN', 'MAXL'])) || 9999999, isExpired: isExp, expiryDateStr: expiryDateStr, inactive: false };
+    }
+    
     function goHome() { document.getElementById('finalEligibleArea').style.display='none'; document.getElementById('catSelectionModal').style.display='none'; document.getElementById('unifiedHome').style.display='flex'; activeCustomerIndex = -1; selectedQueueIndex = -1; renderCustomerQueue(); updateUniversalActionButtons(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function closeImageViewer() { document.getElementById('imageViewerModal').style.display='none'; }
     function openAddProductModal() { if (!isLimitValid()) return; document.getElementById('modalMatrixSearch').value = ''; document.getElementById('modalMatrixSearchDropdown').style.display = 'none'; document.getElementById('addProductModal').style.display = 'flex'; }
@@ -1638,19 +1656,23 @@ function openRecycleBin() { let list = document.getElementById('recycleBinList')
 
     function renderRows(pIdx) {
         let prod = current_products[pIdx]; if(!sortConfigs[pIdx]) sortConfigs[pIdx] = {key: 'dp', dir: 'asc'}; let conf = sortConfigs[pIdx]; prod.calculatedData.sort((a,b) => conf.dir==='asc' ? a[conf.key]-b[conf.key] : b[conf.key]-a[conf.key]); let ltvLimit = customerQueue[activeCustomerIndex]?.ltv || 100; let isNT = prod.isNonTieup;
-        document.getElementById(`body_${pIdx}`).innerHTML = prod.calculatedData.map(d => {
+        
+        let visibleData = prod.calculatedData.filter(d => !d.isExpired); // ADDED
+        
+        document.getElementById(`body_${pIdx}`).innerHTML = visibleData.map(d => {
             let curLTV = d.curLTV; let isLtvB = (curLTV > ltvLimit); let isBoundB = false; if (isNT && prod.inputs.mrp > 0) { if (d.loan < d.minLoan || d.loan > d.maxLoan) isBoundB = true; } let isInactive = d.inactive; 
             
             if (d.isInv50Breach) { isBoundB = true; }
 
-            let rowClass = (d.isFixed ? "fixed-row " : "") + (isLtvB || isBoundB ? "ltv-breach " : "") + (d.isExpired && !isInactive ? "expired-row " : "") + (isInactive ? "inactive-row " : "");
+            let rowClass = (d.isFixed ? "fixed-row " : "") + (isLtvB || isBoundB ? "ltv-breach " : "") + (isInactive ? "inactive-row " : "");
             let toggleBtnHTML = isInactive ? `<button class="action-btn" style="background:var(--success);" onclick="toggleInactive(${pIdx}, ${d.dIdx})">ADD</button>` : `<button class="action-btn" style="background:var(--danger);" onclick="toggleInactive(${pIdx}, ${d.dIdx})">DISABLE</button>`;
-            let expInfo = d.expiryDateStr ? `<div style="font-size:10px; color:#555; margin-top:2px; font-weight:bold;">Exp: ${d.expiryDateStr}</div>` : ''; let expiredWarning = d.isExpired ? `<div style="color:#d35400; font-size:9px; font-weight:900; margin-top:3px; line-height:1.2; background:#ffeaa7; padding:2px; border-radius:3px;">⚠️ EXPIRED<br>Check Live</div>` : '';
+            let expInfo = d.expiryDateStr ? `<div style="font-size:10px; color:#555; margin-top:2px; font-weight:bold;">Exp: ${d.expiryDateStr}</div>` : ''; 
+            
             return `<tr id="row_${pIdx}_${d.dIdx}" class="${rowClass}">
                 <td class="hidden-col">${d.category}</td><td class="hidden-col">${+parseFloat(d.dbd).toFixed(3)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.dbdAmt||0).toLocaleString()}</span></td><td class="hidden-col">₹${d.pf}</td><td class="hidden-col">${+parseFloat(d.roi).toFixed(2)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.roiAmt||0).toLocaleString()}</span></td><td class="hidden-col">${d.fixedEmi > 0 ? '₹'+d.fixedEmi : 'N/A'}</td><td class="hidden-col" id="ltv_${pIdx}_${d.dIdx}">${Math.round(d.curLTV)}%</td><td class="hidden-col" id="nd_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--bajaj-blue);">₹${Math.round(d.netDisb).toLocaleString()}</td><td class="hidden-col" id="extra_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--danger);">₹${Math.round(d.extra).toLocaleString()}</td>
                 ${isNT ? `<td class="bound-col">${d.minLoan > 0 ? '₹' + d.minLoan : '0'}</td><td class="bound-col">${d.maxLoan < 9999999 ? '₹' + d.maxLoan : 'NO'}</td>` : `<td style="color:#777;">₹${Math.floor(d.nbfcMaxL)}</td>`}
                 <td><div class="stepper"><button class="step-btn" onclick="step(${pIdx},${d.dIdx},-${d.isFixed ? d.fixedEmi : 1000})">-</button><input id="l_${pIdx}_${d.dIdx}" type="number" value="${Math.floor(d.loan)}" class="step-inp" oninput="manual(${pIdx},${d.dIdx})"><button class="step-btn" onclick="step(${pIdx},${d.dIdx},${d.isFixed ? d.fixedEmi : 1000})">+</button></div></td>
-                <td id="ta_${pIdx}_${d.dIdx}" style="font-weight:900;">${d.currentTenure}/${d.advEmi}${expInfo}${expiredWarning}</td>
+                <td id="ta_${pIdx}_${d.dIdx}" style="font-weight:900;">${d.currentTenure}/${d.advEmi}${expInfo}</td>
                 <td id="dp_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td><td id="emi_${pIdx}_${d.dIdx}" style="color:var(--primary); font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td><td id="inst_${pIdx}_${d.dIdx}" style="font-weight:900;">${d.inst}</td><td id="day_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950;">₹${Math.round(d.daily).toLocaleString()}</td>
                 <td><div style="display:flex; flex-direction:column; gap:2px; min-width: 40px;"><button class="action-btn btn-copy" onclick="copySchemeText(${pIdx}, ${d.dIdx}, this)">COPY</button><button class="action-btn" style="background:var(--warning); color:#000;" onclick="openEditSchemeModal(${pIdx}, ${d.dIdx})">EDIT</button>${toggleBtnHTML}</div></td>
             </tr>`;
@@ -1787,7 +1809,7 @@ function openRecycleBin() { let list = document.getElementById('recycleBinList')
         
         let hasV = false; let productsToRender = window.tempImageGenIndices.map(idx => current_products[idx]);
         productsToRender.forEach((prod) => {
-            let validS = prod.calculatedData.filter(d => { let isLtvB = (d.curLTV > ltvLimit); let isBoundB = false; if (prod.isNonTieup && prod.inputs.mrp > 0) { if (d.loan < d.minLoan || d.loan > d.maxLoan) isBoundB = true; } return !isLtvB && !isBoundB && !d.inactive && !d.isInv50Breach && d.loan > 0; });
+            let validS = prod.calculatedData.filter(d => { let isLtvB = (d.curLTV > ltvLimit); let isBoundB = false; if (prod.isNonTieup && prod.inputs.mrp > 0) { if (d.loan < d.minLoan || d.loan > d.maxLoan) isBoundB = true; } return !isLtvB && !isBoundB && !d.inactive && !d.isInv50Breach && d.loan > 0 && !d.isExpired; });
             if(validS.length === 0) return; hasV = true; let invAmt = prod.inputs.inv > 0 ? prod.inputs.inv : prod.inputs.mrp;
             
             let winDp = [...validS].sort((a,b) => a.dp - b.dp)[0]; let winEmi = [...validS].sort((a,b) => a.emi - b.emi)[0]; let winPop = [...validS].filter(s => s.roi === 0 || s.isFixed).sort((a,b) => a.dp - b.dp)[0] || validS[0]; let winBalance = [...validS].sort((a,b) => (a.dp + (a.emi * 2)) - (b.dp + (b.emi * 2)))[0] || validS[0];
@@ -1890,175 +1912,137 @@ function openRecycleBin() { let list = document.getElementById('recycleBinList')
             let imgDataUrl = canvas.toDataURL("image/png"); document.getElementById('generatedImage').src = imgDataUrl; document.getElementById('imageViewerModal').style.display = 'flex'; document.body.removeChild(quoteDiv); 
             if(requestWhatsAppDispatch) {
                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                if (isMobile) {
-                    let a = document.createElement("a"); a.href = imgDataUrl; let safeName = c?.name !== "-" ? c.name.replace(/\s+/g, '_') : "Customer"; a.download = `Quotation_${safeName}.png`; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("✅ Image download ho gayi hai! Ab WhatsApp khulega.", "success");
-                    setTimeout(() => { let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); }, 500);
-                } else {
-                    document.getElementById('clipboardStatusAlert').style.display = 'none';
-                    canvas.toBlob(blob => {
-                        try { navigator.clipboard.write([ new ClipboardItem({ "image/png": blob }) ]).then(() => { document.getElementById('clipboardStatusAlert').style.display = 'block'; setTimeout(() => { let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); }, 500); }).catch(err => { showCustomAlert("📋 Click / Long Press karke Copy Image karein."); let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); }); } 
-                        catch (e) { let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); }
-                    }, 'image/png');
-                }
-            } else { document.getElementById('clipboardStatusAlert').style.display = 'none'; }
-        });
-    }
-
-/* === DEALER LINKS WITH STAR (FAVORITES) & 3-ITEM COPY FEATURE === */
-    let showingOnlyStarred = false;
-
-    function getStarredDealers() {
-        return JSON.parse(localStorage.getItem('persistent_starred_dealers') || '[]');
-    }
-
-    function toggleDealerStar(dealerId, event) {
-        if(event) event.stopPropagation();
-        let starred = getStarredDealers();
-        let idStr = String(dealerId).trim();
-        if (starred.includes(idStr)) {
-            starred = starred.filter(id => id !== idStr);
-            showToast("★ Dealer removed from favorites!", "warning");
-        } else {
-            starred.push(idStr);
-            showToast("★ Dealer added to favorites!", "success");
+                if (isMobile) {I encountered an error doing what you asked. Could you try again?
+                function showOnlyStarredDealers() {
+            showingOnlyStarred = !showingOnlyStarred;
+            let btn = document.getElementById('filterStarBtn');
+            if (showingOnlyStarred) {
+                btn.style.background = "#ffb400";
+                btn.style.color = "#fff";
+                btn.innerText = "★ SHOW ALL";
+            } else {
+                btn.style.background = "#fff3cd";
+                btn.style.color = "#856404";
+                btn.innerText = "★ FAVORITES";
+            }
+            searchDealer();
         }
-        localStorage.setItem('persistent_starred_dealers', JSON.stringify(starred));
-        searchDealer();
-    }
 
-    function showOnlyStarredDealers() {
-        showingOnlyStarred = !showingOnlyStarred;
-        let btn = document.getElementById('filterStarBtn');
-        if (showingOnlyStarred) {
-            btn.style.background = "#ffb400";
-            btn.style.color = "#fff";
-            btn.innerText = "★ SHOW ALL";
-        } else {
-            btn.style.background = "#fff3cd";
-            btn.style.color = "#856404";
-            btn.innerText = "★ FAVORITES";
-        }
-        searchDealer();
-    }
-
-    function copyThreeDealerItems(dId, dName, bitlyUrl, btnEl, event) {
-        if(event) event.stopPropagation();
-        let textToCopy = `${dId} - ${dName} - ${bitlyUrl}`;
-        
-        function showSuccess() {
-            let originalText = btnEl.innerText;
-            btnEl.innerText = "COPIED! ✓";
-            btnEl.style.background = "var(--primary)";
-            btnEl.style.color = "white";
-            setTimeout(() => {
-                btnEl.innerText = originalText;
-                btnEl.style.background = "var(--indigo)";
+        function copyThreeDealerItems(dId, dName, bitlyUrl, btnEl, event) {
+            if(event) event.stopPropagation();
+            let textToCopy = `${dId} - ${dName} - ${bitlyUrl}`;
+            
+            function showSuccess() {
+                let originalText = btnEl.innerText;
+                btnEl.innerText = "COPIED! ✓";
+                btnEl.style.background = "var(--primary)";
                 btnEl.style.color = "white";
-            }, 1500);
-            showToast("📋 Dealer ID, Name & Link Copied!", "success");
+                setTimeout(() => {
+                    btnEl.innerText = originalText;
+                    btnEl.style.background = "var(--indigo)";
+                    btnEl.style.color = "white";
+                }, 1500);
+                showToast("📋 Dealer ID, Name & Link Copied!", "success");
+            }
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(showSuccess).catch(() => fallbackCopy(textToCopy, showSuccess));
+            } else {
+                fallbackCopy(textToCopy, showSuccess);
+            }
         }
 
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(textToCopy).then(showSuccess).catch(() => fallbackCopy(textToCopy, showSuccess));
-        } else {
-            fallbackCopy(textToCopy, showSuccess);
+        function openDealerSearchModal() { 
+            document.getElementById('dealerSearchInput').value = ''; 
+            showingOnlyStarred = false;
+            let btn = document.getElementById('filterStarBtn');
+            if(btn) { btn.style.background = "#fff3cd"; btn.style.color = "#856404"; btn.innerText = "★ FAVORITES"; }
+            searchDealer();
+            document.getElementById('dealerSearchModal').style.display = 'flex'; 
+            setTimeout(() => document.getElementById('dealerSearchInput').focus(), 100); 
         }
-    }
-
-    function openDealerSearchModal() { 
-        document.getElementById('dealerSearchInput').value = ''; 
-        showingOnlyStarred = false;
-        let btn = document.getElementById('filterStarBtn');
-        if(btn) { btn.style.background = "#fff3cd"; btn.style.color = "#856404"; btn.innerText = "★ FAVORITES"; }
-        searchDealer();
-        document.getElementById('dealerSearchModal').style.display = 'flex'; 
-        setTimeout(() => document.getElementById('dealerSearchInput').focus(), 100); 
-    }
-    
-    function closeDealerSearchModal() { 
-        document.getElementById('dealerSearchModal').style.display = 'none'; 
-    }
-
-    function searchDealer() {
-        let q = document.getElementById('dealerSearchInput').value.toLowerCase().trim(); 
-        let resultsDiv = document.getElementById('dealerSearchResults');
         
-        if (dealer_records.length === 0) { 
-            resultsDiv.innerHTML = '<div style="text-align:center; color:var(--danger); padding: 15px;">⚠️ Dealer data abhi load nahi hua hai.</div>'; 
-            return; 
+        function closeDealerSearchModal() { 
+            document.getElementById('dealerSearchModal').style.display = 'none'; 
         }
 
-        let starredIds = getStarredDealers();
-
-        // १. रिकामं सर्च बार असेल तर पूर्ण लिस्ट लपवा (फक्त Favorites पाहत नसाल तर)
-        if (!q && !showingOnlyStarred) {
-            resultsDiv.innerHTML = '<div style="text-align:center; color:#888; padding: 20px;">Type Dealer ID or Name to search...</div>';
-            return;
-        }
-
-        // २. स्मार्ट पार्सर वापरून डीलर्सचा डेटा फिक्स करा (हे एरर दूर करेल)
-        let parsedDealers = dealer_records.map(d => parseDealerObj(d));
-
-        let matches = parsedDealers.filter(p => { 
-            if (showingOnlyStarred && !starredIds.includes(p.code)) return false;
-            if (!q && !showingOnlyStarred) return true;
+        function searchDealer() {
+            let q = document.getElementById('dealerSearchInput').value.toLowerCase().trim(); 
+            let resultsDiv = document.getElementById('dealerSearchResults');
             
-            return p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q) || p.city.toLowerCase().includes(q); 
-        });
+            if (dealer_records.length === 0) { 
+                resultsDiv.innerHTML = '<div style="text-align:center; color:var(--danger); padding: 15px;">⚠️ Dealer data abhi load nahi hua hai.</div>'; 
+                return; 
+            }
 
-        matches.sort((a, b) => {
-            let isStarA = starredIds.includes(a.code);
-            let isStarB = starredIds.includes(b.code);
-            
-            if (isStarA && !isStarB) return -1;
-            if (!isStarA && isStarB) return 1;
-            return 0;
-        });
+            let starredIds = getStarredDealers();
 
-        let displayList = matches.slice(0, 50);
+            if (!q && !showingOnlyStarred) {
+                resultsDiv.innerHTML = '<div style="text-align:center; color:#888; padding: 20px;">Type Dealer ID or Name to search...</div>';
+                return;
+            }
 
-        if (displayList.length === 0) { 
-            resultsDiv.innerHTML = '<div style="text-align:center; color:#d35400; padding: 15px; font-weight:bold;">कोणताही डीलर सापडला नाही!</div>'; 
-            return; 
-        }
+            let parsedDealers = dealer_records.map(d => parseDealerObj(d));
 
-        resultsDiv.innerHTML = displayList.map(m => { 
-            let bitly = m.bitly || '#'; 
-            let dId = m.code || '-'; 
-            // नाव आणि शहर एकत्र दाखवूया
-            let dName = m.name + (m.city ? ` - ${m.city}` : ''); 
-            let isStarred = starredIds.includes(dId);
-            
-            let favBtnHtml = isStarred 
-                ? `<button onclick="toggleDealerStar('${dId}', event)" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">⭐ FAVORITED</button>`
-                : `<button onclick="toggleDealerStar('${dId}', event)" style="background:#f8f9fa; color:#555; border:1px solid #ccc; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">☆ ADD FAV</button>`;
+            let matches = parsedDealers.filter(p => { 
+                if (showingOnlyStarred && !starredIds.includes(p.code)) return false;
+                if (!q && !showingOnlyStarred) return true;
+                
+                return p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q) || p.city.toLowerCase().includes(q); 
+            });
 
-            return ` 
-            <div style="display:flex; flex-direction:column; background:${isStarred ? '#fffdf0' : '#fff'}; padding:10px; border-radius:6px; border:1px solid ${isStarred ? '#ffb400' : '#ddd'}; box-shadow: 0 2px 4px rgba(0,0,0,0.05); gap: 8px;"> 
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div style="flex: 1;">
-                        <strong style="color:var(--indigo); display:block; font-size: 14px;">🏪 ${dName}</strong>
-                        <span style="color:#555; font-size: 11px; font-weight:bold;">ID: <span style="color:var(--primary); font-weight:900;">${dId}</span></span>
+            matches.sort((a, b) => {
+                let isStarA = starredIds.includes(a.code);
+                let isStarB = starredIds.includes(b.code);
+                
+                if (isStarA && !isStarB) return -1;
+                if (!isStarA && isStarB) return 1;
+                return 0;
+            });
+
+            let displayList = matches.slice(0, 50);
+
+            if (displayList.length === 0) { 
+                resultsDiv.innerHTML = '<div style="text-align:center; color:#d35400; padding: 15px; font-weight:bold;">कोणताही डीलर सापडला नाही!</div>'; 
+                return; 
+            }
+
+            resultsDiv.innerHTML = displayList.map(m => { 
+                let bitly = m.bitly || '#'; 
+                let dId = m.code || '-'; 
+                let dName = m.name + (m.city ? ` - ${m.city}` : ''); 
+                let isStarred = starredIds.includes(dId);
+                
+                let favBtnHtml = isStarred 
+                    ? `<button onclick="toggleDealerStar('${dId}', event)" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">⭐ FAVORITED</button>`
+                    : `<button onclick="toggleDealerStar('${dId}', event)" style="background:#f8f9fa; color:#555; border:1px solid #ccc; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">☆ ADD FAV</button>`;
+
+                return ` 
+                <div style="display:flex; flex-direction:column; background:${isStarred ? '#fffdf0' : '#fff'}; padding:10px; border-radius:6px; border:1px solid ${isStarred ? '#ffb400' : '#ddd'}; box-shadow: 0 2px 4px rgba(0,0,0,0.05); gap: 8px;"> 
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div style="flex: 1;">
+                            <strong style="color:var(--indigo); display:block; font-size: 14px;">🏪 ${dName}</strong>
+                            <span style="color:#555; font-size: 11px; font-weight:bold;">ID: <span style="color:var(--primary); font-weight:900;">${dId}</span></span>
+                        </div>
+                        <div>${favBtnHtml}</div>
                     </div>
-                    <div>${favBtnHtml}</div>
-                </div>
-                <div style="display:flex; gap: 5px; border-top: 1px dashed #eee; padding-top: 8px;">
-                    <button onclick="openBitlyLink('${bitly}')" style="flex:1; background:var(--success); color:white; border:none; padding:6px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">OPEN LINK ↗</button>
-                    <button onclick="copyThreeDealerItems('${dId}', '${dName.replace(/'/g, "\\'")}', '${bitly}', this, event)" style="flex:1.5; background:var(--indigo); color:white; border:none; padding:6px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">📋 COPY DATA</button>
-                </div>
-            </div>`; 
-        }).join('');
-    }
+                    <div style="display:flex; gap: 5px; border-top: 1px dashed #eee; padding-top: 8px;">
+                        <button onclick="openBitlyLink('${bitly}')" style="flex:1; background:var(--success); color:white; border:none; padding:6px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">OPEN LINK ↗</button>
+                        <button onclick="copyThreeDealerItems('${dId}', '${dName.replace(/'/g, "\\'")}', '${bitly}', this, event)" style="flex:1.5; background:var(--indigo); color:white; border:none; padding:6px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">📋 COPY DATA</button>
+                    </div>
+                </div>`; 
+            }).join('');
+        }
 
-    function openBitlyLink(url) { 
-        if (url && url !== '#' && url.trim() !== '') { 
-            if (!url.startsWith('http://') && !url.startsWith('https://')) { url = 'https://' + url; } 
-            window.open(url, '_blank'); 
-            closeDealerSearchModal(); 
-        } else { 
-            showToast('⚠️ Is dealer ke liye Bitly link available nahi hai!', 'warning'); 
-        } 
-    }
+        function openBitlyLink(url) { 
+            if (url && url !== '#' && url.trim() !== '') { 
+                if (!url.startsWith('http://') && !url.startsWith('https://')) { url = 'https://' + url; } 
+                window.open(url, '_blank'); 
+                closeDealerSearchModal(); 
+            } else { 
+                showToast('⚠️ Is dealer ke liye Bitly link available nahi hai!', 'warning'); 
+            } 
+        }
 
 </script>
 </body>
