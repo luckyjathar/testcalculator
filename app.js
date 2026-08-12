@@ -831,7 +831,19 @@ async function processMultiStack() {
 }
 
 function findValLocal(row, targets) { let key = Object.keys(row).find(k => targets.includes(k.toUpperCase().replace(/\s/g, ''))); return key ? row[key] : null; }
-function mapData(row, type) { if(!row) return null; let expVal = findValLocal(row, ['EXPIRY', 'EXPIRYDATE', 'VALIDTILL', 'SCHEMEEXPIRY', 'ENDDATE']); let expDate = parseExcelDate(expVal); let isExp = false; let expiryDateStr = ""; if(expDate) { let today = new Date(); today.setHours(0,0,0,0); if(expDate < today) isExp = true; let dd = String(expDate.getDate()).padStart(2, '0'); let mm = String(expDate.getMonth() + 1).padStart(2, '0'); let yyyy = expDate.getFullYear(); expiryDateStr = `${dd}/${mm}/${yyyy}`; } return { model: type === SPECIAL_MODEL ? SPECIAL_MODEL : String(findValLocal(row,['MODEL','BRANDMODEL'])||"").toUpperCase(), brand: String(findValLocal(row, ['BRAND', 'MAKE', 'MANUFACTURER'])||"").toUpperCase(), mrp: parseFloat(findValLocal(row, ['MRP', 'PRICE', 'M.R.P'])) || 0, tenure: parseInt(findValLocal(row, ['TOTALTENURE', 'TENURE', 'TA'])) || 0, advEmi: parseInt(findValLocal(row, ['ADVANCEEMI', 'ADV'])) || 0, dbd: parseFloat(findValLocal(row,['DBD','DBD%'])||0), pf: parseInt(findValLocal(row,['PF','PROCESSINGFEE'])||0), roi: parseFloat(findValLocal(row,['ROI','ROI%'])||0), fixedEmi: parseFloat(findValLocal(row,['FIXEDEMI', 'FIXED'])||0), category: standardizeCategoryName(findValLocal(row,['CATEGORY','CAT'])||""), minLoan: parseFloat(findValLocal(row, ['MINLOAN', 'MINL'])) || 0, maxLoan: parseFloat(findValLocal(row, ['MAXLOAN', 'MAXL'])) || 9999999, isExpired: isExp, expiryDateStr: expiryDateStr, inactive: false }; }
+function mapData(row, type) { 
+    if(!row) return null; 
+    let expVal = findValLocal(row, ['EXPIRY', 'EXPIRYDATE', 'VALIDTILL', 'SCHEMEEXPIRY', 'ENDDATE']); 
+    let expDate = parseExcelDate(expVal); 
+    let isExp = false; let expiryDateStr = ""; 
+    if(expDate) { 
+        let today = new Date(); today.setHours(0,0,0,0); 
+        if(expDate < today) isExp = true; 
+        let dd = String(expDate.getDate()).padStart(2, '0'); let mm = String(expDate.getMonth() + 1).padStart(2, '0'); let yyyy = expDate.getFullYear(); expiryDateStr = `${dd}/${mm}/${yyyy}`; 
+    } 
+    if(isExp) return null; // 🔥 एक्सपायर झालेली स्कीम इथूनच ब्लॉक होईल आणि पोर्टलवर दिसणार नाही
+    return { model: type === SPECIAL_MODEL ? SPECIAL_MODEL : String(findValLocal(row,['MODEL','BRANDMODEL'])||"").toUpperCase(), brand: String(findValLocal(row, ['BRAND', 'MAKE', 'MANUFACTURER'])||"").toUpperCase(), mrp: parseFloat(findValLocal(row, ['MRP', 'PRICE', 'M.R.P'])) || 0, tenure: parseInt(findValLocal(row, ['TOTALTENURE', 'TENURE', 'TA'])) || 0, advEmi: parseInt(findValLocal(row, ['ADVANCEEMI', 'ADV'])) || 0, dbd: parseFloat(findValLocal(row,['DBD','DBD%'])||0), pf: parseInt(findValLocal(row,['PF','PROCESSINGFEE'])||0), roi: parseFloat(findValLocal(row,['ROI','ROI%'])||0), fixedEmi: parseFloat(findValLocal(row,['FIXEDEMI', 'FIXED'])||0), category: standardizeCategoryName(findValLocal(row,['CATEGORY','CAT'])||""), minLoan: parseFloat(findValLocal(row, ['MINLOAN', 'MINL'])) || 0, maxLoan: parseFloat(findValLocal(row, ['MAXLOAN', 'MAXL'])) || 9999999, isExpired: isExp, expiryDateStr: expiryDateStr, inactive: false }; 
+}
 function goHome() { document.getElementById('finalEligibleArea').style.display='none'; document.getElementById('catSelectionModal').style.display='none'; document.getElementById('unifiedHome').style.display='flex'; activeCustomerIndex = -1; selectedQueueIndex = -1; renderCustomerQueue(); updateUniversalActionButtons(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 function closeImageViewer() { document.getElementById('imageViewerModal').style.display='none'; }
 function openAddProductModal() { if (!isLimitValid()) return; document.getElementById('modalMatrixSearch').value = ''; document.getElementById('modalMatrixSearchDropdown').style.display = 'none'; document.getElementById('addProductModal').style.display = 'flex'; }
