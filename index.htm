@@ -166,7 +166,7 @@
 <header>
     <div style="display: flex; align-items: center; gap: 10px;">
         <button class="menu-toggle-btn" onclick="toggleSidebar()">☰ MENU</button>
-        <h1 onclick="secretAdminAccess()" style="cursor:pointer; user-select:none;">🚀 Persistent Portal Master</h1>
+        <h1>🚀 Persistent Portal Master</h1>
     </div>
 </header>
 
@@ -450,23 +450,6 @@
         </div>
     </div>
 
-    <!-- UPDATED DEALER SEARCH MODAL WITH STAR FAVORITES FEATURE -->
-    <div id="dealerSearchModal" class="modal">
-        <div class="modal-content" style="max-width: 480px; padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bajaj-blue); padding-bottom: 8px; margin-bottom: 15px;">
-                <h3 style="margin:0; color:var(--bajaj-blue);">🔗 SEARCH DEALER LINK</h3>
-                <button onclick="closeDealerSearchModal()" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:16px;">✖</button>
-            </div>
-            <div style="display: flex; gap: 6px; margin-bottom: 10px;">
-                <input type="text" id="dealerSearchInput" placeholder="🔍 Enter Dealer ID or Name..." oninput="searchDealer()" style="flex: 1; padding: 10px; border: 2px solid var(--primary); border-radius: 6px; outline: none;">
-                <button onclick="showOnlyStarredDealers()" id="filterStarBtn" style="background: #fff3cd; border: 1px solid #ffeeba; color: #856404; font-weight: bold; padding: 0 12px; border-radius: 6px; cursor: pointer; transition: 0.2s;" title="Show Favorite Dealers Only">★ FAVORITES</button>
-            </div>
-            <div id="dealerSearchResults" class="custom-scroll" style="max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 4px;">
-                <div style="text-align:center; color:#888;">Type ID or Name to search...</div>
-            </div>
-        </div>
-    </div>
-
     <div id="editCustomerModal" class="modal">
         <div class="modal-content" style="max-width:300px;">
             <h3 style="margin-top:0; color:var(--indigo); border-bottom: 2px solid #ddd; padding-bottom: 6px;">✏️ Edit Customer Details</h3>
@@ -645,6 +628,24 @@
         <button onclick="openAddProductModal()" style="width: 100%; background:var(--warning); color:#000; padding:10px; border-radius:6px; font-weight:900; margin-bottom:8px; border: 1.5px solid #d35400; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor:pointer;">➕ ADD NEW PRODUCT (SEARCH / NON-TIEUP / MANUAL)</button>
         <div id="multiModelContainer"></div>
     </div>
+    <!-- DEALER SEARCH MODAL -->
+<div id="dealerSearchModal" class="modal">
+    <div class="modal-content" style="max-width: 500px; padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bajaj-blue); padding-bottom: 8px; margin-bottom: 15px;">
+            <h3 style="margin:0; color:var(--bajaj-blue);">🔗 Dealer Links Search</h3>
+            <button onclick="closeDealerSearchModal()" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px;">✖</button>
+        </div>
+        
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <input type="text" id="dealerSearchInput" placeholder="Type Dealer Name, City or Code..." oninput="searchDealer()" style="flex:1;">
+            <button id="filterStarBtn" onclick="showOnlyStarredDealers()" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba; font-weight:bold; padding:0 10px; border-radius:4px; font-size:11px !important;">★ FAVORITES</button>
+        </div>
+        
+        <div id="dealerSearchResults" class="custom-scroll" style="display:flex; flex-direction:column; gap:8px; max-height:350px; overflow-y:auto; padding-right:5px;">
+            <!-- JavaScript will populate the results here -->
+        </div>
+    </div>
+</div>
 </main>
 
 <footer>
@@ -654,111 +655,6 @@
     </div>
 </footer>
 <script>
-    // --- Secret Admin Access Logic ---
-let adminClickCount = 0;
-let adminClickTimer;
-
-function secretAdminAccess() {
-    adminClickCount++;
-    clearTimeout(adminClickTimer);
-    
-    if (adminClickCount === 5) {
-        setupAdminToken(); // ५ वेळा क्लिक केल्यावर टोकन बॉक्स उघडेल
-        adminClickCount = 0; 
-    }
-    
-    // जर युजरने हळू क्लिक केले, तर २ सेकंदांनी काऊंट झिरो होईल
-    adminClickTimer = setTimeout(() => {
-        adminClickCount = 0;
-    }, 2000);
-}
-// ---------------------------------
-// १. GitHub Token सेट करण्यासाठी फंक्शन (Updated)
-function setupAdminToken() {
-    let existingToken = localStorage.getItem("gh_pat_token");
-    
-    // जर टोकन आधीच सेव्ह असेल, तर फक्त टोस्ट दाखवा आणि थांबवा
-    if (existingToken) {
-        showToast("✅ GitHub Token आधीच सेव्ह आहे. पुन्हा टाकण्याची गरज नाही!", "success");
-        return; // इथूनच कोड परत जाईल, prompt बॉक्स उघडणार नाही
-    }
-    
-    // जर टोकन नसेल, तरच बॉक्स उघडेल
-    let token = prompt("Enter your GitHub Personal Access Token (PAT):");
-    
-    // नवीन टोकन सेव्ह करणे
-    if (token && token.trim() !== "") {
-        localStorage.setItem("gh_pat_token", token.trim());
-        showToast("✅ GitHub Token Securely Saved!", "success");
-    }
-}
-}// २. Excel फाईल GitHub वर अपडेट करणारे फंक्शन
-async function updateExcelOnGitHub(newScheme) {
-    let token = localStorage.getItem("gh_pat_token");
-    if (!token) {
-        showToast("⚠️ Admin Token नाही! टोकन सेटअप करा.", "warning");
-        return;
-    }
-    
-    showToast("⏳ GitHub वर Excel अपडेट होत आहे, कृपया थांबा...", "warning");
-    
-    try {
-        const repo = "luckyjathar/testcalculator"; // तुमचे नवीन रेपो नाव
-        const path = "master_data.xlsx";
-        const apiUrl = `https://api.github.com/repos/${repo}/contents/${path}`;
-        
-        let res = await fetch(apiUrl, { headers: { "Authorization": `token ${token}` } });
-        let fileData = await res.json();
-        let sha = fileData.sha;
-        
-        let rawRes = await fetch(fileData.download_url);
-        let arrayBuffer = await rawRes.arrayBuffer();
-        
-        let wb = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
-        let sheetName = wb.SheetNames[0]; 
-        let ws = wb.Sheets[sheetName];
-        
-        let jsonData = XLSX.utils.sheet_to_json(ws);
-        
-        let newRow = {
-            "BRAND": newScheme.brand || "CUSTOM",
-            "MODEL": newScheme.model,
-            "CATEGORY": newScheme.category || "MANUAL",
-            "MRP": newScheme.mrp || 0,
-            "TENURE": newScheme.tenure || 0,
-            "ADV": newScheme.advEmi || 0,
-            "DBD%": newScheme.dbd || 0,
-            "PF": newScheme.pf || 0,
-            "ROI%": newScheme.roi || 0,
-            "FIXED": newScheme.fixedEmi || 0
-        };
-        jsonData.push(newRow);
-        
-        let newWs = XLSX.utils.json_to_sheet(jsonData);
-        wb.Sheets[sheetName] = newWs;
-        let base64Data = XLSX.write(wb, { type: 'base64', bookType: 'xlsx' });
-        
-        let pushRes = await fetch(apiUrl, {
-            method: 'PUT',
-            headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-                message: `Portal Auto-Update: Added new scheme for ${newScheme.model}`,
-                content: base64Data,
-                sha: sha,
-                branch: "main" 
-            })
-        });
-        
-        if (pushRes.ok) {
-            showToast("✅ Master Data Successfully Updated on GitHub!", "success");
-        } else {
-            throw new Error("GitHub API Push Rejected");
-        }
-    } catch (error) {
-        console.error("GitHub Update Error:", error);
-        showToast("⚠️ GitHub अपडेट फेल झाले! (Console तपासा)", "error");
-    }
-}
     /* === TOAST NOTIFICATION FUNCTION === */
     let toastTimeout;
     function showToast(message, type = 'success') {
@@ -1863,39 +1759,11 @@ function openRecycleBin() { let list = document.getElementById('recycleBinList')
     async function toggleInactive(pIdx, dIdx) { let prod = current_products[pIdx]; let scheme = prod.schemes[dIdx]; scheme.inactive = !scheme.inactive; recalcModel(pIdx); customerQueue[activeCustomerIndex].products = current_products; await saveQueueToLocal(); }
 
     async function executeManualAction() {
-    let mode = document.getElementById('targetPIdx').value; 
-    let scheme = { tenure: parseInt(document.getElementById('manTen').value), advEmi: parseInt(document.getElementById('manAdv').value), dbd: parseFloat(document.getElementById('manDbd').value)||0, pf: parseInt(document.getElementById('manPf').value)||0, roi: parseFloat(document.getElementById('manRoi').value)||0, fixedEmi: parseInt(document.getElementById('manFixed').value)||0, minLoan: 0, maxLoan: 9999999, category: "MANUAL", inactive: false, isExpired: false, expiryDateStr: "" };
-    let cCap = customerQueue[activeCustomerIndex]?.cap || "";
-
-    let globalSchemeData = null;
-
-    if(mode === "NEW") { 
-        let name = document.getElementById('manName').value.toUpperCase() || "MANUAL MODEL"; 
-        let comp = customerQueue[activeCustomerIndex].components || {}; 
-        current_products.push({ name: name, schemes: [scheme], category: "MANUAL", inputs: { mrp: "", inv: "", mtCap: cCap, target: "", gtl: 0, rfc: 0, exw: comp.exw||"", margin: comp.margin||"", dealer: comp.dealer||"", surch: 0, manualLoans: {} }, isManual: true }); 
-        sortConfigs.push({ key: 'dp', dir: 'asc' }); 
-        customerQueue[activeCustomerIndex].products = current_products; 
-        customerQueue[activeCustomerIndex].sortConfigs = sortConfigs; 
-        await saveQueueToLocal(); 
-        renderMatrix(); 
-        
-        globalSchemeData = { ...scheme, model: name, brand: "CUSTOM", mrp: 0, category: "MANUAL" };
-    } else { 
-        current_products[mode].schemes.push(scheme); 
-        recalcModel(parseInt(mode)); 
-        
-        let prodName = current_products[mode].name;
-        let prodCat = current_products[mode].category;
-        globalSchemeData = { ...scheme, model: prodName, brand: "CUSTOM", mrp: 0, category: prodCat };
-    } 
-
-    closeManualModal();
-
-    if(globalSchemeData) {
-        db_records.push(globalSchemeData); 
-        await updateExcelOnGitHub(globalSchemeData); 
+        let mode = document.getElementById('targetPIdx').value; 
+        let scheme = { tenure: parseInt(document.getElementById('manTen').value), advEmi: parseInt(document.getElementById('manAdv').value), dbd: parseFloat(document.getElementById('manDbd').value)||0, pf: parseInt(document.getElementById('manPf').value)||0, roi: parseFloat(document.getElementById('manRoi').value)||0, fixedEmi: parseInt(document.getElementById('manFixed').value)||0, minLoan: 0, maxLoan: 9999999, category: "MANUAL", inactive: false, isExpired: false, expiryDateStr: "" };
+        let cCap = customerQueue[activeCustomerIndex]?.cap || "";
+        if(mode === "NEW") { let name = document.getElementById('manName').value.toUpperCase() || "MANUAL MODEL"; let comp = customerQueue[activeCustomerIndex].components || {}; current_products.push({ name: name, schemes: [scheme], category: "MANUAL", inputs: { mrp: "", inv: "", mtCap: cCap, target: "", gtl: 0, rfc: 0, exw: comp.exw||"", margin: comp.margin||"", dealer: comp.dealer||"", surch: 0, manualLoans: {} }, isManual: true }); sortConfigs.push({ key: 'dp', dir: 'asc' }); customerQueue[activeCustomerIndex].products = current_products; customerQueue[activeCustomerIndex].sortConfigs = sortConfigs; await saveQueueToLocal(); renderMatrix(); } else { current_products[mode].schemes.push(scheme); recalcModel(parseInt(mode)); } closeManualModal();
     }
-}
     
     function openQuoteSelectionModal() {
         if(current_products.length === 0) { showToast("⚠️ Kripya pehle matrix mein koi product add karein!", "warning"); return; }
@@ -2036,7 +1904,7 @@ function openRecycleBin() { let list = document.getElementById('recycleBinList')
         });
     }
 
-    /* === DEALER LINKS WITH STAR (FAVORITES) & 3-ITEM COPY FEATURE === */
+/* === DEALER LINKS WITH STAR (FAVORITES) & 3-ITEM COPY FEATURE === */
     let showingOnlyStarred = false;
 
     function getStarredDealers() {
@@ -2052,7 +1920,7 @@ function openRecycleBin() { let list = document.getElementById('recycleBinList')
             showToast("★ Dealer removed from favorites!", "warning");
         } else {
             starred.push(idStr);
-            showToast("★ Dealer added to top favorites!", "success");
+            showToast("★ Dealer added to favorites!", "success");
         }
         localStorage.setItem('persistent_starred_dealers', JSON.stringify(starred));
         searchDealer();
@@ -2116,27 +1984,31 @@ function openRecycleBin() { let list = document.getElementById('recycleBinList')
         let resultsDiv = document.getElementById('dealerSearchResults');
         
         if (dealer_records.length === 0) { 
-            resultsDiv.innerHTML = '<div style="text-align:center; color:var(--danger); padding: 15px;">⚠️ Dealer data abhi load nahi hua hai ya sheet missing hai.</div>'; 
+            resultsDiv.innerHTML = '<div style="text-align:center; color:var(--danger); padding: 15px;">⚠️ Dealer data abhi load nahi hua hai.</div>'; 
             return; 
         }
 
         let starredIds = getStarredDealers();
 
-        let matches = dealer_records.filter(d => { 
-            let dId = String(d['DealerId'] || d['dealerid'] || d['DEALER ID'] || d['ID'] || '').trim();
-            let dName = String(d['Dealer Name'] || d['dealer name'] || d['DEALER NAME'] || d['NAME'] || '').trim();
-            
-            if (showingOnlyStarred && !starredIds.includes(dId)) return false;
+        // १. रिकामं सर्च बार असेल तर पूर्ण लिस्ट लपवा (फक्त Favorites पाहत नसाल तर)
+        if (!q && !showingOnlyStarred) {
+            resultsDiv.innerHTML = '<div style="text-align:center; color:#888; padding: 20px;">Type Dealer ID or Name to search...</div>';
+            return;
+        }
+
+        // २. स्मार्ट पार्सर वापरून डीलर्सचा डेटा फिक्स करा (हे एरर दूर करेल)
+        let parsedDealers = dealer_records.map(d => parseDealerObj(d));
+
+        let matches = parsedDealers.filter(p => { 
+            if (showingOnlyStarred && !starredIds.includes(p.code)) return false;
             if (!q && !showingOnlyStarred) return true;
             
-            return dId.toLowerCase().includes(q) || dName.toLowerCase().includes(q); 
+            return p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q) || p.city.toLowerCase().includes(q); 
         });
 
         matches.sort((a, b) => {
-            let idA = String(a['DealerId'] || a['dealerid'] || a['DEALER ID'] || a['ID'] || '').trim();
-            let idB = String(b['DealerId'] || b['dealerid'] || b['DEALER ID'] || b['ID'] || '').trim();
-            let isStarA = starredIds.includes(idA);
-            let isStarB = starredIds.includes(idB);
+            let isStarA = starredIds.includes(a.code);
+            let isStarB = starredIds.includes(b.code);
             
             if (isStarA && !isStarB) return -1;
             if (!isStarA && isStarB) return 1;
@@ -2151,23 +2023,28 @@ function openRecycleBin() { let list = document.getElementById('recycleBinList')
         }
 
         resultsDiv.innerHTML = displayList.map(m => { 
-            let bitly = m['BitlyLink'] || m['bitlylink'] || m['BITLY LINK'] || m['LINK'] || '#'; 
-            let dId = String(m['DealerId'] || m['dealerid'] || m['DEALER ID'] || m['ID'] || '-').trim(); 
-            let dName = String(m['Dealer Name'] || m['dealer name'] || m['DEALER NAME'] || m['NAME'] || 'Unknown Dealer').trim(); 
+            let bitly = m.bitly || '#'; 
+            let dId = m.code || '-'; 
+            // नाव आणि शहर एकत्र दाखवूया
+            let dName = m.name + (m.city ? ` - ${m.city}` : ''); 
             let isStarred = starredIds.includes(dId);
             
+            let favBtnHtml = isStarred 
+                ? `<button onclick="toggleDealerStar('${dId}', event)" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">⭐ FAVORITED</button>`
+                : `<button onclick="toggleDealerStar('${dId}', event)" style="background:#f8f9fa; color:#555; border:1px solid #ccc; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">☆ ADD FAV</button>`;
+
             return ` 
-            <div style="display:flex; justify-content:space-between; align-items:center; background:${isStarred ? '#fffdf0' : '#f8f9fa'}; padding:10px; border-radius:6px; border:1px solid ${isStarred ? '#ffb400' : '#ddd'}; transition:0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); gap: 8px;"> 
-                <button onclick="toggleDealerStar('${dId}', event)" style="background:none; border:none; font-size:22px; cursor:pointer; color:${isStarred ? '#ffb400' : '#ccc'}; padding:0 4px; transition: 0.2s;" title="Star / Unstar Dealer">
-                    ★
-                </button>
-                <div style="flex: 1; overflow: hidden;">
-                    <strong style="color:var(--indigo); display:block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">🏪 ${dName}</strong>
-                    <span style="color:#555; font-size: 11px; font-weight:bold;">ID: <span style="color:var(--primary); font-weight:900;">${dId}</span></span>
-                </div> 
-                <div style="display:flex; gap: 5px; flex-shrink: 0;">
-                    <button onclick="openBitlyLink('${bitly}')" style="background:var(--success); color:white; border:none; padding:6px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">OPEN ↗</button>
-                    <button onclick="copyThreeDealerItems('${dId}', '${dName.replace(/'/g, "\\'")}', '${bitly}', this, event)" style="background:var(--indigo); color:white; border:none; padding:6px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;" title="Copy Code, Name & Link">📋 COPY DATA</button>
+            <div style="display:flex; flex-direction:column; background:${isStarred ? '#fffdf0' : '#fff'}; padding:10px; border-radius:6px; border:1px solid ${isStarred ? '#ffb400' : '#ddd'}; box-shadow: 0 2px 4px rgba(0,0,0,0.05); gap: 8px;"> 
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div style="flex: 1;">
+                        <strong style="color:var(--indigo); display:block; font-size: 14px;">🏪 ${dName}</strong>
+                        <span style="color:#555; font-size: 11px; font-weight:bold;">ID: <span style="color:var(--primary); font-weight:900;">${dId}</span></span>
+                    </div>
+                    <div>${favBtnHtml}</div>
+                </div>
+                <div style="display:flex; gap: 5px; border-top: 1px dashed #eee; padding-top: 8px;">
+                    <button onclick="openBitlyLink('${bitly}')" style="flex:1; background:var(--success); color:white; border:none; padding:6px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">OPEN LINK ↗</button>
+                    <button onclick="copyThreeDealerItems('${dId}', '${dName.replace(/'/g, "\\'")}', '${bitly}', this, event)" style="flex:1.5; background:var(--indigo); color:white; border:none; padding:6px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">📋 COPY DATA</button>
                 </div>
             </div>`; 
         }).join('');
@@ -2182,6 +2059,7 @@ function openRecycleBin() { let list = document.getElementById('recycleBinList')
             showToast('⚠️ Is dealer ke liye Bitly link available nahi hai!', 'warning'); 
         } 
     }
+
 </script>
 </body>
 </html>
