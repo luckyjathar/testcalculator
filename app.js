@@ -433,6 +433,18 @@ function renderTableModel() {
 
     let validSchemes = schemes.filter(s => s.tenure > 0 || s.fixedEmi > 0);
     
+    // 🔥 LIVE EXPIRY CHECK FOR DICTIONARY
+    let today = new Date(); today.setHours(0,0,0,0);
+    validSchemes = validSchemes.filter(s => {
+        if(!s.expiryDateStr) return true;
+        let p = s.expiryDateStr.trim().split('/');
+        if(p.length === 3) {
+            let expD = new Date(p[2], p[1]-1, p[0]);
+            if(expD < today) return false;
+        }
+        return true;
+    });
+    
     let thead = document.getElementById('tableHead');
     if (isCalculatedMode) {
         thead.innerHTML = `<tr><th style="background:#e3f2fd;">T/A</th><th style="background:#e3f2fd;">LTV%</th><th style="background:#e8f5e9; color:var(--success);">LOAN</th><th style="background:#fff3e0; color:#d35400;">DIFF (INV-LOAN)</th><th style="background:#e8f5e9; color:var(--success);">EST. DP</th><th style="background:#e3f2fd; color:var(--primary);">EMI</th><th style="background:#e3f2fd; color:var(--primary);">MONTHS</th><th>ACTION</th></tr>`;
@@ -555,7 +567,6 @@ function renderTableModel() {
     
     document.getElementById('schemeResultArea').style.display = 'block';
 }
-
 function copySingleScheme(tenure, advEmi, loan, dp, emi, fixedEmi, dbd, roi, pf, btn) {
     let limit = parseFloat(document.getElementById('calcLimit').value) || 0;
     let invoice = parseFloat(document.getElementById('calcInvoice').value) || 0;
@@ -1011,9 +1022,29 @@ function recalcModel(pIdx) {
         return { ...s, pf: dynamicPf, currentTenure, nbfcMaxL, loan, dp: dpRounded, emi, inst, daily: emi/30, dIdx, isFixed, curLTV, extra: extraVal, dbdAmt, roiAmt, netDisb, inactive: s.inactive || false, expiryDateStr: s.expiryDateStr, isInv50Breach: isInv50Breach };
     });
     renderRows(pIdx);
-}function renderRows(pIdx) {
-    let prod = current_products[pIdx]; if(!sortConfigs[pIdx]) sortConfigs[pIdx] = {key: 'dp', dir: 'asc'}; let conf = sortConfigs[pIdx]; prod.calculatedData.sort((a,b) => conf.dir==='asc' ? a[conf.key]-b[conf.key] : b[conf.key]-a[conf.key]); let ltvLimit = customerQueue[activeCustomerIndex]?.ltv || 100; let isNT = prod.isNonTieup;
+}
+function renderRows(pIdx) {
+    let prod = current_products[pIdx]; 
+    if(!sortConfigs[pIdx]) sortConfigs[pIdx] = {key: 'dp', dir: 'asc'}; 
+    let conf = sortConfigs[pIdx]; 
+    prod.calculatedData.sort((a,b) => conf.dir==='asc' ? a[conf.key]-b[conf.key] : b[conf.key]-a[conf.key]); 
+    let ltvLimit = customerQueue[activeCustomerIndex]?.ltv || 100; 
+    let isNT = prod.isNonTieup;
+    
+    // 🔥 LIVE EXPIRY CHECK: आजची तारीख काढा
+    let today = new Date(); today.setHours(0,0,0,0);
+
     document.getElementById(`body_${pIdx}`).innerHTML = prod.calculatedData.map(d => {
+        
+        // 🚀 कोणतीही स्कीम एक्सपायर झाली असेल तर तिला थेट लपवा (Hide)
+        if(d.expiryDateStr) {
+            let p = d.expiryDateStr.trim().split('/');
+            if(p.length === 3) {
+                let expD = new Date(p[2], p[1]-1, p[0]);
+                if(expD < today) return ''; // स्कीम गायब होईल
+            }
+        }
+
         let curLTV = d.curLTV; let isLtvB = (curLTV > ltvLimit); let isBoundB = false; if (isNT && prod.inputs.mrp > 0) { if (d.loan < d.minLoan || d.loan > d.maxLoan) isBoundB = true; } let isInactive = d.inactive; 
         
         if (d.isInv50Breach) { isBoundB = true; }
@@ -1031,7 +1062,6 @@ function recalcModel(pIdx) {
         </tr>`;
     }).join('');
 }
-
 function step(pIdx, dIdx, amt) { let el = document.getElementById(`l_${pIdx}_${dIdx}`); el.value = Math.max(0, parseInt(el.value) + amt); manual(pIdx, dIdx); }
 
 function manual(pIdx, dIdx) {
