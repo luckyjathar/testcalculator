@@ -104,3 +104,49 @@ h3[style*="font-size"] { font-size: 18px !important; }
 .bottom-sheet-menu {
     width: 100%; max-width: 600px; border-radius: 20px 20px 0 0; background: #f8f9fa; padding: 25px 20px; animation: slideUpMenu 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+/* Body Background and Font */
+body {
+    background-color: #f4f7f6;
+    font-family: 'Poppins', sans-serif;
+    color: #333;
+}
+
+/* Card Style for Sections */
+.card-section {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+/* Input Fields and Select Dropdowns */
+input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+input:focus, select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    outline: none;
+}
+
+/* Button Styling */
+button {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 115, 255, 0.4);
+}
