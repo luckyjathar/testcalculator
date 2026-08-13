@@ -1555,3 +1555,8 @@ function toggleZatpatCalc() {
         }
     }, 300);
 }
+function openGlobalAppMenu() { document.getElementById('globalAppMenuModal').style.display = 'flex'; }
+function closeGlobalAppMenu() { document.getElementById('globalAppMenuModal').style.display = 'none'; }
+function openUserGuideModal() { document.getElementById('userGuideModal').style.display = 'flex'; }
+function closeUserGuideModal() { document.getElementById('userGuideModal').style.display = 'none'; }
+function toggleZatpatCalc() { goHome(); setTimeout(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); let zBox = document.querySelector('.fast-calc-box'); if(zBox) { zBox.style.boxShadow = "0 0 20px rgba(9, 132, 227, 0.6)"; setTimeout(() => { zBox.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)"; }, 2000); } }, 300); }
