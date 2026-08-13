@@ -150,3 +150,14 @@ button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0, 115, 255, 0.4);
 }
+/* Bootstrap Modal Conflict Fix */
+.modal {
+    z-index: 99999 !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+}
+.modal-content {
+    background: white !important;
+    margin: 5% auto !important;
+    position: relative !important;
+    display: block !important;
+}
