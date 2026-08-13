@@ -161,3 +161,12 @@ button:hover {
     position: relative !important;
     display: block !important;
 }
+.modal {
+    opacity: 1 !important; 
+    z-index: 99999 !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+}
+.modal-content {
+    background: white !important;
+    margin: 5% auto !important;
+}
