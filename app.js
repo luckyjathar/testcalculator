@@ -1524,3 +1524,32 @@ function openBitlyLink(url) {
         showToast('⚠️ Is dealer ke liye Bitly link available nahi hai!', 'warning'); 
     } 
 }
+// Function to clear the entire searched product from the dictionary
+function clearEntireProduct() {
+    // 1. Clear the inputs
+    document.getElementById('globalModelSearch').value = '';
+    document.getElementById('calcInvoice').value = '';
+    document.getElementById('calcMargin').value = '0';
+    document.getElementById('calcTarget').value = '';
+    document.getElementById('calcCap').value = '';
+    
+    // 2. Hide the result area
+    document.getElementById('schemeResultArea').style.display = 'none';
+    
+    // 3. Clear the table body
+    document.getElementById('globalViewerBody').innerHTML = '';
+    
+    // 4. Update accordion title back to default
+    document.getElementById('headingOne').innerHTML = `
+        <button class="accordion-button fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+            📱 Selected Product Details
+        </button>
+    `;
+    
+    // 5. Show toast notification (If your app has a showToast function)
+    if(typeof showToast === "function") {
+        showToast("Product Cleared Successfully!");
+    } else {
+        alert("Product Cleared!");
+    }
+}
