@@ -1283,17 +1283,24 @@ function doGenerateCustomerImage() {
 
         let top4RowsHtml = top4Entries.map((item, i) => {
             let d = item.scheme;
-            let bHtml = item.badges.map(b => `<div style="font-size:11px; color:${badgeDetails[b].color}; font-weight:950; margin-top:3px; line-height:1.2;">${badgeDetails[b].text}</div>`).join('');
+            
+            // 🔥 UPDATE: नवीन सॉलिड बॅजेस डिझाईन आणि हायलाईटेड बॅकग्राऊंड
+            let bHtml = item.badges.map(b => `
+                <div style="background:${badgeDetails[b].color}; color:white; font-size:11px; font-weight:950; margin-top:5px; padding:3px 8px; border-radius:12px; display:inline-block; box-shadow:0 1px 3px rgba(0,0,0,0.2);">
+                    ${badgeDetails[b].text}
+                </div>
+            `).join('<br>');
+            
             return `
-                <tr style="background:${i%2==0?'#ffffff':'#fcfcfc'}; color:#1e293b; border-bottom: 1px solid #ededed;">
-                    <td style="padding:12px 6px; font-size:16px; font-weight:950; color:#1e293b; line-height:1.2;">
-                        ${d.currentTenure}/${d.advEmi}
+                <tr style="background:#f5fbf7; color:#1e293b; border-bottom: 2px solid #e0e0e0; border-left: 5px solid #00a86b;">
+                    <td style="padding:12px 6px; font-size:16px; font-weight:950; color:#1e293b; line-height:1.4;">
+                        <span style="font-size:18px;">${d.currentTenure}/${d.advEmi}</span><br>
                         ${bHtml}
                     </td>
-                    <td style="padding:12px 6px; color:#00a86b; font-size:16px; font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding:12px 6px; color:#0059A3; font-size:16px; font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td>
+                    <td style="padding:12px 6px; color:#00a86b; font-size:17px; font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td>
+                    <td style="padding:12px 6px; color:#0059A3; font-size:17px; font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td>
                     <td style="padding:12px 6px; font-size:16px; font-weight:950; color:#1e293b;">${d.inst}</td>
-                    <td style="padding:12px 6px; color:#d35400; font-size:16px; font-weight:950;">₹${Math.round(d.daily).toLocaleString()}</td>
+                    <td style="padding:12px 6px; color:#d35400; font-size:17px; font-weight:950;">₹${Math.round(d.daily).toLocaleString()}</td>
                 </tr>
             `;
         }).join('');
