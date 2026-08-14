@@ -1297,41 +1297,27 @@ function doGenerateCustomerImage() {
 
         let remainingSchemes = validS.filter(d => !topSchemeIDs.has(d.dIdx)).sort((a, b) => a.dp - b.dp);
 
-        // 🔥 1. Premium FinTech Badges & Dynamic Row Colors
-        let badgeDetails = {
-            "DP": { text: "▼ LOWEST DP", bg: "#059669", color: "#ffffff", rowBg: "#ecfdf5", accent: "#059669" },
-            "EMI": { text: "▼ LOWEST EMI", bg: "#2563eb", color: "#ffffff", rowBg: "#eff6ff", accent: "#2563eb" },
-            "POP": { text: "★ TOP CHOICE", bg: "#d97706", color: "#ffffff", rowBg: "#fffbeb", accent: "#d97706" },
-            "BAL": { text: "✦ BEST VALUE", bg: "#7c3aed", color: "#ffffff", rowBg: "#f5f3ff", accent: "#7c3aed" }
-        };
-
-        let badgedEntries = Array.from(schemeMap.values()).filter(e => e.badges.length > 0);
-        badgedEntries.sort((a, b) => b.badges.length - a.badges.length);
-        let top4Entries = badgedEntries.slice(0, 4);
-        let top4Schemes = top4Entries.map(e => e.scheme).sort((a, b) => a.dp - b.dp);
-        let topSchemeIDs = new Set(top4Schemes.map(s => s.dIdx));
-
-        let remainingSchemes = validS.filter(d => !topSchemeIDs.has(d.dIdx)).sort((a, b) => a.dp - b.dp);
-
-        // 🔥 2. High-Converting Row Design
+        // 🔥 UPDATE 2: आकर्षक डिझाईन, योग्य Padding आणि डायनॅमिक बॉर्डर कलर
         let top4RowsHtml = top4Entries.map((item, i) => {
             let d = item.scheme;
-            let primaryBadge = badgeDetails[item.badges[0]]; // मुख्य टॅगनुसार पूर्ण लाईनचा रंग ठरेल
+            
+            // पहिल्या टॅगचा जो रंग असेल, तोच रंग डाव्या बाजूच्या बॉर्डरला लागेल
+            let primaryColor = badgeDetails[item.badges[0]].bg;
 
             let bHtml = item.badges.map(b => `
-                <div style="background:${badgeDetails[b].bg}; color:${badgeDetails[b].color}; font-size:10px; font-weight:900; margin-top:5px; padding:4px 8px; border-radius:4px; display:inline-block; letter-spacing:1px; text-transform:uppercase; border: 1px solid rgba(0,0,0,0.1);">
+                <div style="background:${badgeDetails[b].bg}; color:${badgeDetails[b].color}; font-size:10px; font-weight:900; margin-top:6px; padding:4px 8px; border-radius:4px; display:inline-block; letter-spacing:0.5px; text-transform:uppercase; box-shadow:0 1px 3px rgba(0,0,0,0.15);">
                     ${badgeDetails[b].text}
                 </div>
             `).join('<br>');
 
             return `
-                <tr style="background:${primaryBadge.rowBg}; border-bottom: 2px solid #cbd5e1; border-left: 6px solid ${primaryBadge.accent};">
+                <tr style="background:#ffffff; border-bottom: 2px solid #e2e8f0; border-left: 5px solid ${primaryColor};">
                     <td style="padding:15px 6px; font-size:16px; font-weight:950; color:#1e293b; line-height:1.2;">
                         <span style="font-size:18px;">${d.currentTenure}/${d.advEmi}</span><br>
                         ${bHtml}
                     </td>
-                    <td style="padding:15px 6px; color:#059669; font-size:17px; font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding:15px 6px; color:#2563eb; font-size:17px; font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td>
+                    <td style="padding:15px 6px; color:#10b981; font-size:17px; font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td>
+                    <td style="padding:15px 6px; color:#3b82f6; font-size:17px; font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td>
                     <td style="padding:15px 6px; font-size:16px; font-weight:950; color:#1e293b;">${d.inst}</td>
                     <td style="padding:15px 6px; color:#ea580c; font-size:17px; font-weight:950;">₹${Math.round(d.daily).toLocaleString()}</td>
                 </tr>
