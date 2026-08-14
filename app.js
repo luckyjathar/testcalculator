@@ -1281,26 +1281,45 @@ function doGenerateCustomerImage() {
 
         let remainingSchemes = validS.filter(d => !topSchemeIDs.has(d.dIdx)).sort((a, b) => a.dp - b.dp);
 
+        // 🔥 UPDATE 1: Emojis काढले आणि प्रोफेशनल Text/Colors टाकले
+        let badgeDetails = {
+            "DP": { text: "SAVE CASH TODAY", bg: "#10b981", color: "#ffffff" },
+            "EMI": { text: "POCKET FRIENDLY", bg: "#3b82f6", color: "#ffffff" },
+            "POP": { text: "MOST LOVED", bg: "#f59e0b", color: "#ffffff" },
+            "BAL": { text: "SUPER VALUE", bg: "#8b5cf6", color: "#ffffff" }
+        };
+
+        let badgedEntries = Array.from(schemeMap.values()).filter(e => e.badges.length > 0);
+        badgedEntries.sort((a, b) => b.badges.length - a.badges.length);
+        let top4Entries = badgedEntries.slice(0, 4);
+        let top4Schemes = top4Entries.map(e => e.scheme).sort((a, b) => a.dp - b.dp);
+        let topSchemeIDs = new Set(top4Schemes.map(s => s.dIdx));
+
+        let remainingSchemes = validS.filter(d => !topSchemeIDs.has(d.dIdx)).sort((a, b) => a.dp - b.dp);
+
+        // 🔥 UPDATE 2: आकर्षक डिझाईन, योग्य Padding आणि डायनॅमिक बॉर्डर कलर
         let top4RowsHtml = top4Entries.map((item, i) => {
             let d = item.scheme;
             
-            // 🔥 UPDATE: नवीन सॉलिड बॅजेस डिझाईन आणि हायलाईटेड बॅकग्राऊंड
+            // पहिल्या टॅगचा जो रंग असेल, तोच रंग डाव्या बाजूच्या बॉर्डरला लागेल
+            let primaryColor = badgeDetails[item.badges[0]].bg;
+
             let bHtml = item.badges.map(b => `
-                <div style="background:${badgeDetails[b].color}; color:white; font-size:11px; font-weight:950; margin-top:5px; padding:3px 8px; border-radius:12px; display:inline-block; box-shadow:0 1px 3px rgba(0,0,0,0.2);">
+                <div style="background:${badgeDetails[b].bg}; color:${badgeDetails[b].color}; font-size:10px; font-weight:900; margin-top:6px; padding:4px 8px; border-radius:4px; display:inline-block; letter-spacing:0.5px; text-transform:uppercase; box-shadow:0 1px 3px rgba(0,0,0,0.15);">
                     ${badgeDetails[b].text}
                 </div>
             `).join('<br>');
-            
+
             return `
-                <tr style="background:#f5fbf7; color:#1e293b; border-bottom: 2px solid #e0e0e0; border-left: 5px solid #00a86b;">
-                    <td style="padding:12px 6px; font-size:16px; font-weight:950; color:#1e293b; line-height:1.4;">
+                <tr style="background:#ffffff; border-bottom: 2px solid #e2e8f0; border-left: 5px solid ${primaryColor};">
+                    <td style="padding:15px 6px; font-size:16px; font-weight:950; color:#1e293b; line-height:1.2;">
                         <span style="font-size:18px;">${d.currentTenure}/${d.advEmi}</span><br>
                         ${bHtml}
                     </td>
-                    <td style="padding:12px 6px; color:#00a86b; font-size:17px; font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding:12px 6px; color:#0059A3; font-size:17px; font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td>
-                    <td style="padding:12px 6px; font-size:16px; font-weight:950; color:#1e293b;">${d.inst}</td>
-                    <td style="padding:12px 6px; color:#d35400; font-size:17px; font-weight:950;">₹${Math.round(d.daily).toLocaleString()}</td>
+                    <td style="padding:15px 6px; color:#10b981; font-size:17px; font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td>
+                    <td style="padding:15px 6px; color:#3b82f6; font-size:17px; font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td>
+                    <td style="padding:15px 6px; font-size:16px; font-weight:950; color:#1e293b;">${d.inst}</td>
+                    <td style="padding:15px 6px; color:#ea580c; font-size:17px; font-weight:950;">₹${Math.round(d.daily).toLocaleString()}</td>
                 </tr>
             `;
         }).join('');
