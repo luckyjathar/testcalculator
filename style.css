@@ -36,12 +36,14 @@ main { flex: 1; }
 #unifiedHome { display: flex; flex-direction: column; }
 #finalEligibleArea { display: none; flex-direction: column; }
 input, select { width: 100%; padding: 6px; border: 1.5px solid #ccc; border-radius: 4px; font-weight: 600; font-size: 14px !important; height: 34px !important; box-sizing: border-box; transition: border 0.3s; }
-input:focus, select:focus { border-color: var(--bajaj-blue); outline: none; }
+input:focus, select:focus { border-color: var(--primary); outline: none; }
 label { font-weight: 900; font-size: 11px !important; color: #555; text-transform: uppercase; margin-bottom: 3px; display: block; }
 button { padding: 8px; border-radius: 4px; font-weight: 900; cursor: pointer; border: none; text-transform: uppercase; transition: background 0.3s; font-size: 12px !important; }
 .disclaimer-box { background: #e3f2fd; border: 1px solid #bbdefb; padding: 8px; border-radius: 6px; margin-bottom: 6px; color: var(--bajaj-blue); font-size: 13px !important; line-height: 1.4; font-weight: 600; }
 .disclaimer-box b { color: var(--primary); text-transform: uppercase; }
 .top-nav-box { display: flex; gap: 5px; margin-bottom: 6px; position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 4px 0; align-items: center; }
+
+/* MODALS BASE */
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); display: none; justify-content: center; align-items: flex-start; padding-top: 10px; z-index: 4000; overflow-y: auto; box-sizing: border-box; backdrop-filter: blur(3px); }
 .modal-content { background: white; padding: 15px; border-radius: 8px; width: 90%; max-width: 400px; position: relative; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
 #multiStackModal .modal-content, #dictionarySearchModal .modal-content, #customerMessageGenModal .modal-content, #draftsModal .modal-content { max-width: 900px; width: 95%; padding: 15px; }
@@ -52,7 +54,14 @@ button { padding: 8px; border-radius: 4px; font-weight: 900; cursor: pointer; bo
 #generatedImage { max-width: 100%; max-height: 80vh; width: auto; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: block; margin: 10px auto; }
 .close-img-btn { position: fixed; top: 10px; right: 15px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 35px; height: 35px; font-size: 16px; cursor: pointer; font-weight: bold; z-index: 4100; }
 
-/* Table Wrapper */
+/* 7-DIGIT FIX FOR INLINE INPUTS (MRP, INV, VAR) */
+input[id^="mrp_"], input[id^="inv_"], input[id^="surch_"] {
+    width: 95px !important;
+    font-size: 14px !important;
+    padding: 6px !important;
+    letter-spacing: -0.5px !important;
+}
+
 .table-wrapper { overflow-x: hidden; background: white; border-radius: 4px; border: 1px solid #eee; transition: max-height 0.3s ease; width: 100%; box-sizing: border-box; }
 table { width: 100%; border-collapse: collapse; font-size: 13px !important; }
 th, td { padding: 6px 4px !important; border-bottom: 1px solid #eee; text-align: center; width: 1%; }
@@ -66,9 +75,12 @@ th { background: #f8f9fa; font-weight: 900; font-size: 11px !important; cursor: 
 .inactive-row button { text-decoration: none !important; opacity: 1 !important; }
 .expired-row { background-color: #fff4e6 !important; border-left: 3px solid #d35400; }
 .bound-col { color: #d35400; font-weight: 800; font-size: 11px !important; }
+
+/* STEPPER FIX FOR 7 DIGITS */
 .stepper { display: flex; align-items: center; justify-content: center; gap: 2px; transform: scale(0.95); }
-.step-btn { width: 24px !important; height: 28px !important; background: var(--primary); color: white; border-radius: 3px; font-size: 16px !important; cursor: pointer; padding: 0; }
-.step-inp { width: 75px; text-align: center; font-weight: 955; border: 1px solid var(--primary); height: 28px !important; font-size: 14px !important; color: var(--primary); }
+.step-btn { width: 30px !important; height: 38px !important; background: var(--primary); color: white; border-radius: 4px; font-size: 18px !important; cursor: pointer; padding: 0; }
+.step-inp { width: 90px !important; text-align: center; font-weight: 900; border: 1px solid var(--primary); height: 38px !important; font-size: 14px !important; color: var(--primary); padding: 4px !important; letter-spacing: -0.5px; }
+
 .model-panel { background: #fff; padding: 8px; border-radius: 6px; border: 1.5px solid var(--primary); margin-bottom: 10px; box-shadow: 0 2px 6px rgba(25, 118, 210, 0.1); width: 100%; box-sizing: border-box; }
 .control-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 6px 0; background: #f8f9fa; padding: 8px; border-radius: 4px; border: 1px solid #e0e0e0; }
 .bajaj-cust-card { background: linear-gradient(135deg, var(--bajaj-blue) 0%, #003a6b 100%); color: white; padding: 10px !important; border-radius: 6px; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); font-size: 14px !important; border-left: 6px solid var(--bajaj-green); display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; text-transform: uppercase; font-weight: bold; }
@@ -110,79 +122,68 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
 .bottom-nav { display: none; }
 
 /* =========================================================
-   ✨ MOBILE FIRST OPTIMIZATION (PREMIUM APP UI) ✨
+   ✨ MOBILE FIRST OPTIMIZATION (PREMIUM APP UI + MODAL FIX) ✨
    ========================================================= */
 @media (max-width: 768px) {
     .forms-row { flex-direction: column; }
     
-    /* Smooth App-Like Containers */
-    .form-container, .model-panel, .card-section, .action-box { 
-        width: 100%; 
-        margin-bottom: 15px; 
-        flex: none !important; 
-        border: none !important; 
-        box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important; 
-        border-radius: 12px !important; 
-        padding: 16px !important; 
-        background: #fff !important;
+    /* Perfect Modal alignment above Keyboard */
+    .modal { 
+        padding-top: 15px !important; 
+        align-items: flex-start !important; 
+    }
+    .modal-content { 
+        width: 96% !important; 
+        max-width: none !important; 
+        padding: 24px !important; 
+        border-radius: 12px !important;
+        margin: 5px auto !important;
     }
     
+    /* Proportional Font sizes inside Modal */
+    .modal-content h3 { font-size: 18px !important; margin-bottom: 15px !important; }
+    .modal-content label { font-size: 12px !important; margin-bottom: 6px !important; }
+    .modal-content input, .modal-content select { 
+        height: 46px !important; 
+        font-size: 15px !important; 
+        padding: 10px 14px !important; 
+    }
+    .modal-content button { 
+        min-height: 46px !important; 
+        font-size: 14px !important; 
+        padding: 12px 8px !important; 
+    }
+
+    .form-container, .model-panel, .card-section, .action-box { width: 100%; margin-bottom: 12px; flex: none !important; }
     #customerQueueList { max-height: 350px !important; }
     .toast-notification { width: 90%; min-width: unset; font-size: 13px; }
 
-    body { font-size: 15px !important; padding-bottom: 70px !important; background-color: #f7f9fc; } 
+    body { font-size: 14px !important; padding-bottom: 70px !important; } 
     footer { margin-bottom: 60px; } 
 
-    /* ✨ PREMIUM LABELS (Photo सारखे Normal Case, Bold, Dark) ✨ */
-    label { 
-        font-size: 14px !important; 
-        font-weight: 700 !important; 
-        color: #1a1a1a !important; 
-        text-transform: none !important; /* जुना Uppercase काढला */
-        margin-bottom: 8px !important; 
-        letter-spacing: 0 !important;
-    }
+    div[style*="font-size"], span[style*="font-size"] { font-size: 13px !important; }
+    strong[style*="font-size"] { font-size: 14px !important; }
+    h3[style*="font-size"] { font-size: 18px !important; }
+    label { font-size: 11px !important; margin-bottom: 4px; }
 
-    /* ✨ PREMIUM INPUTS & SELECTS (मोठे बॉक्सेस, Rounded Corners) ✨ */
-    input, select, textarea { 
-        height: 48px !important; 
-        font-size: 15px !important; 
-        padding: 10px 14px !important; 
-        border-radius: 8px !important; 
-        border: 1px solid #b0b0b0 !important; 
-        background-color: #fff !important;
-        color: #222 !important;
-        box-shadow: none !important;
-    }
-    input:focus, select:focus {
-        border: 2px solid var(--bajaj-blue) !important;
-    }
-
-    /* ✨ PREMIUM BUTTONS ✨ */
-    button, .action-btn { 
-        min-height: 48px !important; 
-        font-size: 15px !important; 
-        padding: 12px 16px !important; 
-        border-radius: 8px !important; 
-        letter-spacing: 0.5px;
-        font-weight: 700 !important;
-    }
+    input, select { height: 44px !important; font-size: 14px !important; padding: 8px 12px !important; }
+    button, .action-btn { min-height: 44px !important; font-size: 13px !important; padding: 8px 10px !important; }
     
-    /* Stepper Buttons (Loan +/-) */
-    .step-btn { width: 36px !important; height: 42px !important; font-size: 20px !important; border-radius: 6px !important; }
-    .step-inp { height: 42px !important; font-size: 15px !important; width: 85px !important; font-weight: bold !important; border: 1px solid #b0b0b0 !important; }
-
-    /* Grids Configuration */
-    .control-grid { grid-template-columns: 1fr 1fr !important; gap: 12px; background: transparent; border: none; padding: 0; }
+    .control-grid { grid-template-columns: 1fr 1fr !important; gap: 8px; }
     .stack-card .inner-grid { grid-template-columns: 1fr !important; }
     .msg-grid { grid-template-columns: 1fr !important; }
 
-    #customerQueueList > div { padding: 12px !important; margin-bottom: 10px; border-radius: 8px !important; border: 1px solid #eee; }
+    #customerQueueList > div { padding: 10px !important; margin-bottom: 8px; }
+    .card-section, .model-panel { padding: 10px !important; }
+
+    th, td { padding: 8px 4px !important; font-size: 12px !important; }
+    th { font-size: 11px !important; }
+    .table-wrapper { overflow-x: hidden; padding-bottom: 8px; width: 100%; }
 
     /* Bottom Nav Mobile */
     .bottom-nav {
         display: flex; position: fixed; bottom: 0; left: 0; width: 100%; background-color: #ffffff;
-        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1); z-index: 5000; justify-content: space-around;
+        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.08); z-index: 5000; justify-content: space-around;
         padding: 8px 0; padding-bottom: env(safe-area-inset-bottom, 8px); border-top: 1px solid #eee;
     }
     .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #888; font-size: 11px; font-weight: 800; transition: color 0.3s; -webkit-tap-highlight-color: transparent; }
@@ -215,7 +216,6 @@ td.bound-col:nth-last-child(8) {
 /* =========================================================
    ✨ 9x2 GRID DETAILS VIEW (बॉर्डरच्या आत फिट व Single Line) ✨
    ========================================================= */
-
 .show-details-mode table,
 .show-details-mode tbody,
 .show-details-mode thead,
@@ -283,9 +283,7 @@ td.bound-col:nth-last-child(8) {
     font-size: 11px !important;
 }
 
-/* --------------------------------------------------------
-   १. THEAD (Row 1): 9 Columns
-   -------------------------------------------------------- */
+/* THEAD */
 .show-details-mode th.hidden-col:nth-child(1) { grid-column: 1; grid-row: 1; }
 .show-details-mode th:nth-last-child(7) { grid-column: 2; grid-row: 1; }
 .show-details-mode th:nth-last-child(6) { grid-column: 3; grid-row: 1; }
@@ -303,9 +301,7 @@ td.bound-col:nth-last-child(8) {
     display: none !important;
 }
 
-/* --------------------------------------------------------
-   २. TBODY (ROW 1): 9 Columns
-   -------------------------------------------------------- */
+/* TBODY (ROW 1) */
 .show-details-mode td.hidden-col:nth-child(1) { grid-column: 1; grid-row: 1; font-weight: 900; background: #fff; }
 .show-details-mode td:nth-last-child(7) { grid-column: 2; grid-row: 1; background: #fff; }
 .show-details-mode td:nth-last-child(6) { grid-column: 3; grid-row: 1; background: #fff; }
@@ -317,9 +313,7 @@ td.bound-col:nth-last-child(8) {
 .show-details-mode td.hidden-col:nth-child(8)::before { display: none !important; }
 .show-details-mode td:nth-last-child(1) { grid-column: 9; grid-row: 1 / span 2; background: #f4fcf6; border-left: 1px dashed #eee !important; padding: 4px !important; }
 
-/* --------------------------------------------------------
-   ३. TBODY (ROW 2): 7 Details Columns (Single Line Labels)
-   -------------------------------------------------------- */
+/* TBODY (ROW 2) */
 .show-details-mode td.hidden-col:not(:nth-child(1)):not(:nth-child(8))::before,
 .show-details-mode td:not(.bound-col):nth-last-child(8)::before,
 .show-details-mode td.bound-col:nth-last-child(9)::before {
@@ -328,10 +322,9 @@ td.bound-col:nth-last-child(8) {
     color: #888;
     font-size: 9px !important;
     margin-bottom: 2px;
-    white-space: nowrap !important; /* सर्व Labels सिंगल लाईनमध्ये */
+    white-space: nowrap !important; 
 }
 
-/* फक्त NBFC LIMIT ला २ ओळींत (NBFC \n LIMIT) तोडण्यासाठी विशेष नियम */
 .show-details-mode td:not(.bound-col):nth-last-child(8)::before { 
     content: "NBFC\A LIMIT" !important; 
     white-space: pre !important; 
@@ -353,21 +346,15 @@ td.bound-col:nth-last-child(8) {
 .show-details-mode td.bound-col:nth-last-child(9) { grid-column: 1; grid-row: 2; background: #fdfdfd; }
 .show-details-mode td.bound-col:nth-last-child(9)::before { content: "MIN LOAN" !important; }
 .show-details-mode td.bound-col:nth-last-child(8) { display: none !important; }
-
 .show-details-mode td.hidden-col:nth-child(2) { grid-column: 2; grid-row: 2; background: #fdfdfd; }
 .show-details-mode td.hidden-col:nth-child(2)::before { content: "DBD %" !important; }
-
 .show-details-mode td.hidden-col:nth-child(3) { grid-column: 3; grid-row: 2; background: #fdfdfd; }
 .show-details-mode td.hidden-col:nth-child(3)::before { content: "PF FEE" !important; }
-
 .show-details-mode td.hidden-col:nth-child(4) { grid-column: 4; grid-row: 2; background: #fdfdfd; }
 .show-details-mode td.hidden-col:nth-child(4)::before { content: "ROI %" !important; }
-
 .show-details-mode td.hidden-col:nth-child(5) { grid-column: 5; grid-row: 2; background: #fdfdfd; }
 .show-details-mode td.hidden-col:nth-child(5)::before { content: "FIXED EMI" !important; }
-
 .show-details-mode td.hidden-col:nth-child(6) { grid-column: 6; grid-row: 2; background: #fdfdfd; }
 .show-details-mode td.hidden-col:nth-child(6)::before { content: "LTV %" !important; }
-
 .show-details-mode td.hidden-col:nth-child(7) { grid-column: 7 / span 2; grid-row: 2; background: #fdfdfd; }
 .show-details-mode td.hidden-col:nth-child(7)::before { content: "NET DISB" !important; color: var(--bajaj-blue); }
