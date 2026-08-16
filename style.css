@@ -83,9 +83,12 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
 .footer-support { font-size: 11px; color: #bdc3c7; margin-top: 4px; line-height: 1.4; }
 .wa-link { display: inline-block; margin-top: 4px; color: #25D366; font-weight: 900; font-size: 12px; text-decoration: none; background: rgba(37, 211, 102, 0.1); padding: 6px 12px; border-radius: 12px; border: 1px solid #25D366; transition: 0.3s; }
 .wa-link:hover { background: #25D366; color: #fff; }
+
+/* === DESKTOP DETAILS MODE === */
 .hidden-col { display: none; }
 .show-details-mode .hidden-col { display: table-cell !important; background-color: #fcf3cf; border-left: 1px dashed #f39c12; border-right: 1px dashed #f39c12; }
 .show-details-mode th.hidden-col { background-color: #f39c12; color: #fff; border: 1px solid #d68910; }
+
 .action-btn { padding: 4px; font-size: 11px !important; border-radius: 3px; border: none; cursor: pointer; color: white; font-weight: 900; width: 100%; text-transform: uppercase; transition: background 0.3s;}
 .btn-copy { background: var(--primary); }
 .forms-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; align-items: stretch; }
@@ -214,4 +217,88 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
     .nav-item.active .nav-icon {
         transform: scale(1.15);
     }
+
+    /* =========================================================
+       ✨ SEAMLESS EXPANDED ROW (टेबल तसाच राहील, फक्त डिटेल्स खाली येतील) ✨
+       ========================================================= */
+    
+    .show-details-mode table, 
+    .show-details-mode tbody, 
+    .show-details-mode thead, 
+    .show-details-mode tr { 
+        display: block; 
+        width: max-content; 
+        min-width: 100%; 
+    }
+
+    .show-details-mode thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: #f8f9fa;
+        border-bottom: 2px solid #ccc;
+    }
+
+    .show-details-mode tr {
+        display: flex;
+        flex-wrap: wrap; 
+        border-bottom: 2px solid #ccc;
+    }
+
+    .show-details-mode th.hidden-col { display: none !important; }
+
+    .show-details-mode th:not(.hidden-col),
+    .show-details-mode td:not(.hidden-col) {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        order: 1; 
+        width: 85px; 
+        flex-shrink: 0;
+        height: 55px;
+        padding: 4px !important;
+        box-sizing: border-box;
+        border-right: 1px solid #eee;
+        border-bottom: none;
+        white-space: normal;
+        text-align: center;
+        font-size: 13px !important;
+    }
+
+    .show-details-mode th:last-child,
+    .show-details-mode td:last-child {
+        width: 105px;
+        border-right: none;
+    }
+
+    .show-details-mode td.hidden-col {
+        display: flex !important;
+        order: 2; 
+        justify-content: space-between;
+        align-items: center;
+        width: 100vw; 
+        position: sticky; 
+        left: 0; 
+        padding: 6px 15px !important;
+        background: #fdfdfd !important;
+        border-top: 1px dashed #ddd;
+        box-sizing: border-box;
+        font-size: 13px !important;
+        text-align: right;
+    }
+
+    .show-details-mode td.hidden-col::before {
+        font-weight: 900; 
+        color: #888;
+    }
+
+    .show-details-mode td.hidden-col:nth-child(1)::before { content: "CATEGORY"; }
+    .show-details-mode td.hidden-col:nth-child(2)::before { content: "DBD %"; }
+    .show-details-mode td.hidden-col:nth-child(3)::before { content: "PF FEE"; }
+    .show-details-mode td.hidden-col:nth-child(4)::before { content: "ROI %"; }
+    .show-details-mode td.hidden-col:nth-child(5)::before { content: "FIXED EMI"; }
+    .show-details-mode td.hidden-col:nth-child(6)::before { content: "LTV %"; }
+    .show-details-mode td.hidden-col:nth-child(7)::before { content: "NET DISB"; color: var(--bajaj-blue); }
+    .show-details-mode td.hidden-col:nth-child(8)::before { content: "EXTRA"; color: var(--danger); }
 }
