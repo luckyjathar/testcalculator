@@ -146,3 +146,21 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
     th { font-size: 13px !important; }
     .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px; }
 }
+/* === APP-LIKE FEEL (वेबसाईटचा फील लपवण्यासाठी) === */
+html, body {
+    overscroll-behavior-y: none; /* पेज रबरसारखे बाऊन्स होणे बंद करते */
+    -webkit-tap-highlight-color: transparent; /* टॅप केल्यावर येणारा निळा फ्लॅश बंद करते */
+    touch-action: manipulation; /* डबल-टॅप झूम बंद करून बटन्स फास्ट करते */
+}
+
+/* युझरने चुकून मजकूर सिलेक्ट करू नये (फक्त ॲप फीलसाठी) */
+body {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* पण Inputs आणि Textarea मध्ये टायपिंग करता यायला हवे */
+input, select, textarea {
+    -webkit-user-select: auto;
+    user-select: auto;
+}
