@@ -1,5 +1,24 @@
 :root { --primary: #1976D2; --success: #27ae60; --danger: #d63031; --warning: #f39c12; --dark: #1E293B; --bg: #F0F4F8; --indigo: #2C3E50; --bajaj-blue: #0059A3; --bajaj-green: #00A34F; --bg-pattern: none; --sidebar-width: 270px; }
-body { font-family: 'Segoe UI', sans-serif; margin: 0 auto; max-width: 1200px; padding: 4px; background-color: var(--bg); background-image: var(--bg-pattern); background-attachment: fixed; font-size: 14px; display: flex; flex-direction: column; min-height: 98vh; scroll-behavior: smooth; }
+
+/* === APP-LIKE FEEL (वेबसाईटचा फील लपवण्यासाठी) === */
+html, body {
+    overscroll-behavior-y: none; /* पेज रबरसारखे बाऊन्स होणे बंद करते */
+    -webkit-tap-highlight-color: transparent; /* टॅप केल्यावर येणारा निळा फ्लॅश बंद करते */
+    touch-action: manipulation; /* डबल-टॅप झूम बंद करून बटन्स फास्ट करते */
+}
+
+body { 
+    font-family: 'Segoe UI', sans-serif; margin: 0 auto; max-width: 1200px; padding: 4px; background-color: var(--bg); background-image: var(--bg-pattern); background-attachment: fixed; font-size: 14px; display: flex; flex-direction: column; min-height: 98vh; scroll-behavior: smooth; 
+    -webkit-user-select: none; /* युझरने चुकून मजकूर सिलेक्ट करू नये */
+    user-select: none;
+}
+
+/* Inputs आणि Textarea मध्ये टायपिंग करता यायला हवे */
+input, select, textarea {
+    -webkit-user-select: auto;
+    user-select: auto;
+}
+
 .sidebar { position: fixed; top: 0; left: -300px; width: var(--sidebar-width); height: 100vh; background: var(--dark); color: white; z-index: 3000; box-shadow: 4px 0 15px rgba(0,0,0,0.3); transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
 .sidebar.open { left: 0; }
 .sidebar-header { padding: 15px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); }
@@ -90,77 +109,109 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
 .toast-notification.warning { background-color: var(--warning); color: #000; }
 .toast-notification.info { background-color: var(--bajaj-blue); color: white; }
 
-/* === MOBILE FIRST OPTIMIZATION === */
+/* === BOTTOM NAVIGATION BASE CSS === */
+.bottom-nav {
+    display: none; /* डेस्कटॉपवर लपवून ठेवण्यासाठी */
+}
+
+/* === MOBILE FIRST OPTIMIZATION (BALANCED RATIO + BOTTOM NAV) === */
 @media (max-width: 768px) {
     /* 1. Layout Adjustments */
     .forms-row { flex-direction: column; }
     .form-container { width: 100%; margin-bottom: 12px; flex: none !important; }
     #customerQueueList { max-height: 350px !important; }
-    .toast-notification { width: 90%; min-width: unset; font-size: 14px; }
+    .toast-notification { width: 90%; min-width: unset; font-size: 13px; }
 
-    /* 2. Make Texts Readable (Bigger Fonts) */
-    body { font-size: 15px !important; }
-    div[style*="font-size"], span[style*="font-size"] { font-size: 14px !important; }
-    strong[style*="font-size"] { font-size: 15px !important; }
-    h3[style*="font-size"] { font-size: 20px !important; }
-    label { font-size: 12px !important; margin-bottom: 5px; }
+    /* 2. Balanced Fonts (Text Size) & Bottom Nav Padding */
+    body { font-size: 14px !important; padding-bottom: 70px !important; } 
+    footer { margin-bottom: 60px; } 
 
-    /* 3. Touch-Friendly Inputs & Selects (Minimum 44px height for fingers) */
+    div[style*="font-size"], span[style*="font-size"] { font-size: 13px !important; }
+    strong[style*="font-size"] { font-size: 14px !important; }
+    h3[style*="font-size"] { font-size: 18px !important; }
+    label { font-size: 11px !important; margin-bottom: 4px; }
+
+    /* 3. Proportionate Inputs & Selects (Box Size) */
     input, select { 
-        height: 44px !important; 
-        font-size: 15px !important; 
-        padding: 10px !important; 
+        height: 40px !important; 
+        font-size: 14px !important; 
+        padding: 8px 10px !important; 
     }
 
-    /* 4. Large Buttons for Easy Tapping */
+    /* 4. Balanced Buttons */
     button, .action-btn { 
-        min-height: 44px !important; 
-        font-size: 14px !important; 
-        padding: 12px 8px !important; 
+        min-height: 40px !important; 
+        font-size: 13px !important; 
+        padding: 8px 10px !important; 
     }
+    
+    /* 5. Stepper Buttons (Loan +/-) */
     .step-btn { 
-        width: 34px !important; 
-        height: 38px !important; 
-        font-size: 20px !important; 
+        width: 32px !important; 
+        height: 36px !important; 
+        font-size: 18px !important; 
     }
     .step-inp {
-        height: 38px !important;
-        font-size: 15px !important;
-        width: 85px !important;
+        height: 36px !important;
+        font-size: 14px !important;
+        width: 80px !important;
     }
 
-    /* 5. Convert Multi-Column Grids to Single Column on Mobile */
+    /* 6. Grids and Spacing */
     .control-grid { grid-template-columns: 1fr 1fr !important; gap: 8px; }
     .stack-card .inner-grid { grid-template-columns: 1fr !important; }
     .msg-grid { grid-template-columns: 1fr !important; }
 
-    /* 6. Spacing inside Cards & Lists */
-    #customerQueueList > div { padding: 12px !important; margin-bottom: 8px; }
-    .card-section, .model-panel { padding: 12px !important; }
+    #customerQueueList > div { padding: 10px !important; margin-bottom: 8px; }
+    .card-section, .model-panel { padding: 10px !important; }
 
-    /* 7. Table Adjustments for Readability */
+    /* 7. Tables - Compact but readable */
     th, td { 
-        padding: 10px 8px !important; 
-        font-size: 14px !important; 
+        padding: 8px 6px !important; 
+        font-size: 13px !important; 
     }
-    th { font-size: 13px !important; }
-    .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px; }
-}
-/* === APP-LIKE FEEL (वेबसाईटचा फील लपवण्यासाठी) === */
-html, body {
-    overscroll-behavior-y: none; /* पेज रबरसारखे बाऊन्स होणे बंद करते */
-    -webkit-tap-highlight-color: transparent; /* टॅप केल्यावर येणारा निळा फ्लॅश बंद करते */
-    touch-action: manipulation; /* डबल-टॅप झूम बंद करून बटन्स फास्ट करते */
-}
+    th { font-size: 12px !important; }
+    .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
 
-/* युझरने चुकून मजकूर सिलेक्ट करू नये (फक्त ॲप फीलसाठी) */
-body {
-    -webkit-user-select: none;
-    user-select: none;
-}
+    /* === BOTTOM NAVIGATION MOBILE CSS === */
+    .bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.08);
+        z-index: 5000;
+        justify-content: space-around;
+        padding: 8px 0;
+        padding-bottom: env(safe-area-inset-bottom, 8px);
+        border-top: 1px solid #eee;
+    }
 
-/* पण Inputs आणि Textarea मध्ये टायपिंग करता यायला हवे */
-input, select, textarea {
-    -webkit-user-select: auto;
-    user-select: auto;
+    .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: #888;
+        font-size: 11px;
+        font-weight: 800;
+        transition: color 0.3s;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .nav-icon {
+        font-size: 20px;
+        margin-bottom: 3px;
+        transition: transform 0.2s;
+    }
+
+    .nav-item.active {
+        color: var(--primary);
+    }
+
+    .nav-item.active .nav-icon {
+        transform: scale(1.15);
+    }
 }
