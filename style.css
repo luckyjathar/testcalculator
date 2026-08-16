@@ -51,8 +51,10 @@ button { padding: 8px; border-radius: 4px; font-weight: 900; cursor: pointer; bo
 #imageViewerModal { align-items: center; justify-content: center; padding: 20px; flex-direction: column; }
 #generatedImage { max-width: 100%; max-height: 80vh; width: auto; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: block; margin: 10px auto; }
 .close-img-btn { position: fixed; top: 10px; right: 15px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 35px; height: 35px; font-size: 16px; cursor: pointer; font-weight: bold; z-index: 4100; }
-.table-wrapper { overflow-x: hidden; background: white; border-radius: 4px; border: 1px solid #eee; transition: max-height 0.3s ease; width: 100%; box-sizing: border-box; }
-table { width: 100%; border-collapse: collapse; font-size: 13px !important; }
+
+/* Table Wrapper - Allowed scroll on mobile */
+.table-wrapper { overflow-x: auto; background: white; border-radius: 4px; border: 1px solid #eee; transition: max-height 0.3s ease; width: 100%; box-sizing: border-box; }
+table { width: 100%; min-width: 580px; border-collapse: collapse; font-size: 13px !important; }
 th, td { padding: 6px 4px !important; border-bottom: 1px solid #eee; text-align: center; width: 1%; }
 th { background: #f8f9fa; font-weight: 900; font-size: 11px !important; cursor: pointer; user-select: none; color: var(--indigo); white-space: nowrap !important; }
 .fixed-row { background-color: #f1f8e9; }
@@ -137,7 +139,9 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
 
     th, td { padding: 8px 4px !important; font-size: 12px !important; }
     th { font-size: 11px !important; }
-    .table-wrapper { overflow-x: hidden; padding-bottom: 8px; width: 100%; }
+
+    /* Mobile Var Table Disava Mhanun Scroll Allow Kela Ahe */
+    .table-wrapper { overflow-x: auto !important; padding-bottom: 8px; width: 100%; }
 
     /* Bottom Nav Mobile */
     .bottom-nav {
@@ -173,16 +177,16 @@ td.bound-col:nth-last-child(8) {
 }
 
 /* =========================================================
-   ✨ 9x2 GRID DETAILS VIEW (बॉर्डरच्या आत फिट व Single Line) ✨
+   ✨ 9x2 GRID DETAILS VIEW ✨
    ========================================================= */
 
-/* टेबलला बॉक्सच्या बाहेर जाण्यापासून रोखण्यासाठी रुंदी 100% व box-sizing */
 .show-details-mode table,
 .show-details-mode tbody,
 .show-details-mode thead,
 .show-details-mode tr {
     display: block;
     width: 100%;
+    min-width: 580px; /* Forces scroll on Mobile, Fits Perfectly on Laptop */
     box-sizing: border-box;
 }
 
@@ -196,8 +200,8 @@ td.bound-col:nth-last-child(8) {
 
 .show-details-mode thead tr {
     display: grid;
-    /* Grid Columns 100% च्या आत बसण्यासाठी 'fr' चे प्रमाण (Proportions) दिले आहेत */
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.7fr) minmax(0, 0.9fr) minmax(0, 1.1fr) minmax(0, 1.1fr) minmax(0, 0.7fr) minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 0.9fr);
+    /* Added grid-template-columns */
+    grid-template-columns: minmax(85px, 1.4fr) minmax(70px, 1.6fr) minmax(45px, 0.9fr) minmax(65px, 1.2fr) minmax(65px, 1.1fr) minmax(35px, 0.7fr) minmax(75px, 1.1fr) minmax(65px, 1fr) minmax(65px, 0.9fr);
     border-bottom: 2px solid #ccc;
     box-shadow: none;
     margin-bottom: 0;
@@ -206,7 +210,7 @@ td.bound-col:nth-last-child(8) {
 
 .show-details-mode tbody tr {
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.7fr) minmax(0, 0.9fr) minmax(0, 1.1fr) minmax(0, 1.1fr) minmax(0, 0.7fr) minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 0.9fr);
+    grid-template-columns: minmax(85px, 1.4fr) minmax(70px, 1.6fr) minmax(45px, 0.9fr) minmax(65px, 1.2fr) minmax(65px, 1.1fr) minmax(35px, 0.7fr) minmax(75px, 1.1fr) minmax(65px, 1fr) minmax(65px, 0.9fr);
     grid-template-rows: auto auto; 
     border-bottom: 3px solid var(--indigo);
     margin-bottom: 12px;
@@ -224,14 +228,13 @@ td.bound-col:nth-last-child(8) {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 6px 2px !important; 
-    border-right: none !important;  
-    border-bottom: none !important; 
+    width: 100% !important; 
+    padding: 6px 2px !important;
+    border: none !important; 
     font-size: 12px !important; 
     text-align: center;
-    white-space: nowrap !important; 
+    white-space: nowrap !important; /* All values in single line */
     box-sizing: border-box;
-    overflow: hidden;
 }
 
 .show-details-mode th {
@@ -246,7 +249,7 @@ td.bound-col:nth-last-child(8) {
 }
 
 /* --------------------------------------------------------
-   १. THEAD (Row 1): 9 Columns
+   १. THEAD (Row 1): Headings Fixed to Row 1
    -------------------------------------------------------- */
 .show-details-mode th.hidden-col:nth-child(1) { grid-column: 1; grid-row: 1; }
 .show-details-mode th:nth-last-child(7) { grid-column: 2; grid-row: 1; }
@@ -290,10 +293,10 @@ td.bound-col:nth-last-child(8) {
     color: #888;
     font-size: 9px !important;
     margin-bottom: 2px;
-    white-space: nowrap !important; /* सर्व Labels सिंगल लाईनमध्ये */
+    white-space: nowrap !important; 
 }
 
-/* फक्त NBFC LIMIT ला २ ओळींत (NBFC \n LIMIT) तोडण्यासाठी विशेष नियम */
+/* NBFC LIMIT ला २ ओळींत तोडले आहे */
 .show-details-mode td:not(.bound-col):nth-last-child(8)::before { 
     content: "NBFC\A LIMIT" !important; 
     white-space: pre !important; 
