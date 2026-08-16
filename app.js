@@ -1560,16 +1560,3 @@ function openBitlyLink(url) {
         showToast('⚠️ Is dealer ke liye Bitly link available nahi hai!', 'warning'); 
     } 
 }
-/* === BOTTOM NAVIGATION ACTIVE STATE LOGIC === */
-function setActiveNav(clickedItem) {
-    // सर्व टॅबचा active क्लास काढून टाका
-    let navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(item => {
-        item.classList.remove('active');
-    });
-    
-    // ज्या टॅबवर क्लिक केले आहे, त्याला active क्लास लावा
-    if(clickedItem) {
-        clickedItem.classList.add('active');
-    }
-}
