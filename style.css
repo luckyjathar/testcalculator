@@ -2,18 +2,17 @@
 
 /* === APP-LIKE FEEL (वेबसाईटचा फील लपवण्यासाठी) === */
 html, body {
-    overscroll-behavior-y: none; /* पेज रबरसारखे बाऊन्स होणे बंद करते */
-    -webkit-tap-highlight-color: transparent; /* टॅप केल्यावर येणारा निळा फ्लॅश बंद करते */
-    touch-action: manipulation; /* डबल-टॅप झूम बंद करून बटन्स फास्ट करते */
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 body { 
     font-family: 'Segoe UI', sans-serif; margin: 0 auto; max-width: 1200px; padding: 4px; background-color: var(--bg); background-image: var(--bg-pattern); background-attachment: fixed; font-size: 14px; display: flex; flex-direction: column; min-height: 98vh; scroll-behavior: smooth; 
-    -webkit-user-select: none; /* युझरने चुकून मजकूर सिलेक्ट करू नये */
+    -webkit-user-select: none;
     user-select: none;
 }
 
-/* Inputs आणि Textarea मध्ये टायपिंग करता यायला हवे */
 input, select, textarea {
     -webkit-user-select: auto;
     user-select: auto;
@@ -84,11 +83,6 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
 .wa-link { display: inline-block; margin-top: 4px; color: #25D366; font-weight: 900; font-size: 12px; text-decoration: none; background: rgba(37, 211, 102, 0.1); padding: 6px 12px; border-radius: 12px; border: 1px solid #25D366; transition: 0.3s; }
 .wa-link:hover { background: #25D366; color: #fff; }
 
-/* === DESKTOP DETAILS MODE === */
-.hidden-col { display: none; }
-.show-details-mode .hidden-col { display: table-cell !important; background-color: #fcf3cf; border-left: 1px dashed #f39c12; border-right: 1px dashed #f39c12; }
-.show-details-mode th.hidden-col { background-color: #f39c12; color: #fff; border: 1px solid #d68910; }
-
 .action-btn { padding: 4px; font-size: 11px !important; border-radius: 3px; border: none; cursor: pointer; color: white; font-weight: 900; width: 100%; text-transform: uppercase; transition: background 0.3s;}
 .btn-copy { background: var(--primary); }
 .forms-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; align-items: stretch; }
@@ -99,7 +93,6 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
 .msg-lang-selector { background: #fff3cd; padding: 10px; border-radius: 6px; border: 1px solid #ffeeba; margin-top: 12px; }
 #finalMessage { width: 100%; height: 350px; padding: 12px; border: 1px solid #bbb; border-radius: 6px; font-size: 13px; line-height: 1.5; box-sizing: border-box; background-color: #fafafa; resize: vertical; }
 
-/* TOAST NOTIFICATION CSS */
 .toast-notification {
     visibility: hidden; min-width: 280px; background-color: #333; color: #fff; text-align: center;
     border-radius: 8px; padding: 14px 20px; position: fixed; z-index: 99999; left: 50%; bottom: 20px;
@@ -113,19 +106,15 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
 .toast-notification.info { background-color: var(--bajaj-blue); color: white; }
 
 /* === BOTTOM NAVIGATION BASE CSS === */
-.bottom-nav {
-    display: none; /* डेस्कटॉपवर लपवून ठेवण्यासाठी */
-}
+.bottom-nav { display: none; }
 
-/* === MOBILE FIRST OPTIMIZATION (BALANCED RATIO + BOTTOM NAV) === */
+/* === MOBILE FIRST OPTIMIZATION === */
 @media (max-width: 768px) {
-    /* 1. Layout Adjustments */
     .forms-row { flex-direction: column; }
     .form-container { width: 100%; margin-bottom: 12px; flex: none !important; }
     #customerQueueList { max-height: 350px !important; }
     .toast-notification { width: 90%; min-width: unset; font-size: 13px; }
 
-    /* 2. Balanced Fonts (Text Size) & Bottom Nav Padding */
     body { font-size: 14px !important; padding-bottom: 70px !important; } 
     footer { margin-bottom: 60px; } 
 
@@ -134,33 +123,12 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
     h3[style*="font-size"] { font-size: 18px !important; }
     label { font-size: 11px !important; margin-bottom: 4px; }
 
-    /* 3. Proportionate Inputs & Selects (Box Size) */
-    input, select { 
-        height: 40px !important; 
-        font-size: 14px !important; 
-        padding: 8px 10px !important; 
-    }
-
-    /* 4. Balanced Buttons */
-    button, .action-btn { 
-        min-height: 40px !important; 
-        font-size: 13px !important; 
-        padding: 8px 10px !important; 
-    }
+    input, select { height: 40px !important; font-size: 14px !important; padding: 8px 10px !important; }
+    button, .action-btn { min-height: 40px !important; font-size: 13px !important; padding: 8px 10px !important; }
     
-    /* 5. Stepper Buttons (Loan +/-) */
-    .step-btn { 
-        width: 32px !important; 
-        height: 36px !important; 
-        font-size: 18px !important; 
-    }
-    .step-inp {
-        height: 36px !important;
-        font-size: 14px !important;
-        width: 80px !important;
-    }
+    .step-btn { width: 32px !important; height: 36px !important; font-size: 18px !important; }
+    .step-inp { height: 36px !important; font-size: 14px !important; width: 80px !important; }
 
-    /* 6. Grids and Spacing */
     .control-grid { grid-template-columns: 1fr 1fr !important; gap: 8px; }
     .stack-card .inner-grid { grid-template-columns: 1fr !important; }
     .msg-grid { grid-template-columns: 1fr !important; }
@@ -168,137 +136,180 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
     #customerQueueList > div { padding: 10px !important; margin-bottom: 8px; }
     .card-section, .model-panel { padding: 10px !important; }
 
-    /* 7. Tables - Compact but readable */
-    th, td { 
-        padding: 8px 6px !important; 
-        font-size: 13px !important; 
-    }
+    th, td { padding: 8px 6px !important; font-size: 13px !important; }
     th { font-size: 12px !important; }
     .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
 
-    /* === BOTTOM NAVIGATION MOBILE CSS === */
+    /* Bottom Nav Mobile */
     .bottom-nav {
-        display: flex;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: #ffffff;
-        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.08);
-        z-index: 5000;
-        justify-content: space-around;
-        padding: 8px 0;
-        padding-bottom: env(safe-area-inset-bottom, 8px);
-        border-top: 1px solid #eee;
+        display: flex; position: fixed; bottom: 0; left: 0; width: 100%; background-color: #ffffff;
+        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.08); z-index: 5000; justify-content: space-around;
+        padding: 8px 0; padding-bottom: env(safe-area-inset-bottom, 8px); border-top: 1px solid #eee;
     }
+    .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #888; font-size: 11px; font-weight: 800; transition: color 0.3s; -webkit-tap-highlight-color: transparent; }
+    .nav-icon { font-size: 20px; margin-bottom: 3px; transition: transform 0.2s; }
+    .nav-item.active { color: var(--primary); }
+    .nav-item.active .nav-icon { transform: scale(1.15); }
+}
 
-    .nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-decoration: none;
-        color: #888;
-        font-size: 11px;
-        font-weight: 800;
-        transition: color 0.3s;
-        -webkit-tap-highlight-color: transparent;
-    }
+/* =========================================================
+   ✨ SPLIT DETAILS VIEW (डावीकडे वर्टिकल लिस्ट, उजवीकडे नेहमीचे कॉलम्स) ✨
+   ========================================================= */
 
-    .nav-icon {
-        font-size: 20px;
-        margin-bottom: 3px;
-        transition: transform 0.2s;
-    }
+/* डेस्कटॉपवर रेग्युलर हिडन कॉलम्स लपवणे */
+.hidden-col { display: none; }
 
-    .nav-item.active {
-        color: var(--primary);
-    }
+/* जेव्हा 'DETAILS' मोड ऑन असेल तेव्हाचे डिझाईन */
+.show-details-mode table, 
+.show-details-mode tbody, 
+.show-details-mode thead { 
+    display: block; 
+    width: 100%; 
+}
 
-    .nav-item.active .nav-icon {
-        transform: scale(1.15);
-    }
+.show-details-mode tr {
+    display: grid;
+    /* डावीकडे 210px ची वर्टिकल लिस्ट आणि उजवीकडे उरलेले ७ कॉलम्स */
+    grid-template-columns: 210px repeat(7, minmax(75px, 1fr));
+    background: #fff;
+    border-bottom: 3px solid var(--indigo);
+    margin-bottom: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
 
-    /* =========================================================
-       ✨ SEAMLESS EXPANDED ROW (टेबल तसाच राहील, फक्त डिटेल्स खाली येतील) ✨
-       ========================================================= */
-    
-    .show-details-mode table, 
-    .show-details-mode tbody, 
-    .show-details-mode thead, 
-    .show-details-mode tr { 
-        display: block; 
-        width: max-content; 
-        min-width: 100%; 
-    }
+.show-details-mode thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
 
-    .show-details-mode thead {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        background: #f8f9fa;
-        border-bottom: 2px solid #ccc;
-    }
+.show-details-mode thead tr {
+    margin-bottom: 0;
+    border-bottom: 2px solid #ccc;
+    border-radius: 6px 6px 0 0;
+    box-shadow: none;
+    background: #f8f9fa;
+}
 
+/* हेडिंग्स मधून नको असलेले कॉलम्स पूर्णपणे लपवणे */
+.show-details-mode th.hidden-col,
+.show-details-mode th:not(.bound-col):nth-last-child(8),
+.show-details-mode th.bound-col:nth-last-child(9),
+.show-details-mode th.bound-col:nth-last-child(8) {
+    display: none !important;
+}
+
+/* उरलेले ७ मुख्य हेडिंग्स (LOAN, T/A, NET DP, EMI, M, DAILY, ACT) बरोबर उजव्या बाजूला सेट करणे */
+.show-details-mode th:nth-last-child(7) { grid-column: 2; display: flex; align-items: center; justify-content: center; }
+.show-details-mode th:nth-last-child(6) { grid-column: 3; display: flex; align-items: center; justify-content: center; }
+.show-details-mode th:nth-last-child(5) { grid-column: 4; display: flex; align-items: center; justify-content: center; }
+.show-details-mode th:nth-last-child(4) { grid-column: 5; display: flex; align-items: center; justify-content: center; }
+.show-details-mode th:nth-last-child(3) { grid-column: 6; display: flex; align-items: center; justify-content: center; }
+.show-details-mode th:nth-last-child(2) { grid-column: 7; display: flex; align-items: center; justify-content: center; }
+.show-details-mode th:nth-last-child(1) { grid-column: 8; display: flex; align-items: center; justify-content: center; }
+
+/* ----------------------------------------------------
+   👈 १. डावीकडील उभी यादी (Vertical List on Left)
+   ---------------------------------------------------- */
+.show-details-mode td.hidden-col,
+.show-details-mode td:not(.bound-col):nth-last-child(8),
+.show-details-mode td.bound-col:nth-last-child(9),
+.show-details-mode td.bound-col:nth-last-child(8) {
+    grid-column: 1; /* सर्व लपलेले कॉलम्स पहिल्या कॉलममध्ये एकाखाली एक येतील */
+    display: flex !important;
+    justify-content: space-between; /* नाव डावीकडे आणि व्हॅल्यू उजवीकडे */
+    align-items: center;
+    padding: 8px 12px !important;
+    background: #fdfdfd;
+    border-bottom: 1px solid #eee;
+    border-right: 2px solid #ddd; /* डाव्या लिस्टची उजवी बॉर्डर */
+    font-size: 13px !important;
+    text-align: right;
+}
+
+/* डावीकडील लिस्टची लेबल्स (Labels) */
+.show-details-mode td.hidden-col::before,
+.show-details-mode td:not(.bound-col):nth-last-child(8)::before,
+.show-details-mode td.bound-col:nth-last-child(9)::before,
+.show-details-mode td.bound-col:nth-last-child(8)::before {
+    font-weight: 900; 
+    color: #888;
+    display: block;
+}
+
+/* क्रमानुसार लेबल्स आणि त्यांची जागा ठरवणे (Order) */
+.show-details-mode td:not(.bound-col):nth-last-child(8) { order: 1; background: #eef6ff !important; }
+.show-details-mode td:not(.bound-col):nth-last-child(8)::before { content: "NBFC LIMIT"; color: var(--indigo); }
+
+.show-details-mode td.bound-col:nth-last-child(9) { order: 1; background: #fff3e0 !important; }
+.show-details-mode td.bound-col:nth-last-child(9)::before { content: "MIN LOAN"; color: #d35400; }
+
+.show-details-mode td.bound-col:nth-last-child(8) { order: 2; background: #fff3e0 !important; }
+.show-details-mode td.bound-col:nth-last-child(8)::before { content: "MAX LOAN"; color: #d35400; }
+
+.show-details-mode td.hidden-col:nth-child(1) { order: 3; }
+.show-details-mode td.hidden-col:nth-child(1)::before { content: "CATEGORY"; }
+
+.show-details-mode td.hidden-col:nth-child(2) { order: 4; }
+.show-details-mode td.hidden-col:nth-child(2)::before { content: "DBD %"; }
+
+.show-details-mode td.hidden-col:nth-child(3) { order: 5; }
+.show-details-mode td.hidden-col:nth-child(3)::before { content: "PF FEE"; }
+
+.show-details-mode td.hidden-col:nth-child(4) { order: 6; }
+.show-details-mode td.hidden-col:nth-child(4)::before { content: "ROI %"; }
+
+.show-details-mode td.hidden-col:nth-child(5) { order: 7; }
+.show-details-mode td.hidden-col:nth-child(5)::before { content: "FIXED EMI"; }
+
+.show-details-mode td.hidden-col:nth-child(6) { order: 8; }
+.show-details-mode td.hidden-col:nth-child(6)::before { content: "LTV %"; }
+
+.show-details-mode td.hidden-col:nth-child(7) { order: 9; }
+.show-details-mode td.hidden-col:nth-child(7)::before { content: "NET DISB"; color: var(--bajaj-blue); }
+
+.show-details-mode td.hidden-col:nth-child(8) { order: 10; border-bottom: none; }
+.show-details-mode td.hidden-col:nth-child(8)::before { content: "EXTRA"; color: var(--danger); }
+
+/* ----------------------------------------------------
+   👉 २. उजवीकडील आडवे कॉलम्स (Horizontal Columns on Right)
+   ---------------------------------------------------- */
+.show-details-mode td:nth-last-child(-n+7) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid #eee;
+    padding: 8px !important;
+    font-size: 13px !important;
+    order: 11;
+    grid-row: 1 / 20; /* हे महत्त्वाचे आहे: उजवीकडील भाग पूर्ण उंची घेईल (Stretch होईल) */
+}
+
+/* उजवीकडील ७ कॉलम्स त्यांच्या योग्य जागेवर बसवणे */
+.show-details-mode td:nth-last-child(7) { grid-column: 2; }
+.show-details-mode td:nth-last-child(6) { grid-column: 3; }
+.show-details-mode td:nth-last-child(5) { grid-column: 4; }
+.show-details-mode td:nth-last-child(4) { grid-column: 5; }
+.show-details-mode td:nth-last-child(3) { grid-column: 6; }
+.show-details-mode td:nth-last-child(2) { grid-column: 7; }
+.show-details-mode td:nth-last-child(1) { grid-column: 8; border-right: none; background: #f4fcf6; }
+
+/* उजवीकडील कॉलम्सना लेबल नको, म्हणून ते लपवणे */
+.show-details-mode td:nth-last-child(-n+7)::before { display: none !important; }
+
+/* मोबाईलवर योग्य रुंदी सेट करणे जेणेकरून Horizontal Scroll व्यवस्थित चालेल */
+@media (max-width: 768px) {
     .show-details-mode tr {
-        display: flex;
-        flex-wrap: wrap; 
-        border-bottom: 2px solid #ccc;
+        grid-template-columns: 160px repeat(7, minmax(70px, 1fr));
     }
-
-    .show-details-mode th.hidden-col { display: none !important; }
-
-    .show-details-mode th:not(.hidden-col),
-    .show-details-mode td:not(.hidden-col) {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        order: 1; 
-        width: 85px; 
-        flex-shrink: 0;
-        height: 55px;
-        padding: 4px !important;
-        box-sizing: border-box;
-        border-right: 1px solid #eee;
-        border-bottom: none;
-        white-space: normal;
-        text-align: center;
-        font-size: 13px !important;
+    .show-details-mode td.hidden-col,
+    .show-details-mode td:not(.bound-col):nth-last-child(8),
+    .show-details-mode td.bound-col:nth-last-child(9),
+    .show-details-mode td.bound-col:nth-last-child(8) {
+        padding: 6px 8px !important;
+        font-size: 12px !important;
     }
-
-    .show-details-mode th:last-child,
-    .show-details-mode td:last-child {
-        width: 105px;
-        border-right: none;
-    }
-
-    .show-details-mode td.hidden-col {
-        display: flex !important;
-        order: 2; 
-        justify-content: space-between;
-        align-items: center;
-        width: 100vw; 
-        position: sticky; 
-        left: 0; 
-        padding: 6px 15px !important;
-        background: #fdfdfd !important;
-        border-top: 1px dashed #ddd;
-        box-sizing: border-box;
-        font-size: 13px !important;
-        text-align: right;
-    }
-
-    .show-details-mode td.hidden-col::before {
-        font-weight: 900; 
-        color: #888;
-    }
-
-    .show-details-mode td.hidden-col:nth-child(1)::before { content: "CATEGORY"; }
-    .show-details-mode td.hidden-col:nth-child(2)::before { content: "DBD %"; }
-    .show-details-mode td.hidden-col:nth-child(3)::before { content: "PF FEE"; }
-    .show-details-mode td.hidden-col:nth-child(4)::before { content: "ROI %"; }
-    .show-details-mode td.hidden-col:nth-child(5)::before { content: "FIXED EMI"; }
-    .show-details-mode td.hidden-col:nth-child(6)::before { content: "LTV %"; }
-    .show-details-mode td.hidden-col:nth-child(7)::before { content: "NET DISB"; color: var(--bajaj-blue); }
-    .show-details-mode td.hidden-col:nth-child(8)::before { content: "EXTRA"; color: var(--danger); }
 }
