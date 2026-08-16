@@ -90,63 +90,59 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
 .toast-notification.warning { background-color: var(--warning); color: #000; }
 .toast-notification.info { background-color: var(--bajaj-blue); color: white; }
 
+/* === MOBILE FIRST OPTIMIZATION === */
 @media (max-width: 768px) {
+    /* 1. Layout Adjustments */
     .forms-row { flex-direction: column; }
-    .form-container { width: 100%; margin-bottom: 8px; flex: none !important; }
+    .form-container { width: 100%; margin-bottom: 12px; flex: none !important; }
     #customerQueueList { max-height: 350px !important; }
-    .toast-notification { width: 90%; min-width: unset; font-size: 13px; }
-}
-div[style*="font-size"] { font-size: 13px !important; }
-span[style*="font-size"] { font-size: 13px !important; }
-strong[style*="font-size"] { font-size: 14px !important; }
-h3[style*="font-size"] { font-size: 18px !important; }
-.model-panel input { height: 28px !important; font-size: 12px !important; border: 1px solid #ccc; }
-.bottom-sheet-menu {
-    width: 100%; max-width: 600px; border-radius: 20px 20px 0 0; background: #f8f9fa; padding: 25px 20px; animation: slideUpMenu 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-/* Body Background and Font */
-body {
-    background-color: #f4f7f6;
-    font-family: 'Poppins', sans-serif;
-    color: #333;
-}
+    .toast-notification { width: 90%; min-width: unset; font-size: 14px; }
 
-/* Card Style for Sections */
-.card-section {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    margin-bottom: 20px;
-}
+    /* 2. Make Texts Readable (Bigger Fonts) */
+    body { font-size: 15px !important; }
+    div[style*="font-size"], span[style*="font-size"] { font-size: 14px !important; }
+    strong[style*="font-size"] { font-size: 15px !important; }
+    h3[style*="font-size"] { font-size: 20px !important; }
+    label { font-size: 12px !important; margin-bottom: 5px; }
 
-/* Input Fields and Select Dropdowns */
-input, select {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-input:focus, select:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-    outline: none;
-}
+    /* 3. Touch-Friendly Inputs & Selects (Minimum 44px height for fingers) */
+    input, select { 
+        height: 44px !important; 
+        font-size: 15px !important; 
+        padding: 10px !important; 
+    }
 
-/* Button Styling */
-button {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 115, 255, 0.4);
+    /* 4. Large Buttons for Easy Tapping */
+    button, .action-btn { 
+        min-height: 44px !important; 
+        font-size: 14px !important; 
+        padding: 12px 8px !important; 
+    }
+    .step-btn { 
+        width: 34px !important; 
+        height: 38px !important; 
+        font-size: 20px !important; 
+    }
+    .step-inp {
+        height: 38px !important;
+        font-size: 15px !important;
+        width: 85px !important;
+    }
+
+    /* 5. Convert Multi-Column Grids to Single Column on Mobile */
+    .control-grid { grid-template-columns: 1fr 1fr !important; gap: 8px; }
+    .stack-card .inner-grid { grid-template-columns: 1fr !important; }
+    .msg-grid { grid-template-columns: 1fr !important; }
+
+    /* 6. Spacing inside Cards & Lists */
+    #customerQueueList > div { padding: 12px !important; margin-bottom: 8px; }
+    .card-section, .model-panel { padding: 12px !important; }
+
+    /* 7. Table Adjustments for Readability */
+    th, td { 
+        padding: 10px 8px !important; 
+        font-size: 14px !important; 
+    }
+    th { font-size: 13px !important; }
+    .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px; }
 }
