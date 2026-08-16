@@ -18,7 +18,6 @@ input, select, textarea {
     user-select: auto;
 }
 
-/* === SIDEBAR & HEADER === */
 .sidebar { position: fixed; top: 0; left: -300px; width: var(--sidebar-width); height: 100vh; background: var(--dark); color: white; z-index: 3000; box-shadow: 4px 0 15px rgba(0,0,0,0.3); transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
 .sidebar.open { left: 0; }
 .sidebar-header { padding: 15px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); }
@@ -33,8 +32,6 @@ header { display: flex; justify-content: space-between; align-items: center; fle
 header h1 { margin: 0; font-size: 1.4rem; color: var(--primary); font-weight: 900; letter-spacing: 0.5px; }
 .menu-toggle-btn { background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 16px !important; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: bold; }
 main { flex: 1; } 
-
-/* === GENERAL CONTAINERS === */
 .card, .form-container, .action-box, .detail-card { background: #fff; padding: 8px; border-radius: 6px; border: 1px solid #ddd; margin-bottom: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
 #unifiedHome { display: flex; flex-direction: column; }
 #finalEligibleArea { display: none; flex-direction: column; }
@@ -46,16 +43,10 @@ button { padding: 8px; border-radius: 4px; font-weight: 900; cursor: pointer; bo
 .disclaimer-box b { color: var(--primary); text-transform: uppercase; }
 .top-nav-box { display: flex; gap: 5px; margin-bottom: 6px; position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 4px 0; align-items: center; }
 
-/* === ALL MODALS (WINDOWS) BASE === */
+/* MODALS BASE */
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); display: none; justify-content: center; align-items: flex-start; padding-top: 10px; z-index: 4000; overflow-y: auto; box-sizing: border-box; backdrop-filter: blur(3px); }
 .modal-content { background: white; padding: 15px; border-radius: 8px; width: 90%; max-width: 400px; position: relative; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
 #multiStackModal .modal-content, #dictionarySearchModal .modal-content, #customerMessageGenModal .modal-content, #draftsModal .modal-content { max-width: 900px; width: 95%; padding: 15px; }
-
-/* Dropdown Base */
-#modalMatrixSearchDropdown, #globalModelDropdown, #fgDealerList, #fgModelList, #dealerSearchResults {
-    border-radius: 6px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.15) !important;
-}
 
 .stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; margin-top: 8px; }
 .stack-card { border: 1px solid #ddd; padding: 10px; border-radius: 6px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
@@ -64,7 +55,7 @@ button { padding: 8px; border-radius: 4px; font-weight: 900; cursor: pointer; bo
 #generatedImage { max-width: 100%; max-height: 80vh; width: auto; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: block; margin: 10px auto; }
 .close-img-btn { position: fixed; top: 10px; right: 15px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 35px; height: 35px; font-size: 16px; cursor: pointer; font-weight: bold; z-index: 4100; }
 
-/* 7-DIGIT FIX FOR INLINE INPUTS */
+/* 7-DIGIT FIX FOR INLINE INPUT्स */
 input[id^="mrp_"], input[id^="inv_"], input[id^="surch_"] {
     width: 95px !important;
     font-size: 14px !important;
@@ -72,8 +63,9 @@ input[id^="mrp_"], input[id^="inv_"], input[id^="surch_"] {
     letter-spacing: -0.5px !important;
 }
 
-.table-wrapper { overflow-x: hidden; background: white; border-radius: 4px; border: 1px solid #eee; transition: max-height 0.3s ease; width: 100%; box-sizing: border-box; }
-table { width: 100%; border-collapse: collapse; font-size: 13px !important; }
+/* TABLE WRAPPER - ENABLE HORIZONTAL SCROLL ON MOBILE */
+.table-wrapper { overflow-x: auto !important; -webkit-overflow-scrolling: touch; background: white; border-radius: 4px; border: 1px solid #eee; transition: max-height 0.3s ease; width: 100%; box-sizing: border-box; }
+table { width: 100%; min-width: 680px; border-collapse: collapse; font-size: 13px !important; }
 th, td { padding: 6px 4px !important; border-bottom: 1px solid #eee; text-align: center; width: 1%; }
 th { background: #f8f9fa; font-weight: 900; font-size: 11px !important; cursor: pointer; user-select: none; color: var(--indigo); white-space: nowrap !important; }
 .fixed-row { background-color: #f1f8e9; }
@@ -86,7 +78,7 @@ th { background: #f8f9fa; font-weight: 900; font-size: 11px !important; cursor: 
 .expired-row { background-color: #fff4e6 !important; border-left: 3px solid #d35400; }
 .bound-col { color: #d35400; font-weight: 800; font-size: 11px !important; }
 
-/* STEPPER FIX FOR 7 DIGITS */
+/* STEPPER FIX */
 .stepper { display: flex; align-items: center; justify-content: center; gap: 2px; transform: scale(0.95); }
 .step-btn { width: 30px !important; height: 38px !important; background: var(--primary); color: white; border-radius: 4px; font-size: 18px !important; cursor: pointer; padding: 0; }
 .step-inp { width: 90px !important; text-align: center; font-weight: 900; border: 1px solid var(--primary); height: 38px !important; font-size: 14px !important; color: var(--primary); padding: 4px !important; letter-spacing: -0.5px; }
@@ -116,7 +108,6 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
 .msg-lang-selector { background: #fff3cd; padding: 10px; border-radius: 6px; border: 1px solid #ffeeba; margin-top: 12px; }
 #finalMessage { width: 100%; height: 350px; padding: 12px; border: 1px solid #bbb; border-radius: 6px; font-size: 13px; line-height: 1.5; box-sizing: border-box; background-color: #fafafa; resize: vertical; }
 
-/* TOAST NOTIFICATION */
 .toast-notification {
     visibility: hidden; min-width: 280px; background-color: #333; color: #fff; text-align: center;
     border-radius: 8px; padding: 14px 20px; position: fixed; z-index: 99999; left: 50%; bottom: 20px;
@@ -133,12 +124,11 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
 .bottom-nav { display: none; }
 
 /* =========================================================
-   ✨ UNIVERSAL MOBILE APP UI (FOR ALL WINDOWS & DROPDOWNS) ✨
+   ✨ MOBILE FIRST OPTIMIZATION (PREMIUM APP UI + MODAL FIX) ✨
    ========================================================= */
 @media (max-width: 768px) {
     .forms-row { flex-direction: column; }
     
-    /* Perfect Modal alignment for ALL Windows above Keyboard */
     .modal { 
         padding-top: 12px !important; 
         align-items: flex-start !important; 
@@ -151,16 +141,14 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
         margin: 0 auto !important;
     }
     
-    /* Universal Dropdown Fixes (Visible Above Keyboard) */
     #modalMatrixSearchDropdown, #globalModelDropdown, #fgDealerList, #fgModelList, #dealerSearchResults, #recycleBinList {
-        max-height: 200px !important; /* Limits height to show above keyboard */
+        max-height: 200px !important; 
         overflow-y: auto !important;
         background: #fff !important;
         box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
         border-radius: 8px !important;
     }
 
-    /* Proportional Font sizes inside ALL Modals */
     .modal-content h3 { font-size: 18px !important; margin-bottom: 15px !important; }
     .modal-content label { font-size: 12px !important; margin-bottom: 6px !important; font-weight: 700 !important; color: #1a1a1a !important; text-transform: none !important;}
     .modal-content input, .modal-content select, .modal-content textarea { 
@@ -169,7 +157,7 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
         padding: 10px 14px !important; 
         border-radius: 8px !important;
         border: 1px solid #b0b0b0 !important;
-        letter-spacing: -0.5px !important; /* Fits 7 digits */
+        letter-spacing: -0.5px !important; 
     }
     .modal-content button { 
         min-height: 48px !important; 
@@ -179,7 +167,6 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
         font-weight: 700 !important;
     }
 
-    /* Standard Cards */
     .form-container, .model-panel, .card-section, .action-box { 
         width: 100%; margin-bottom: 15px; flex: none !important; 
         border: none !important; box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important; 
@@ -212,7 +199,7 @@ footer { text-align: center; margin-top: 10px; padding: 10px; background: var(--
 
     th, td { padding: 8px 4px !important; font-size: 12px !important; }
     th { font-size: 11px !important; }
-    .table-wrapper { overflow-x: hidden; padding-bottom: 8px; width: 100%; }
+    .table-wrapper { overflow-x: auto !important; padding-bottom: 8px; width: 100%; }
 
     /* Bottom Nav Mobile */
     .bottom-nav {
@@ -256,7 +243,7 @@ td.bound-col:nth-last-child(8) {
 .show-details-mode tr {
     display: block;
     width: 100%;
-    min-width: max-content;
+    min-width: 680px; /* Allows smooth horizontal scroll on mobile */
     box-sizing: border-box;
 }
 
