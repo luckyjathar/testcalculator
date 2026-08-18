@@ -1100,42 +1100,41 @@ function recalcModel(pIdx) {
 }
 
 function renderRows(pIdx) {
-    let prod = current_products[pIdx]; 
-    if(!sortConfigs[pIdx]) sortConfigs[pIdx] = {key: 'dp', dir: 'asc'}; 
-    let conf = sortConfigs[pIdx]; 
-    prod.calculatedData.sort((a,b) => conf.dir==='asc' ? a[conf.key]-b[conf.key] : b[conf.key]-a[conf.key]); 
-    let ltvLimit = customerQueue[activeCustomerIndex]?.ltv || 100; 
-    let isNT = prod.isNonTieup;
-
-    let today = new Date(); today.setHours(0,0,0,0);
-
+    let prod = current_products[pIdx]; if(!sortConfigs[pIdx]) sortConfigs[pIdx] = {key: 'dp', dir: 'asc'}; let conf = sortConfigs[pIdx]; prod.calculatedData.sort((a,b) => conf.dir==='asc' ? a[conf.key]-b[conf.key] : b[conf.key]-a[conf.key]); let ltvLimit = customerQueue[activeCustomerIndex]?.ltv || 100; let isNT = prod.isNonTieup;
     document.getElementById(`body_${pIdx}`).innerHTML = prod.calculatedData.map(d => {
-        if(d.expiryDateStr) {
-            let p = d.expiryDateStr.trim().split('/');
-            if(p.length === 3) {
-                let expD = new Date(p[2], p[1]-1, p[0]);
-                if(expD < today) return ''; 
-            }
-        }
-
         let curLTV = d.curLTV; let isLtvB = (curLTV > ltvLimit); let isBoundB = false; if (isNT && prod.inputs.mrp > 0) { if (d.loan < d.minLoan || d.loan > d.maxLoan) isBoundB = true; } let isInactive = d.inactive; 
-
+        
         if (d.isInv50Breach) { isBoundB = true; }
 
         let rowClass = (d.isFixed ? "fixed-row " : "") + (isLtvB || isBoundB ? "ltv-breach " : "") + (d.isExpired && !isInactive ? "expired-row " : "") + (isInactive ? "inactive-row " : "");
-        let toggleBtnHTML = isInactive ? `<button class="action-btn" style="background:var(--success);" onclick="toggleInactive(${pIdx}, ${d.dIdx})">ADD</button>` : `<button class="action-btn" style="background:var(--danger);" onclick="toggleInactive(${pIdx}, ${d.dIdx})">DISABLE</button>`;
+        let toggleBtnText = isInactive ? "ADD" : "DISABLE";
+        let toggleBtnBg = isInactive ? "var(--success)" : "var(--danger)";
         let expInfo = d.expiryDateStr ? `<div style="font-size:10px; color:#555; margin-top:2px; font-weight:bold;">Exp: ${d.expiryDateStr}</div>` : ''; let expiredWarning = d.isExpired ? `<div style="color:#d35400; font-size:9px; font-weight:900; margin-top:3px; line-height:1.2; background:#ffeaa7; padding:2px; border-radius:3px;">⚠️ EXPIRED<br>Check Live</div>` : '';
+        
         return `<tr id="row_${pIdx}_${d.dIdx}" class="${rowClass}">
             <td class="hidden-col">${d.category}</td><td class="hidden-col">${+parseFloat(d.dbd).toFixed(3)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.dbdAmt||0).toLocaleString()}</span></td><td class="hidden-col">₹${d.pf}</td><td class="hidden-col">${+parseFloat(d.roi).toFixed(2)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.roiAmt||0).toLocaleString()}</span></td><td class="hidden-col">${d.fixedEmi > 0 ? '₹'+d.fixedEmi : 'N/A'}</td><td class="hidden-col" id="ltv_${pIdx}_${d.dIdx}">${Math.round(d.curLTV)}%</td><td class="hidden-col" id="nd_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--bajaj-blue);">₹${Math.round(d.netDisb).toLocaleString()}</td><td class="hidden-col" id="extra_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--danger);">₹${Math.round(d.extra).toLocaleString()}</td>
             ${isNT ? `<td class="bound-col">${d.minLoan > 0 ? '₹' + d.minLoan : '0'}</td><td class="bound-col">${d.maxLoan < 9999999 ? '₹' + d.maxLoan : 'NO'}</td>` : `<td style="color:#777;">₹${Math.floor(d.nbfcMaxL)}</td>`}
-            <td><div class="stepper"><button class="step-btn" onclick="step(${pIdx},${d.dIdx},-${d.isFixed ? d.fixedEmi : 1000})">-</button><input id="l_${pIdx}_${d.dIdx}" type="number" value="${Math.floor(d.loan)}" class="step-inp" onchange="manual(${pIdx},${d.dIdx})" onblur="manual(${pIdx},${d.dIdx})"><button class="step-btn" onclick="step(${pIdx},${d.dIdx},${d.isFixed ? d.fixedEmi : 1000})">+</button></div></td>
-            <td id="ta_${pIdx}_${d.dIdx}" style="font-weight:900;">${d.currentTenure}/${d.advEmi}${expInfo}${expiredWarning}</td>
-            <td id="dp_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td><td id="emi_${pIdx}_${d.dIdx}" style="color:var(--primary); font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td><td id="inst_${pIdx}_${d.dIdx}" style="font-weight:900;">${d.inst}</td><td id="day_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950;">₹${Math.round(d.daily).toLocaleString()}</td>
-            <td><div style="display:flex; flex-direction:column; gap:2px; min-width: 40px;"><button class="action-btn btn-copy" onclick="copySchemeText(${pIdx}, ${d.dIdx}, this)">COPY</button><button class="action-btn" style="background:var(--warning); color:#000;" onclick="openEditSchemeModal(${pIdx}, ${d.dIdx})">EDIT</button>${toggleBtnHTML}</div></td>
+            
+            <!-- स्टेपरचे + - बटणे काढून टाकले आणि साईज वाढवली -->
+            <td><input id="l_${pIdx}_${d.dIdx}" type="number" value="${Math.floor(d.loan)}" class="step-inp" style="width:110px; font-size:16px !important; font-weight:bold; text-align:center;" oninput="manual(${pIdx},${d.dIdx})"></td>
+            
+            <td id="ta_${pIdx}_${d.dIdx}" style="font-weight:900; font-size:15px !important;">${d.currentTenure}/${d.advEmi}${expInfo}${expiredWarning}</td>
+            <td id="dp_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950; font-size:16px !important;">₹${Math.round(d.dp).toLocaleString()}</td>
+            <td id="emi_${pIdx}_${d.dIdx}" style="color:var(--primary); font-weight:950; font-size:16px !important;">₹${Math.round(d.emi).toLocaleString()}</td>
+            <td id="inst_${pIdx}_${d.dIdx}" style="font-weight:900; font-size:15px !important;">${d.inst}</td>
+            <td id="day_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950; font-size:15px !important;">₹${Math.round(d.daily).toLocaleString()}</td>
+            
+            <!-- ACT कॉलममध्ये 1 मेनू आणि त्या अंतर्गत 3 बटणे -->
+            <td>
+                <div style="display:flex; flex-direction:column; gap:3px;">
+                    <button class="action-btn btn-copy" style="padding:6px; font-size:12px !important;" onclick="copySchemeText(${pIdx}, ${d.dIdx}, this)">📋 COPY</button>
+                    <button class="action-btn" style="background:var(--warning); color:#000; padding:6px; font-size:12px !important;" onclick="openEditSchemeModal(${pIdx}, ${d.dIdx})">✏️ EDIT</button>
+                    <button class="action-btn" style="background:${toggleBtnBg}; color:white; padding:6px; font-size:12px !important;" onclick="toggleInactive(${pIdx}, ${d.dIdx})">${toggleBtnText}</button>
+                </div>
+            </td>
         </tr>`;
     }).join('');
 }
-
 function step(pIdx, dIdx, amt) { let el = document.getElementById(`l_${pIdx}_${dIdx}`); el.value = Math.max(0, parseInt(el.value) + amt); manual(pIdx, dIdx); }
 
 function manual(pIdx, dIdx) {
