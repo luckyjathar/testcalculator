@@ -1,1 +1,36 @@
+name: Auto Excel Extractor
 
+on:
+  push:
+    paths:
+      - '*.xlsb'
+      - '*.xlsx'
+      - '*.xls'
+  workflow_dispatch: # तुला मॅन्युअली पण हे रन करता येईल
+
+jobs:
+  extract-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Python Libraries
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Python Extractor Script
+        run: |
+          python process_excel.py
+
+      - name: Upload Extracted CSV Result
+        uses: actions/upload-artifact@v3
+        with:
+          name: Extracted-Data-CSV
+          path: Extracted_Data_Output.csv
