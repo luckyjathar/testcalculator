@@ -1,29 +1,64 @@
 import pandas as pd
 import os
 import re
+from datetime import datetime, timedelta
 
 INPUT_FILE = "Updated Digital Scheme Chart AUG 26.xlsb"
 OUTPUT_FILE = "Extracted_Data_Output.csv"
+
+def format_date(val):
+    if not val or str(val).strip() == "" or str(val).upper() == "NIL":
+        return ""
+    val_str = str(val).strip()
+    
+    # 1. जर Excel सीरियल नंबर असेल (उदा. 45150 किंवा 45150.0)
+    try:
+        num = float(val_str)
+        if 30000 < num < 60000:  # Valid Excel date serial range
+            excel_epoch = datetime(1899, 12, 30)
+            parsed_date = excel_epoch + timedelta(days=num)
+            return parsed_date.strftime('%d-%m-%Y')
+    except ValueError:
+        pass
+
+    # 2. जर आधीच तारीख फॉरमॅट असेल तर parse करणे
+    for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d', '%d-%m-%Y', '%d/%m/%Y', '%m/%d/%Y', '%d-%b-%Y', '%d-%b-%y'):
+        try:
+            parsed_date = datetime.strptime(val_str, fmt)
+            return parsed_date.strftime('%d-%m-%Y')
+        except ValueError:
+            pass
+            
+    return val_str
+
+def format_dbd(val):
+    if not val or str(val).strip() == "" or str(val).upper() == "NIL":
+        return "0"
+    val_str = str(val).replace("%", "").strip()
+    try:
+        num = float(val_str)
+        # जर दशांश स्वरूपात असेल (उदा. 0.025 असेल तर 2.5 होण्यासाठी * 100)
+        if 0 < num < 1:
+            num = num * 100
+        # दशांशानंतर विनाकारण जास्त 0 नको असतील तर round/int करणे
+        return f"{num:.4f}".rstrip('0').rstrip('.')
+    except ValueError:
+        return val_str
 
 def process_data():
     print(f"Reading file: {INPUT_FILE}...")
     
     try:
-        # सर्व शीट्स वाचणे
         all_sheets = pd.read_excel(INPUT_FILE, sheet_name=None, engine='pyxlsb', header=None)
     except Exception as e:
         print(f"Error reading file: {e}")
         return
 
     final_data = []
-    # तुझे मूळ Headers
     headers = ["SHEET NAME", "CATEGORY", "BRAND", "MODEL", "MRP", "TOTAL TENURE", "ADVANCE EMI", "DBD", "CPF", "VALIDITY", "LOCATION"]
     final_data.append(headers)
 
     for sheet_name, df in all_sheets.items():
-        print(f"Processing sheet: {sheet_name}")
-        
-        # NaN व्हॅल्यूज रिकाम्या स्ट्रिंगमध्ये बदलून लिस्ट बनवणे
         raw_data = df.fillna("").values.tolist()
         if not raw_data:
             continue
@@ -40,7 +75,6 @@ def process_data():
         with_mrp_col_idx = -1
         data_start_row = -1
 
-        # 1. डायनॅमिक Row आणि Column शोधणे
         for idx, row in enumerate(raw_data):
             row_strs = [str(c).strip().upper() for c in row]
             
@@ -63,7 +97,7 @@ def process_data():
                 mrp_col_idx = next((i for i, x in enumerate(row_strs) if x == 'MRP'), -1)
                 data_start_row = idx + 1
 
-        # Fallbacks (जर सापडले नाहीत तर)
+        # Fallbacks
         if dbd_row_idx == -1: dbd_row_idx = 1
         if cpf_row_idx == -1: cpf_row_idx = 3
         if location_row_idx == -1: location_row_idx = 4
@@ -75,7 +109,6 @@ def process_data():
         if mrp_col_idx == -1: mrp_col_idx = 7
         if data_start_row == -1: data_start_row = 8
 
-        # 2. डेटा एक्सट्रॅक्ट करणे
         for i in range(data_start_row, len(raw_data)):
             current_row = raw_data[i]
             max_idx = max(category_col_idx, brand_col_idx, model_name_col_idx)
@@ -104,7 +137,6 @@ def process_data():
             for j in range(search_start_index, len(current_row)):
                 cell_value = str(current_row[j]).strip()
                 
-                # फक्त जिथे काहीतरी Value आहे तीच घेणार
                 if cell_value != "":
                     tenure_val_raw = str(raw_data[tenure_row_idx][j]).strip() if tenure_row_idx < len(raw_data) and j < len(raw_data[tenure_row_idx]) else ""
                     total_tenure = ""
@@ -115,10 +147,12 @@ def process_data():
                         advance_emi = parts[1].strip() if len(parts) > 1 else ""
 
                     dbd_val_raw = str(raw_data[dbd_row_idx][j]).strip() if dbd_row_idx < len(raw_data) and j < len(raw_data[dbd_row_idx]) else ""
-                    final_dbd = dbd_val_raw.replace("%", "").strip()
+                    final_dbd = format_dbd(dbd_val_raw)
 
                     cpf_val = str(raw_data[cpf_row_idx][j]).strip() if cpf_row_idx < len(raw_data) and j < len(raw_data[cpf_row_idx]) else ""
                     validity_val = str(raw_data[validity_row_idx][j]).strip() if validity_row_idx < len(raw_data) and j < len(raw_data[validity_row_idx]) else ""
+                    final_validity = format_date(validity_val)
+                    
                     location_val = str(raw_data[location_row_idx][j]).strip() if location_row_idx < len(raw_data) and j < len(raw_data[location_row_idx]) else ""
 
                     def check_nil(val):
@@ -134,11 +168,10 @@ def process_data():
                         check_nil(advance_emi),
                         check_nil(final_dbd),
                         check_nil(cpf_val),
-                        check_nil(validity_val),
+                        check_nil(final_validity),
                         check_nil(location_val)
                     ])
 
-    # 3. CSV फाईलमध्ये सेव्ह करणे
     out_df = pd.DataFrame(final_data)
     out_df.to_csv(OUTPUT_FILE, index=False, header=False, encoding='utf-8-sig')
     print(f"Success! Data saved to {OUTPUT_FILE}")
