@@ -1124,12 +1124,17 @@ function renderRows(pIdx) {
             <td id="inst_${pIdx}_${d.dIdx}" style="font-weight:900; font-size:15px !important;">${d.inst}</td>
             <td id="day_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950; font-size:15px !important;">₹${Math.round(d.daily).toLocaleString()}</td>
             
-            <!-- ACT कॉलममध्ये 1 मेनू आणि त्या अंतर्गत 3 बटणे -->
-            <td>
-                <div style="display:flex; flex-direction:column; gap:3px;">
-                    <button class="action-btn btn-copy" style="padding:6px; font-size:12px !important;" onclick="copySchemeText(${pIdx}, ${d.dIdx}, this)">📋 COPY</button>
-                    <button class="action-btn" style="background:var(--warning); color:#000; padding:6px; font-size:12px !important;" onclick="openEditSchemeModal(${pIdx}, ${d.dIdx})">✏️ EDIT</button>
-                    <button class="action-btn" style="background:${toggleBtnBg}; color:white; padding:6px; font-size:12px !important;" onclick="toggleInactive(${pIdx}, ${d.dIdx})">${toggleBtnText}</button>
+            <!-- ACT कॉलमच्या एकाच मुख्य बटणाच्या आत COPY, EDIT आणि DISABLE पर्याय -->
+            <td style="position: relative; text-align: center; overflow: visible;">
+                <div style="position: relative; display: inline-block; text-align: left;">
+                    <button class="action-btn" style="background: var(--bajaj-blue); color: white; padding: 8px 14px; font-size: 13px !important; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onclick="toggleActionMenu(${pIdx}, ${d.dIdx}, event)">
+                        ⚙️ ACT ▼
+                    </button>
+                    <div id="actMenu_${pIdx}_${d.dIdx}" style="display: none; position: absolute; right: 0; top: 105%; background: white; border: 1px solid #ccc; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 6px; z-index: 999; min-width: 140px; padding: 5px;">
+                        <button class="action-btn btn-copy" style="width: 100%; text-align: left; padding: 8px; font-size: 12px !important; margin-bottom: 3px; border-radius: 4px;" onclick="copySchemeText(${pIdx}, ${d.dIdx}, this); hideAllActionMenus();">📋 COPY</button>
+                        <button class="action-btn" style="width: 100%; text-align: left; background: var(--warning); color: #000; padding: 8px; font-size: 12px !important; margin-bottom: 3px; border-radius: 4px;" onclick="openEditSchemeModal(${pIdx}, ${d.dIdx}); hideAllActionMenus();">✏️ EDIT</button>
+                        <button class="action-btn" style="width: 100%; text-align: left; background: ${toggleBtnBg}; color: white; padding: 8px; font-size: 12px !important; border-radius: 4px;" onclick="toggleInactive(${pIdx}, ${d.dIdx}); hideAllActionMenus();">${toggleBtnText}</button>
+                    </div>
                 </div>
             </td>
         </tr>`;
@@ -1559,3 +1564,21 @@ function openBitlyLink(url) {
         showToast('⚠️ Is dealer ke liye Bitly link available nahi hai!', 'warning'); 
     } 
 }
+
+/* === HELPER FUNCTIONS FOR ACTION MENU TOGGLE === */
+function toggleActionMenu(pIdx, dIdx, event) {
+    event.stopPropagation();
+    let menu = document.getElementById(`actMenu_${pIdx}_${dIdx}`);
+    let isVisible = menu.style.display === 'block';
+    hideAllActionMenus();
+    menu.style.display = isVisible ? 'none' : 'block';
+}
+
+function hideAllActionMenus() {
+    document.querySelectorAll('[id^="actMenu_"]').forEach(m => m.style.display = 'none');
+}
+
+// Close the menu when clicking anywhere else on the document
+document.addEventListener('click', () => {
+    hideAllActionMenus();
+});
