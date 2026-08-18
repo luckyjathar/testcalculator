@@ -385,3 +385,31 @@ td.bound-col:nth-last-child(8) {
 .show-details-mode td.hidden-col:nth-child(6)::before { content: "LTV %" !important; }
 .show-details-mode td.hidden-col:nth-child(7) { grid-column: 7 / span 2; grid-row: 2; background: #fdfdfd; }
 .show-details-mode td.hidden-col:nth-child(7)::before { content: "NET DISB" !important; color: var(--bajaj-blue); }
+/* Mobile Layout Compression to avoid left-right scroll */
+@media (max-width: 768px) {
+    .table-wrapper table th, 
+    .table-wrapper table td {
+        padding: 4px 2px !important;
+        font-size: 12px !important;
+        letter-spacing: -0.3px;
+    }
+    .table-wrapper table th {
+        font-size: 10px !important;
+    }
+    .step-inp {
+        font-size: 13px !important;
+        height: 26px !important;
+        padding: 0 2px !important;
+    }
+    .action-btn {
+        padding: 4px 6px !important;
+        font-size: 10px !important;
+    }
+    /* Wrap long texts like PHONE(WEB-MOBILE) inside Details Mode */
+    .show-details-mode .hidden-col {
+        max-width: 65px !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        font-size: 9px !important;
+    }
+}
