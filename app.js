@@ -1115,22 +1115,24 @@ function renderRows(pIdx) {
             <td class="hidden-col">${d.category}</td><td class="hidden-col">${+parseFloat(d.dbd).toFixed(3)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.dbdAmt||0).toLocaleString()}</span></td><td class="hidden-col">₹${d.pf}</td><td class="hidden-col">${+parseFloat(d.roi).toFixed(2)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.roiAmt||0).toLocaleString()}</span></td><td class="hidden-col">${d.fixedEmi > 0 ? '₹'+d.fixedEmi : 'N/A'}</td><td class="hidden-col" id="ltv_${pIdx}_${d.dIdx}">${Math.round(d.curLTV)}%</td><td class="hidden-col" id="nd_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--bajaj-blue);">₹${Math.round(d.netDisb).toLocaleString()}</td><td class="hidden-col" id="extra_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--danger);">₹${Math.round(d.extra).toLocaleString()}</td>
             ${isNT ? `<td class="bound-col">${d.minLoan > 0 ? '₹' + d.minLoan : '0'}</td><td class="bound-col">${d.maxLoan < 9999999 ? '₹' + d.maxLoan : 'NO'}</td>` : `<td style="color:#777;">₹${Math.floor(d.nbfcMaxL)}</td>`}
             
-            <!-- स्टेपरचे + - बटणे काढून टाकले आणि साईज वाढवली -->
-            <td><input id="l_${pIdx}_${d.dIdx}" type="number" value="${Math.floor(d.loan)}" class="step-inp" style="width:110px; font-size:16px !important; font-weight:bold; text-align:center;" oninput="manual(${pIdx},${d.dIdx})"></td>
+            <!-- LOAN Input कॉम्पॅक्ट केले आहे (width:100%; max-width:80px;) -->
+            <td style="padding: 2px !important;">
+                <input id="l_${pIdx}_${d.dIdx}" type="number" value="${Math.floor(d.loan)}" class="step-inp" style="width:100%; min-width:55px; max-width:80px; font-size:14px !important; font-weight:bold; text-align:center; padding: 2px;" oninput="manual(${pIdx},${d.dIdx})">
+            </td>
             
-            <td id="ta_${pIdx}_${d.dIdx}" style="font-weight:900; font-size:15px !important;">${d.currentTenure}/${d.advEmi}${expInfo}${expiredWarning}</td>
-            <td id="dp_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950; font-size:16px !important;">₹${Math.round(d.dp).toLocaleString()}</td>
-            <td id="emi_${pIdx}_${d.dIdx}" style="color:var(--primary); font-weight:950; font-size:16px !important;">₹${Math.round(d.emi).toLocaleString()}</td>
-            <td id="inst_${pIdx}_${d.dIdx}" style="font-weight:900; font-size:15px !important;">${d.inst}</td>
-            <td id="day_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950; font-size:15px !important;">₹${Math.round(d.daily).toLocaleString()}</td>
+            <td id="ta_${pIdx}_${d.dIdx}" style="font-weight:900; font-size:13px !important; padding: 2px !important;">${d.currentTenure}/${d.advEmi}${expInfo}${expiredWarning}</td>
+            <td id="dp_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950; font-size:14px !important; padding: 2px !important;">₹${Math.round(d.dp).toLocaleString()}</td>
+            <td id="emi_${pIdx}_${d.dIdx}" style="color:var(--primary); font-weight:950; font-size:14px !important; padding: 2px !important;">₹${Math.round(d.emi).toLocaleString()}</td>
+            <td id="inst_${pIdx}_${d.dIdx}" style="font-weight:900; font-size:13px !important; padding: 2px !important;">${d.inst}</td>
+            <td id="day_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950; font-size:13px !important; padding: 2px !important;">₹${Math.round(d.daily).toLocaleString()}</td>
             
-            <!-- ACT कॉलमच्या एकाच मुख्य बटणाच्या आत COPY, EDIT आणि DISABLE पर्याय -->
-            <td style="position: relative; text-align: center; overflow: visible;">
+            <!-- ACT बटण लहान केले आहे आणि "ACT ▼" ऐवजी "⚙️ ACT" केले आहे जेणेकरून जागा वाचेल -->
+            <td style="position: relative; text-align: center; padding: 2px !important; overflow: visible;">
                 <div style="position: relative; display: inline-block; text-align: left;">
-                    <button class="action-btn" style="background: var(--bajaj-blue); color: white; padding: 8px 14px; font-size: 13px !important; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onclick="toggleActionMenu(${pIdx}, ${d.dIdx}, event)">
-                        ⚙️ ACT ▼
+                    <button class="action-btn" style="background: var(--bajaj-blue); color: white; padding: 6px 8px; font-size: 11px !important; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap;" onclick="toggleActionMenu(${pIdx}, ${d.dIdx}, event)">
+                        ⚙️ ACT
                     </button>
-                    <div id="actMenu_${pIdx}_${d.dIdx}" style="display: none; position: absolute; right: 0; top: 105%; background: white; border: 1px solid #ccc; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 6px; z-index: 999; min-width: 140px; padding: 5px;">
+                    <div id="actMenu_${pIdx}_${d.dIdx}" style="display: none; position: absolute; right: 0; top: 105%; background: white; border: 1px solid #ccc; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 6px; z-index: 999; min-width: 130px; padding: 5px;">
                         <button class="action-btn btn-copy" style="width: 100%; text-align: left; padding: 8px; font-size: 12px !important; margin-bottom: 3px; border-radius: 4px;" onclick="copySchemeText(${pIdx}, ${d.dIdx}, this); hideAllActionMenus();">📋 COPY</button>
                         <button class="action-btn" style="width: 100%; text-align: left; background: var(--warning); color: #000; padding: 8px; font-size: 12px !important; margin-bottom: 3px; border-radius: 4px;" onclick="openEditSchemeModal(${pIdx}, ${d.dIdx}); hideAllActionMenus();">✏️ EDIT</button>
                         <button class="action-btn" style="width: 100%; text-align: left; background: ${toggleBtnBg}; color: white; padding: 8px; font-size: 12px !important; border-radius: 4px;" onclick="toggleInactive(${pIdx}, ${d.dIdx}); hideAllActionMenus();">${toggleBtnText}</button>
