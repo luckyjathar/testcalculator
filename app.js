@@ -284,25 +284,66 @@ function parseExcelDate(val) { if (!val) return null; if (typeof val === 'number
 
 async function saveQueueToLocal(shouldCloudSync = true) { try { let compactQueue = customerQueue.map(c => { let cp = (c.products || []).map(p => { let { calculatedData, allSchemes, ...keepProduct } = p; return keepProduct; }); return { ...c, products: cp }; }); localStorage.setItem('persistent_queue_backup', JSON.stringify(compactQueue)); localStorage.setItem('persistent_active_idx_backup', activeCustomerIndex); await saveToDB('persistent_queue', compactQueue); await saveToDB('persistent_active_idx', activeCustomerIndex); if(shouldCloudSync && loggedInUserEmail) { triggerSilentCloudSync(); } } catch(e) { console.error("Local Save Interrupted", e); } }
 
+// === DIRECT DOWNLOAD FUNCTION (Bypasses GitHub API Errors) ===
 async function fetchFromMasterStream() {
-    let statusBadge = document.getElementById('gitStatusBadge'); if(statusBadge) { statusBadge.innerHTML = '🔄 CHECKING UPDATES...'; statusBadge.style.color = '#f39c12'; statusBadge.style.borderColor = '#f39c12'; statusBadge.style.background = 'rgba(243, 156, 18, 0.15)'; }
+    let statusBadge = document.getElementById('gitStatusBadge'); 
+    if(statusBadge) { 
+        statusBadge.innerHTML = '⬇️ DOWNLOADING NEW RATES...'; 
+        statusBadge.style.color = '#f39c12'; 
+        statusBadge.style.borderColor = '#f39c12'; 
+        statusBadge.style.background = 'rgba(243, 156, 18, 0.15)'; 
+    }
+    
     try {
-        let apiRes = await fetch(GITHUB_API_URL); if (!apiRes.ok) throw new Error("API Limit Reached or Repo Error");
-        let apiData = await apiRes.json(); if (!apiData || apiData.length === 0) throw new Error("No commits found for file.");
-        let latestSha = apiData[0].sha; let savedSha = localStorage.getItem('persistent_master_sha'); let savedDB = await getFromDB("persistent_db"); let isDbEmpty = (!savedDB || savedDB.length === 0);
-        if (latestSha === savedSha && !isDbEmpty) { if(statusBadge) { statusBadge.innerHTML = '✅ SYSTEM OPTIMIZED (FAST LOAD)'; statusBadge.style.color = 'var(--success)'; statusBadge.style.borderColor = 'var(--success)'; statusBadge.style.background = 'rgba(39, 174, 96, 0.15)'; } return; }
-        if (statusBadge) statusBadge.innerHTML = '⬇️ DOWNLOADING NEW RATES...';
-        let cacheBusterUrl = GITHUB_RAW_URL + '?t=' + Date.now(); let res = await fetch(cacheBusterUrl); if (!res.ok) throw new Error("File not deployed inside path setup yet.");
-        let dataBuffer = await res.arrayBuffer(); let wb = XLSX.read(new Uint8Array(dataBuffer), { type: 'array' });
-        tempSheet1Data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { raw: false, defval: "" }); parsedSheet2Data = wb.SheetNames.length > 1 ? XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[1]], { raw: false, defval: "" }).map(r => mapData(r, SPECIAL_MODEL)).filter(x => x && x.model && x.model.trim() !== "") : [];
-        if (wb.SheetNames.length > 2) { dealer_records = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[2]], { raw: false, defval: "" }); await saveToDB("persistent_dealers", dealer_records); }
-        let filteredSheet1 = tempSheet1Data.map(r => mapData(r, "REG")).filter(m => m && m.model && m.model.trim() !== ""); let rawCombined = [...filteredSheet1, ...parsedSheet2Data]; let uniqueDB = []; let seenDB = new Set();
-        rawCombined.forEach(r => { let key = `${r.model}_${r.category}_${r.tenure}_${r.advEmi}_${r.fixedEmi}_${r.minLoan}_${r.maxLoan}`; if (!seenDB.has(key)) { seenDB.add(key); uniqueDB.push(r); } });
-        if (uniqueDB.length > 0) { db_records = uniqueDB; await saveToDB("persistent_db", db_records); localStorage.setItem('persistent_master_sha', latestSha); if (activeCustomerIndex !== -1) { loadCurrentProducts(); renderMatrix(); } }
-        if(statusBadge) { statusBadge.innerHTML = '✅ MASTER DATA SYNCED'; statusBadge.style.color = 'var(--success)'; statusBadge.style.borderColor = 'var(--success)'; statusBadge.style.background = 'rgba(39, 174, 96, 0.15)'; }
-    } catch(err) { console.error("Smart Version Check Error: ", err); if(statusBadge) { statusBadge.innerHTML = '⚠️ OFFLINE MODE (USING LOCAL DATA)'; statusBadge.style.color = 'var(--danger)'; statusBadge.style.borderColor = 'var(--danger)'; statusBadge.style.background = 'rgba(214, 48, 49, 0.15)'; } }
+        // थेट रॉ (RAW) फाईल डाउनलोड करणे (Cache होऊ नये म्हणून शेवटी Time जोडला आहे)
+        let cacheBusterUrl = GITHUB_RAW_URL + '?t=' + new Date().getTime(); 
+        let res = await fetch(cacheBusterUrl, { cache: 'no-store' }); 
+        
+        if (!res.ok) throw new Error("File download failed from raw link.");
+        
+        let dataBuffer = await res.arrayBuffer(); 
+        let wb = XLSX.read(new Uint8Array(dataBuffer), { type: 'array' });
+        
+        tempSheet1Data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { raw: false, defval: "" }); 
+        parsedSheet2Data = wb.SheetNames.length > 1 ? XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[1]], { raw: false, defval: "" }).map(r => mapData(r, SPECIAL_MODEL)).filter(x => x && x.model && x.model.trim() !== "") : [];
+        
+        if (wb.SheetNames.length > 2) { 
+            dealer_records = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[2]], { raw: false, defval: "" }); 
+            await saveToDB("persistent_dealers", dealer_records); 
+        }
+        
+        let filteredSheet1 = tempSheet1Data.map(r => mapData(r, "REG")).filter(m => m && m.model && m.model.trim() !== ""); 
+        let rawCombined = [...filteredSheet1, ...parsedSheet2Data]; 
+        let uniqueDB = []; let seenDB = new Set();
+        
+        rawCombined.forEach(r => { 
+            let key = `${r.model}_${r.category}_${r.tenure}_${r.advEmi}_${r.fixedEmi}_${r.minLoan}_${r.maxLoan}`; 
+            if (!seenDB.has(key)) { seenDB.add(key); uniqueDB.push(r); } 
+        });
+        
+        if (uniqueDB.length > 0) { 
+            db_records = uniqueDB; 
+            await saveToDB("persistent_db", db_records); 
+            // जुन्या SHA चे लॉजिक काढून टाकले आहे, आता थेट डेटाबेस अपडेट होईल.
+            if (activeCustomerIndex !== -1) { loadCurrentProducts(); renderMatrix(); } 
+        }
+        
+        if(statusBadge) { 
+            statusBadge.innerHTML = '✅ MASTER DATA SYNCED'; 
+            statusBadge.style.color = 'var(--success)'; 
+            statusBadge.style.borderColor = 'var(--success)'; 
+            statusBadge.style.background = 'rgba(39, 174, 96, 0.15)'; 
+        }
+    } catch(err) { 
+        console.error("Direct Fetch Error: ", err); 
+        if(statusBadge) { 
+            statusBadge.innerHTML = '⚠️ OFFLINE MODE (USING LOCAL DATA)'; 
+            statusBadge.style.color = 'var(--danger)'; 
+            statusBadge.style.borderColor = 'var(--danger)'; 
+            statusBadge.style.background = 'rgba(214, 48, 49, 0.15)'; 
+        } 
+    }
 }
-
 window.onload = async function() {
     if(loggedInUserEmail) { let savedName = localStorage.getItem('persistent_user_name') || "User"; updateLoginUI(savedName, true); } generateStackCards(); 
     try {
