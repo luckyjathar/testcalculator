@@ -1560,11 +1560,24 @@ function openBitlyLink(url) {
         showToast('⚠️ Is dealer ke liye Bitly link available nahi hai!', 'warning'); 
     } 
 }
+// === HARD RESET FUNCTION (UPDATED) ===
 function hardResetApp() {
-    if(confirm("तुम्हाला नवीन मास्टर डेटा डाउनलोड करायचा आहे का?")) {
-        localStorage.clear(); // सर्व लोकल स्टोरेज क्लिअर करेल
-        indexedDB.deleteDatabase("PersistentPortalDB"); // जुना डेटाबेस उडवेल
-        alert("डेटा रिसेट झाला आहे. ॲप पुन्हा सुरू होत आहे...");
-        window.location.reload(true); // पेज रिफ्रेश करेल
+    let confirmMsg = "तुम्हाला जुना डेटा डिलीट करून नवीन मास्टर डेटा डाउनलोड करायचा आहे का?";
+    if (confirm(confirmMsg)) {
+        // १. जुना SHA उडवणे
+        localStorage.removeItem('persistent_master_sha');
+        
+        // २. डेटाबेस उडवणे आणि तो पूर्ण उडाल्यावरच पेज रिफ्रेश करणे
+        let req = indexedDB.deleteDatabase("PersistentPortalDB");
+        
+        req.onsuccess = function () {
+            alert("डेटा रिसेट झाला आहे. ॲप आता पुन्हा सुरू होत आहे...");
+            window.location.reload(true);
+        };
+        
+        req.onerror = function () {
+            alert("डेटा रिसेट करताना एरर आला. कृपया मॅन्युअली History क्लिअर करा.");
+            window.location.reload(true);
+        };
     }
 }
