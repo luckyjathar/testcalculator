@@ -1560,3 +1560,11 @@ function openBitlyLink(url) {
         showToast('⚠️ Is dealer ke liye Bitly link available nahi hai!', 'warning'); 
     } 
 }
+function hardResetApp() {
+    if(confirm("तुम्हाला नवीन मास्टर डेटा डाउनलोड करायचा आहे का?")) {
+        localStorage.clear(); // सर्व लोकल स्टोरेज क्लिअर करेल
+        indexedDB.deleteDatabase("PersistentPortalDB"); // जुना डेटाबेस उडवेल
+        alert("डेटा रिसेट झाला आहे. ॲप पुन्हा सुरू होत आहे...");
+        window.location.reload(true); // पेज रिफ्रेश करेल
+    }
+}
