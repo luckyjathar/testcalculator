@@ -268,8 +268,8 @@ function standardizeCategoryName(cat) { if (!cat) return "OTHER"; let c = String
 function getRfcSlabValue(val) { let amount = parseFloat(val) || 0; if (amount < 8000) return 0; if (amount <= 10000) return 1109; if (amount <= 15000) return 1631; if (amount <= 20000) return 2147; if (amount <= 25000) return 2695; if (amount <= 30000) return 3215; if (amount <= 35000) return 3648; if (amount <= 40000) return 4219; if (amount <= 50000) return 5720; if (amount <= 60000) return 8686; if (amount <= 100000) return 11438; if (amount <= 200000) return 16677; return 0; }
 function getNonTieupPfValue(category, amount) { let cat = String(category || "").toUpperCase().replace(/\s+/g, '').trim(); let val = parseFloat(amount) || 0; if (cat.includes('DESKTOP') || cat.includes('LAPTOP')) { return 699; } if (cat === 'PHONE(WEB-MOBILE)' || cat.includes('PHONE') || cat.includes('TABLET') || cat.includes('WATCH') || cat.includes('PRINTER') || cat.includes('HEADPHONE') || cat === 'SMARTPHONES' || cat === 'MOBILE') { if (val <= 30000) return 499; if (val <= 50000) return 599; return 699; } return null; }
 
-const GITHUB_RAW_URL = "https://raw.githubusercontent.com/luckyjathar/CALCULATOR/main/master_data_v2.xlsx"; 
-const GITHUB_API_URL = "https://api.github.com/repos/luckyjathar/CALCULATOR/commits?path=master_data_v2.xlsx&page=1&per_page=1";
+const GITHUB_RAW_URL = "https://raw.githubusercontent.com/luckyjathar/CALCULATOR/main/master_data_august.xlsx"; 
+const GITHUB_API_URL = "https://api.github.com/repos/luckyjathar/CALCULATOR/commits?path=master_data_august.xlsx&page=1&per_page=1";
 const DB_NAME = "PersistentPortalDB"; const DB_VERSION = 2; const STORE_NAME = "dataStore"; let dbInstance;
 
 function initDB() { return new Promise((resolve, reject) => { let request = indexedDB.open(DB_NAME, DB_VERSION); request.onupgradeneeded = function(e) { let db = e.target.result; if (!db.objectStoreNames.contains(STORE_NAME)) { db.createObjectStore(STORE_NAME); } }; request.onsuccess = function(e) { dbInstance = e.target.result; resolve(dbInstance); }; request.onerror = function(e) { reject(e); }; }); }
