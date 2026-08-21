@@ -521,7 +521,8 @@ function renderTableModel() {
     
     let thead = document.getElementById('tableHead');
     if (isCalculatedMode) {
-        thead.innerHTML = `<tr><th style="background:#e3f2fd;">T/A</th><th style="background:#e3f2fd;">LTV%</th><th style="background:#e8f5e9; color:var(--success);">LOAN</th><th style="background:#fff3e0; color:#d35400;">DIFF (INV-LOAN)</th><th style="background:#e8f5e9; color:var(--success);">EST. DP</th><th style="background:#e3f2fd; color:var(--primary);">EMI</th><th style="background:#e3f2fd; color:var(--primary);">MONTHS</th><th>ACTION</th></tr>`;
+        // हेडिंग्स कॉम्पॅक्ट केले आहेत जेणेकरून स्क्रोल कमी होईल
+        thead.innerHTML = `<tr><th style="background:#e3f2fd; padding:10px 4px; font-size:12px;">T/A</th><th style="background:#e3f2fd; padding:10px 4px; font-size:12px;">LTV%</th><th style="background:#e8f5e9; color:var(--success); padding:10px 4px; font-size:12px;">LOAN</th><th style="background:#fff3e0; color:#d35400; padding:10px 4px; font-size:12px;">DIFF</th><th style="background:#e8f5e9; color:var(--success); padding:10px 4px; font-size:12px;">NET DP</th><th style="background:#e3f2fd; color:var(--primary); padding:10px 4px; font-size:12px;">EMI</th><th style="background:#e3f2fd; color:var(--primary); padding:10px 4px; font-size:12px;">M</th><th style="padding:10px 4px; font-size:12px;">ACT</th></tr>`;
     } else {
         thead.innerHTML = `<tr><th style="background:#e3f2fd;">T/A</th><th style="background:#e3f2fd;">LTV%</th><th style="background:#e3f2fd;">FIXED EMI</th><th style="background:#e3f2fd;">DBD%</th><th style="background:#e3f2fd;">ROI%</th><th style="background:#e3f2fd;">PF</th></tr>`;
     }
@@ -628,15 +629,16 @@ function renderTableModel() {
     tbody.innerHTML = validSchemes.map(s => {
         let displayTenure = s.currentTenure ? s.currentTenure : s.tenure;
         if (isCalculatedMode) {
+            // पॅडिंग आणि साईझ कमी केली आहे जेणेकरून स्क्रीनमध्ये बसेल
             return `<tr>
-                <td style="font-weight:900; color:var(--indigo); border-bottom:1px solid #eee;">${displayTenure}/${s.advEmi}</td>
-                <td style="font-weight:bold; color:var(--bajaj-blue); border-bottom:1px solid #eee;">${Math.round(s.calcLTV)}%</td>
-                <td style="border-bottom:1px solid #eee; background:#f4fcf6; color:var(--success); font-weight:900;">₹${Math.floor(s.calcLoan).toLocaleString()}</td>
-                <td style="border-bottom:1px solid #eee; background:#fff3e0; color:#d35400; font-weight:900;">₹${Math.floor(s.calcDiff).toLocaleString()}</td>
-                <td style="border-bottom:1px solid #eee; background:#f4fcf6; color:var(--success); font-weight:900;">₹${Math.round(s.calcDp).toLocaleString()}</td>
-                <td style="border-bottom:1px solid #eee; background:#eef6ff; color:var(--primary); font-weight:900;">₹${Math.round(s.calcEmi).toLocaleString()}</td>
-                <td style="font-weight:900; color:var(--primary); background:#eef6ff; border-bottom:1px solid #eee;">${s.calcInst}</td>
-                <td style="border-bottom:1px solid #eee;"><button style="padding:4px 8px; font-size:10px !important; background:var(--primary); color:white; border:none; border-radius:3px; cursor:pointer;" onclick="copySingleScheme('${displayTenure}', '${s.advEmi}', '${s.calcLoan}', '${s.calcDp}', '${s.calcEmi}', '${s.fixedEmi}', '${s.dbd}', '${s.roi}', '${s.pf}', this)">COPY</button></td>
+                <td style="font-weight:900; color:var(--indigo); border-bottom:1px solid #eee; padding:10px 4px; font-size:13px;">${displayTenure}/${s.advEmi}</td>
+                <td style="font-weight:bold; color:var(--bajaj-blue); border-bottom:1px solid #eee; padding:10px 4px; font-size:13px;">${Math.round(s.calcLTV)}%</td>
+                <td style="border-bottom:1px solid #eee; background:#f4fcf6; color:var(--success); font-weight:900; padding:10px 4px; font-size:13px;">₹${Math.floor(s.calcLoan).toLocaleString()}</td>
+                <td style="border-bottom:1px solid #eee; background:#fff3e0; color:#d35400; font-weight:900; padding:10px 4px; font-size:13px;">₹${Math.floor(s.calcDiff).toLocaleString()}</td>
+                <td style="border-bottom:1px solid #eee; background:#f4fcf6; color:var(--success); font-weight:900; padding:10px 4px; font-size:13px;">₹${Math.round(s.calcDp).toLocaleString()}</td>
+                <td style="border-bottom:1px solid #eee; background:#eef6ff; color:var(--primary); font-weight:900; padding:10px 4px; font-size:13px;">₹${Math.round(s.calcEmi).toLocaleString()}</td>
+                <td style="font-weight:900; color:var(--primary); background:#eef6ff; border-bottom:1px solid #eee; padding:10px 4px; font-size:13px;">${s.calcInst}</td>
+                <td style="border-bottom:1px solid #eee; padding:10px 4px;"><button style="padding:4px 6px; font-size:10px !important; background:var(--primary); color:white; border:none; border-radius:3px; cursor:pointer;" onclick="copySingleScheme('${displayTenure}', '${s.advEmi}', '${s.calcLoan}', '${s.calcDp}', '${s.calcEmi}', '${s.fixedEmi}', '${s.dbd}', '${s.roi}', '${s.pf}', this)">COPY</button></td>
             </tr>`;
         } else {
             let dbdAmtPreview = invoice > 0 ? invoice * (s.dbd * 1.18 / 100) : 0;
@@ -655,7 +657,6 @@ function renderTableModel() {
     
     document.getElementById('schemeResultArea').style.display = 'block';
 }
-
 function copySingleScheme(tenure, advEmi, loan, dp, emi, fixedEmi, dbd, roi, pf, btn) {
     let limit = parseFloat(document.getElementById('calcLimit').value) || 0;
     let invoice = parseFloat(document.getElementById('calcInvoice').value) || 0;
