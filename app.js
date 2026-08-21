@@ -521,10 +521,26 @@ function renderTableModel() {
     
     let thead = document.getElementById('tableHead');
     if (isCalculatedMode) {
-        // हेडिंग्स कॉम्पॅक्ट केले आहेत जेणेकरून स्क्रोल कमी होईल
-        thead.innerHTML = `<tr><th style="background:#e3f2fd; padding:10px 4px; font-size:12px;">T/A</th><th style="background:#e3f2fd; padding:10px 4px; font-size:12px;">LTV%</th><th style="background:#e8f5e9; color:var(--success); padding:10px 4px; font-size:12px;">LOAN</th><th style="background:#fff3e0; color:#d35400; padding:10px 4px; font-size:12px;">DIFF</th><th style="background:#e8f5e9; color:var(--success); padding:10px 4px; font-size:12px;">NET DP</th><th style="background:#e3f2fd; color:var(--primary); padding:10px 4px; font-size:12px;">EMI</th><th style="background:#e3f2fd; color:var(--primary); padding:10px 4px; font-size:12px;">M</th><th style="padding:10px 4px; font-size:12px;">ACT</th></tr>`;
+        // येथे T/A ला display: table-cell !important; लावले आहे
+        thead.innerHTML = `<tr>
+            <th style="display: table-cell !important; background:#e3f2fd; padding:10px 4px; font-size:12px;">T/A</th>
+            <th style="background:#e3f2fd; padding:10px 4px; font-size:12px;">LTV%</th>
+            <th style="background:#e8f5e9; color:var(--success); padding:10px 4px; font-size:12px;">LOAN</th>
+            <th style="background:#fff3e0; color:#d35400; padding:10px 4px; font-size:12px;">DIFF</th>
+            <th style="background:#e8f5e9; color:var(--success); padding:10px 4px; font-size:12px;">NET DP</th>
+            <th style="background:#e3f2fd; color:var(--primary); padding:10px 4px; font-size:12px;">EMI</th>
+            <th style="background:#e3f2fd; color:var(--primary); padding:10px 4px; font-size:12px;">M</th>
+            <th style="padding:10px 4px; font-size:12px;">ACT</th>
+        </tr>`;
     } else {
-        thead.innerHTML = `<tr><th style="background:#e3f2fd;">T/A</th><th style="background:#e3f2fd;">LTV%</th><th style="background:#e3f2fd;">FIXED EMI</th><th style="background:#e3f2fd;">DBD%</th><th style="background:#e3f2fd;">ROI%</th><th style="background:#e3f2fd;">PF</th></tr>`;
+        thead.innerHTML = `<tr>
+            <th style="display: table-cell !important; background:#e3f2fd;">T/A</th>
+            <th style="background:#e3f2fd;">LTV%</th>
+            <th style="background:#e3f2fd;">FIXED EMI</th>
+            <th style="background:#e3f2fd;">DBD%</th>
+            <th style="background:#e3f2fd;">ROI%</th>
+            <th style="background:#e3f2fd;">PF</th>
+        </tr>`;
     }
 
     validSchemes.forEach(s => { 
@@ -629,9 +645,8 @@ function renderTableModel() {
     tbody.innerHTML = validSchemes.map(s => {
         let displayTenure = s.currentTenure ? s.currentTenure : s.tenure;
         if (isCalculatedMode) {
-            // पॅडिंग आणि साईझ कमी केली आहे जेणेकरून स्क्रीनमध्ये बसेल
             return `<tr>
-                <td style="font-weight:900; color:var(--indigo); border-bottom:1px solid #eee; padding:10px 4px; font-size:13px;">${displayTenure}/${s.advEmi}</td>
+                <td style="display: table-cell !important; font-weight:900; color:var(--indigo); border-bottom:1px solid #eee; padding:10px 4px; font-size:13px;">${displayTenure}/${s.advEmi}</td>
                 <td style="font-weight:bold; color:var(--bajaj-blue); border-bottom:1px solid #eee; padding:10px 4px; font-size:13px;">${Math.round(s.calcLTV)}%</td>
                 <td style="border-bottom:1px solid #eee; background:#f4fcf6; color:var(--success); font-weight:900; padding:10px 4px; font-size:13px;">₹${Math.floor(s.calcLoan).toLocaleString()}</td>
                 <td style="border-bottom:1px solid #eee; background:#fff3e0; color:#d35400; font-weight:900; padding:10px 4px; font-size:13px;">₹${Math.floor(s.calcDiff).toLocaleString()}</td>
@@ -645,7 +660,7 @@ function renderTableModel() {
             let dbdStr = invoice > 0 ? `${+parseFloat(s.dbd).toFixed(3)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(dbdAmtPreview).toLocaleString()}</span>` : `${+parseFloat(s.dbd).toFixed(3)}%`;
 
             return `<tr>
-                <td style="font-weight:900; color:var(--indigo); border-bottom:1px solid #eee;">${displayTenure}/${s.advEmi}</td>
+                <td style="display: table-cell !important; font-weight:900; color:var(--indigo); border-bottom:1px solid #eee;">${displayTenure}/${s.advEmi}</td>
                 <td style="font-weight:bold; color:var(--bajaj-blue); border-bottom:1px solid #eee;">${Math.round(s.calcLTV)}%</td>
                 <td style="font-weight:900; color:var(--primary); border-bottom:1px solid #eee;">${s.fixedEmi > 0 ? '₹'+s.fixedEmi : 'N/A'}</td>
                 <td style="border-bottom:1px solid #eee;">${dbdStr}</td>
