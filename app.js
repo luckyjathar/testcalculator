@@ -364,10 +364,7 @@ window.onload = async function() {
     try {
         await initDB(); 
         
-        localStorage.removeItem('persistent_master_sha');
-        
-        await fetchFromMasterStream();
-        
+        // १. आधी युजरचा लोकल डेटा आणि Queue सेकंदात लोड करून घ्या (Superfast UI)
         let savedQ = await getFromDB('persistent_queue'); 
         if (!savedQ || savedQ.length === 0) { 
             let lsQ = localStorage.getItem('persistent_queue_backup'); 
@@ -391,11 +388,14 @@ window.onload = async function() {
         
         renderCustomerQueue(); 
         updateUniversalActionButtons();
+
+        // २. वेबसाइट पूर्ण उघडल्यावर, बॅकग्राउंडमध्ये Master Data डाउनलोड करा (Non-blocking)
+        fetchFromMasterStream(); 
+        
     } catch(e) { 
         console.error("Local Data Initialization Failure", e); 
     }
 };
-
 function openFlyerGenModal() { document.getElementById('fgSalesName').value = ''; document.getElementById('fgSalesMobile').value = ''; document.getElementById('fgDealerSearch').value = ''; document.getElementById('fgDealerList').innerHTML = ''; tempFgDealerId = ""; tempFgDealerName = ""; tempFgBitly = ""; clearFgModel(); document.getElementById('fgOfferType').value = 'NONE'; toggleFgOfferInput(); document.getElementById('fgSelectedDealerBox').style.display = 'none'; document.getElementById('flyerGeneratedLinkBox').style.display = 'none'; document.getElementById('flyerGenModal').style.display = 'flex'; }
 function toggleFgOfferInput() { let type = document.getElementById('fgOfferType').value; let box = document.getElementById('fgOfferValBox'); let label = document.getElementById('fgOfferValLabel'); let inp = document.getElementById('fgOfferValue'); if(type === "NONE") { box.style.display = 'none'; inp.value = ''; } else if(type === "FREEBIE") { box.style.display = 'block'; label.innerText = "ENTER GIFT NAME"; inp.placeholder = "E.g. Earbuds / Smartwatch"; } else { box.style.display = 'block'; label.innerText = "ENTER UPTO AMOUNT (₹)"; inp.placeholder = "E.g. 2500"; } }
 function searchFgDealer() { let q = document.getElementById('fgDealerSearch').value.toLowerCase().trim(); let list = document.getElementById('fgDealerList'); if(!q) { list.innerHTML = ''; return; } let matches = dealer_records.map(d => parseDealerObj(d)).filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q) || p.city.toLowerCase().includes(q)).slice(0, 10); list.innerHTML = matches.map(p => { let displayStr = `${p.name}${p.city ? ' - ' + p.city : ''} (${p.code})`; return `<div onclick="selectFgDealer('${p.code}', '${p.name.replace(/'/g, "\\'")}', '${p.city.replace(/'/g, "\\'")}', '${encodeURIComponent(p.bitly||'')}')" style="padding:8px; border-bottom:1px solid #eee; cursor:pointer; background:#fff; font-size:12px; font-weight:bold; color:var(--bajaj-blue);">🏪 ${displayStr}</div>`; }).join(''); }
