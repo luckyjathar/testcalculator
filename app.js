@@ -268,7 +268,7 @@ function standardizeCategoryName(cat) { if (!cat) return "OTHER"; let c = String
 function getRfcSlabValue(val) { let amount = parseFloat(val) || 0; if (amount < 8000) return 0; if (amount <= 10000) return 1109; if (amount <= 15000) return 1631; if (amount <= 20000) return 2147; if (amount <= 25000) return 2695; if (amount <= 30000) return 3215; if (amount <= 35000) return 3648; if (amount <= 40000) return 4219; if (amount <= 50000) return 5720; if (amount <= 60000) return 8686; if (amount <= 100000) return 11438; if (amount <= 200000) return 16677; return 0; }
 function getNonTieupPfValue(category, amount) { let cat = String(category || "").toUpperCase().replace(/\s+/g, '').trim(); let val = parseFloat(amount) || 0; if (cat.includes('DESKTOP') || cat.includes('LAPTOP')) { return 699; } if (cat === 'PHONE(WEB-MOBILE)' || cat.includes('PHONE') || cat.includes('TABLET') || cat.includes('WATCH') || cat.includes('PRINTER') || cat.includes('HEADPHONE') || cat === 'SMARTPHONES' || cat === 'MOBILE') { if (val <= 30000) return 499; if (val <= 50000) return 599; return 699; } return null; }
 
-const GITHUB_RAW_URL = "https://raw.githubusercontent.com/luckyjathar/CALCULATOR/main/master_data.xlsx"; const GITHUB_API_URL = "https://api.github.com/repos/luckyjathar/CALCULATOR/commits?path=master_data.xlsx&page=1&per_page=1";
+const GITHUB_RAW_URL = "https://raw.githubusercontent.com/luckyjathar/CALCULATOR/main/master_data.xlsx";
 const DB_NAME = "PersistentPortalDB"; const DB_VERSION = 2; const STORE_NAME = "dataStore"; let dbInstance;
 
 function initDB() { return new Promise((resolve, reject) => { let request = indexedDB.open(DB_NAME, DB_VERSION); request.onupgradeneeded = function(e) { let db = e.target.result; if (!db.objectStoreNames.contains(STORE_NAME)) { db.createObjectStore(STORE_NAME); } }; request.onsuccess = function(e) { dbInstance = e.target.result; resolve(dbInstance); }; request.onerror = function(e) { reject(e); }; }); }
@@ -284,49 +284,117 @@ function parseExcelDate(val) { if (!val) return null; if (typeof val === 'number
 async function saveQueueToLocal(shouldCloudSync = true) { try { let compactQueue = customerQueue.map(c => { let cp = (c.products || []).map(p => { let { calculatedData, allSchemes, ...keepProduct } = p; return keepProduct; }); return { ...c, products: cp }; }); localStorage.setItem('persistent_queue_backup', JSON.stringify(compactQueue)); localStorage.setItem('persistent_active_idx_backup', activeCustomerIndex); await saveToDB('persistent_queue', compactQueue); await saveToDB('persistent_active_idx', activeCustomerIndex); if(shouldCloudSync && loggedInUserEmail) { triggerSilentCloudSync(); } } catch(e) { console.error("Local Save Interrupted", e); } }
 
 async function fetchFromMasterStream() {
-    let statusBadge = document.getElementById('gitStatusBadge'); if(statusBadge) { statusBadge.innerHTML = '🔄 CHECKING UPDATES...'; statusBadge.style.color = '#f39c12'; statusBadge.style.borderColor = '#f39c12'; statusBadge.style.background = 'rgba(243, 156, 18, 0.15)'; }
+    let statusBadge = document.getElementById('gitStatusBadge'); 
+    if(statusBadge) { 
+        statusBadge.innerHTML = '⬇️ DOWNLOADING LIVE DATA...'; 
+        statusBadge.style.color = '#f39c12'; 
+        statusBadge.style.borderColor = '#f39c12'; 
+        statusBadge.style.background = 'rgba(243, 156, 18, 0.15)'; 
+    }
+    
     try {
-        let apiRes = await fetch(GITHUB_API_URL); if (!apiRes.ok) throw new Error("API Limit Reached or Repo Error");
-        let apiData = await apiRes.json(); if (!apiData || apiData.length === 0) throw new Error("No commits found for file.");
-        let latestSha = apiData[0].sha; let savedSha = localStorage.getItem('persistent_master_sha'); let savedDB = await getFromDB("persistent_db"); let isDbEmpty = (!savedDB || savedDB.length === 0);
-        if (latestSha === savedSha && !isDbEmpty) { if(statusBadge) { statusBadge.innerHTML = '✅ SYSTEM OPTIMIZED (FAST LOAD)'; statusBadge.style.color = 'var(--success)'; statusBadge.style.borderColor = 'var(--success)'; statusBadge.style.background = 'rgba(39, 174, 96, 0.15)'; } return; }
-        if (statusBadge) statusBadge.innerHTML = '⬇️ DOWNLOADING NEW RATES...';
-        let cacheBusterUrl = GITHUB_RAW_URL + '?t=' + Date.now(); let res = await fetch(cacheBusterUrl); if (!res.ok) throw new Error("File not deployed inside path setup yet.");
-        let dataBuffer = await res.arrayBuffer(); let wb = XLSX.read(new Uint8Array(dataBuffer), { type: 'array' });
-        tempSheet1Data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { raw: false, defval: "" }); parsedSheet2Data = wb.SheetNames.length > 1 ? XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[1]], { raw: false, defval: "" }).map(r => mapData(r, SPECIAL_MODEL)).filter(x => x && x.model && x.model.trim() !== "") : [];
-        if (wb.SheetNames.length > 2) { dealer_records = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[2]], { raw: false, defval: "" }); await saveToDB("persistent_dealers", dealer_records); }
-        let filteredSheet1 = tempSheet1Data.map(r => mapData(r, "REG")).filter(m => m && m.model && m.model.trim() !== ""); let rawCombined = [...filteredSheet1, ...parsedSheet2Data]; let uniqueDB = []; let seenDB = new Set();
-        rawCombined.forEach(r => { let key = `${r.model}_${r.category}_${r.tenure}_${r.advEmi}_${r.fixedEmi}_${r.minLoan}_${r.maxLoan}`; if (!seenDB.has(key)) { seenDB.add(key); uniqueDB.push(r); } });
-        if (uniqueDB.length > 0) { db_records = uniqueDB; await saveToDB("persistent_db", db_records); localStorage.setItem('persistent_master_sha', latestSha); if (activeCustomerIndex !== -1) { loadCurrentProducts(); renderMatrix(); } }
-        if(statusBadge) { statusBadge.innerHTML = '✅ MASTER DATA SYNCED'; statusBadge.style.color = 'var(--success)'; statusBadge.style.borderColor = 'var(--success)'; statusBadge.style.background = 'rgba(39, 174, 96, 0.15)'; }
-    } catch(err) { console.error("Smart Version Check Error: ", err); if(statusBadge) { statusBadge.innerHTML = '⚠️ OFFLINE MODE (USING LOCAL DATA)'; statusBadge.style.color = 'var(--danger)'; statusBadge.style.borderColor = 'var(--danger)'; statusBadge.style.background = 'rgba(214, 48, 49, 0.15)'; } }
+        let cacheBusterUrl = GITHUB_RAW_URL + '?t=' + new Date().getTime(); 
+        let res = await fetch(cacheBusterUrl); 
+        
+        if (!res.ok) {
+            throw new Error("Master file missing or deleted from GitHub.");
+        }
+        
+        let dataBuffer = await res.arrayBuffer(); 
+        let wb = XLSX.read(new Uint8Array(dataBuffer), { type: 'array' });
+        
+        tempSheet1Data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { raw: false, defval: "" }); 
+        parsedSheet2Data = wb.SheetNames.length > 1 ? XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[1]], { raw: false, defval: "" }).map(r => mapData(r, SPECIAL_MODEL)).filter(x => x && x.model && x.model.trim() !== "") : [];
+        
+        if (wb.SheetNames.length > 2) { 
+            dealer_records = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[2]], { raw: false, defval: "" }); 
+        } else {
+            dealer_records = [];
+        }
+        
+        let filteredSheet1 = tempSheet1Data.map(r => mapData(r, "REG")).filter(m => m && m.model && m.model.trim() !== ""); 
+        let rawCombined = [...filteredSheet1, ...parsedSheet2Data]; 
+        let uniqueDB = []; 
+        let seenDB = new Set();
+        
+        rawCombined.forEach(r => { 
+            let key = `${r.model}_${r.category}_${r.tenure}_${r.advEmi}_${r.fixedEmi}_${r.minLoan}_${r.maxLoan}`; 
+            if (!seenDB.has(key)) { 
+                seenDB.add(key); 
+                uniqueDB.push(r); 
+            } 
+        });
+        
+        let today = new Date(); today.setHours(0,0,0,0);
+        db_records = uniqueDB.filter(r => {
+            if(!r.expiryDateStr) return true;
+            let p = r.expiryDateStr.split('/');
+            if(p.length !== 3) return true;
+            let expD = new Date(p[2], p[1]-1, p[0]);
+            return expD >= today;
+        });
+
+        if (activeCustomerIndex !== -1) { loadCurrentProducts(); renderMatrix(); }
+        
+        if(statusBadge) { 
+            statusBadge.innerHTML = '✅ LIVE DATA SYNCED'; 
+            statusBadge.style.color = 'var(--success)'; 
+            statusBadge.style.borderColor = 'var(--success)'; 
+            statusBadge.style.background = 'rgba(39, 174, 96, 0.15)'; 
+        }
+    } catch(err) { 
+        console.error("Live Fetch Error: ", err); 
+        db_records = []; 
+        dealer_records = [];
+        if(statusBadge) { 
+            statusBadge.innerHTML = '⚠️ NO MASTER DATA FOUND'; 
+            statusBadge.style.color = 'var(--danger)'; 
+            statusBadge.style.borderColor = 'var(--danger)'; 
+            statusBadge.style.background = 'rgba(214, 48, 49, 0.15)'; 
+        } 
+    }
 }
 
 window.onload = async function() {
-    if(loggedInUserEmail) { let savedName = localStorage.getItem('persistent_user_name') || "User"; updateLoginUI(savedName, true); } generateStackCards(); 
+    if(loggedInUserEmail) { 
+        let savedName = localStorage.getItem('persistent_user_name') || "User"; 
+        updateLoginUI(savedName, true); 
+    } 
+    generateStackCards(); 
+    
     try {
         await initDB(); 
-        let savedDB = await getFromDB("persistent_db"); 
-        if (savedDB && savedDB.length > 0) { 
-            let today = new Date(); today.setHours(0,0,0,0);
-            db_records = savedDB.filter(r => {
-                if(!r.expiryDateStr) return true;
-                let p = r.expiryDateStr.split('/');
-                if(p.length !== 3) return true;
-                let expD = new Date(p[2], p[1]-1, p[0]);
-                return expD >= today;
-            });
-        }
-        let savedDealers = await getFromDB("persistent_dealers"); if (savedDealers && savedDealers.length > 0) { dealer_records = savedDealers; }
+        
+        localStorage.removeItem('persistent_master_sha');
+        
         await fetchFromMasterStream();
-        let savedQ = await getFromDB('persistent_queue'); if (!savedQ || savedQ.length === 0) { let lsQ = localStorage.getItem('persistent_queue_backup'); if (lsQ) savedQ = JSON.parse(lsQ); }
+        
+        let savedQ = await getFromDB('persistent_queue'); 
+        if (!savedQ || savedQ.length === 0) { 
+            let lsQ = localStorage.getItem('persistent_queue_backup'); 
+            if (lsQ) savedQ = JSON.parse(lsQ); 
+        }
         if (savedQ) { customerQueue = savedQ.map(c => ({ ...c, components: c.components || {}, products: c.products || [], sortConfigs: c.sortConfigs || [] })); }
-        let savedRecycle = await getFromDB('persistent_recycle'); if (!savedRecycle || savedRecycle.length === 0) { let lsRec = localStorage.getItem('persistent_recycle_backup'); if (lsRec) savedRecycle = JSON.parse(lsRec); }
+        
+        let savedRecycle = await getFromDB('persistent_recycle'); 
+        if (!savedRecycle || savedRecycle.length === 0) { 
+            let lsRec = localStorage.getItem('persistent_recycle_backup'); 
+            if (lsRec) savedRecycle = JSON.parse(lsRec); 
+        }
         if (savedRecycle) recycleBin = savedRecycle;
-        let savedIdx = await getFromDB('persistent_active_idx'); if (savedIdx === null || savedIdx === undefined) { savedIdx = localStorage.getItem('persistent_active_idx_backup'); }
-        if (savedIdx !== null && savedIdx !== undefined) activeCustomerIndex = parseInt(savedIdx); if(activeCustomerIndex >= customerQueue.length) activeCustomerIndex = -1;
-        renderCustomerQueue(); updateUniversalActionButtons();
-    } catch(e) { console.error("Local Data Initialization Failure", e); }
+        
+        let savedIdx = await getFromDB('persistent_active_idx'); 
+        if (savedIdx === null || savedIdx === undefined) { 
+            savedIdx = localStorage.getItem('persistent_active_idx_backup'); 
+        }
+        if (savedIdx !== null && savedIdx !== undefined) activeCustomerIndex = parseInt(savedIdx); 
+        if(activeCustomerIndex >= customerQueue.length) activeCustomerIndex = -1;
+        
+        renderCustomerQueue(); 
+        updateUniversalActionButtons();
+    } catch(e) { 
+        console.error("Local Data Initialization Failure", e); 
+    }
 };
 
 function openFlyerGenModal() { document.getElementById('fgSalesName').value = ''; document.getElementById('fgSalesMobile').value = ''; document.getElementById('fgDealerSearch').value = ''; document.getElementById('fgDealerList').innerHTML = ''; tempFgDealerId = ""; tempFgDealerName = ""; tempFgBitly = ""; clearFgModel(); document.getElementById('fgOfferType').value = 'NONE'; toggleFgOfferInput(); document.getElementById('fgSelectedDealerBox').style.display = 'none'; document.getElementById('flyerGeneratedLinkBox').style.display = 'none'; document.getElementById('flyerGenModal').style.display = 'flex'; }
@@ -957,7 +1025,7 @@ async function finalizeProductAddition() {
     let raw = tempPendingProduct.isNT ? db_records.filter(r => r.model === SPECIAL_MODEL && r.category === tempPendingProduct.category) : db_records.filter(r => r.model === tempPendingProduct.name); let ltvLimit = customerQueue[activeCustomerIndex]?.ltv || 100; let matrixEligible = raw.filter(s => s.fixedEmi > 0 || (s.tenure > 0 && ((s.tenure-s.advEmi)/s.tenure)*100 <= ltvLimit)); let uniqueSchemes = []; let seenSchemes = new Set();
     matrixEligible.forEach(s => { let schemeKey = `${s.tenure}_${s.advEmi}_${s.fixedEmi}_${s.minLoan}_${s.maxLoan}`; if (!seenSchemes.has(schemeKey)) { seenSchemes.add(schemeKey); s.inactive = false; uniqueSchemes.push(s); } });
     let comp = customerQueue[activeCustomerIndex].components || {}; let finalMrp = comp.mrp || ""; let finalInv = comp.inv || ""; let surch = (finalInv > finalMrp && finalMrp > 0) ? finalInv - finalMrp : 0;
-    current_products.push({ name: tempPendingProduct.name, isNonTieup: tempPendingProduct.isNT, schemes: uniqueSchemes, category: tempPendingProduct.category, inputs: { mrp: finalMrp, inv: finalInv, cap: comp.cap || (customerQueue[activeCustomerIndex]?.cap || ""), target: comp.target || "", gtl: comp.gtl || 0, rfc: comp.rfc || 0, exw: comp.exw || 0, margin: comp.margin || "", dealer: comp.dealer || "", surch: surch, manualLoans: {} }, isManual: false }); sortConfigs.push({ key: 'dp', dir: 'asc' }); customerQueue[activeCustomerIndex].products = current_products; customerQueue[activeCustomerIndex].sortConfigs = sortConfigs; tempPendingProduct = null; await saveQueueToLocal(); renderMatrix(); 
+    current_products.push({ name: tempPendingProduct.name, isNonTieup: tempPendingProduct.isNT, schemes: uniqueSchemes, category: tempPendingProduct.category, inputs: { mrp: finalMrp, inv: finalInv, cap: comp.cap || (customerQueue[activeCustomerIndex]?.cap || ""), target: comp.target || "", gtl: comp.gtl || 0, rfc: comp.rfc || 0, exw: comp.exw || 0, margin: comp.margin || "", dealer: comp.dealer || "", surch: surch, manualLoans: {} }, isManual: false }); sortConfigs.push({ key: 'dp', asc: 'asc' }); customerQueue[activeCustomerIndex].products = current_products; customerQueue[activeCustomerIndex].sortConfigs = sortConfigs; tempPendingProduct = null; await saveQueueToLocal(); renderMatrix(); 
 }
 
 function updateFinalSwitcher() { let sw = document.getElementById('finalCustomerSwitcher'); if(!sw) return; sw.innerHTML = customerQueue.map((c, i) => `<option value="${i}" ${i === activeCustomerIndex ? 'selected' : ''}>👤 ${c.name} (₹${c.limit})</option>`).join(''); }
