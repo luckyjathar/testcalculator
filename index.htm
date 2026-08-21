@@ -21,6 +21,71 @@
     
     <!-- Link to our separate CSS file -->
     <link rel="stylesheet" href="style.css?v=6.5">
+
+<style>
+/* प्रीमियम कार्ड CSS (Suggestion 1) */
+.premium-customer-card {
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    border-radius: 16px;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+    animation: slideDownFade 0.5s ease-out;
+    margin-bottom: 20px;
+    margin-top: 15px;
+}
+
+/* काचेसारखा इफेक्ट (Glassmorphism) */
+.premium-customer-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    transform: rotate(30deg);
+    pointer-events: none;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 2;
+}
+
+.profile-info { display: flex; align-items: center; gap: 15px; }
+.avatar { font-size: 35px; background: rgba(255,255,255,0.2); border-radius: 50%; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+.cust-name { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+
+.cust-badges { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.premium-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; letter-spacing: 0.5px; }
+.type-badge { background: #e67e22; color: white; box-shadow: 0 2px 5px rgba(230, 126, 34, 0.4); }
+.ltv-badge { background: rgba(255,255,255,0.2); }
+.cap-badge { border: 1px dashed rgba(255,255,255,0.5); }
+
+.card-body { position: relative; z-index: 2; text-align: center; }
+.limit-label { font-size: 12px; color: #a8c0ff; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
+.limit-amount { font-size: 42px; font-weight: 900; color: #00ff87; text-shadow: 0 0 20px rgba(0, 255, 135, 0.4); margin-top: 5px; line-height: 1; }
+
+.quick-actions { display: flex; gap: 10px; }
+.icon-btn { background: rgba(255,255,255,0.1); border: none; font-size: 18px; padding: 10px; border-radius: 50%; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
+.icon-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
+.wa-btn { color: #25D366; text-shadow: 0 0 5px rgba(37, 211, 102, 0.5); }
+.call-btn { color: #3498db; }
+
+/* अ‍ॅनिमेशन */
+@keyframes slideDownFade {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
 </head>
 <body>
 
@@ -523,13 +588,31 @@
             <button onclick="goHome()" style="flex:0.8; background:var(--danger); color:white;">✖ BACK</button>
         </div>
         
-        <div class="bajaj-cust-card">
-            <span style="color: #87c3f7;">NAME:</span> <span id="infoName" style="color: #fff;">-</span> |
-            <span style="color: #87c3f7;">MOBILE:</span> <span id="infoMobile" style="color: #fff;">-</span> |
-            <span style="color: #87c3f7;">LIMIT:</span> <span id="infoLimit" class="highlight">₹0</span> |
-            <span style="color: #87c3f7;">TYPE:</span> <span id="infoType" style="color: #fff;">-</span> |
-            <span style="color: #87c3f7;">LTV:</span> <span id="infoLtv" style="color: #fff;">0%</span> |
-            <span style="color: #87c3f7;">EMI CAPPING:</span> <span id="infoCap" style="color: #fff;">-</span>
+        <!-- YETHE BADAL KELA AHE: Suggestion 1 - Premium Glassmorphism Card -->
+        <div class="premium-customer-card">
+            <div class="card-header">
+                <div class="profile-info">
+                    <div class="avatar">👤</div>
+                    <div>
+                        <h2 id="infoName" class="cust-name">-</h2>
+                        <div style="font-size: 11px; color: #a8c0ff; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">📞 <span id="infoMobile">-</span></div>
+                        <div class="cust-badges">
+                            <span class="premium-badge type-badge" id="infoType">NEW</span>
+                            <span class="premium-badge ltv-badge">LTV: <span id="infoLtv">0%</span></span>
+                            <span class="premium-badge cap-badge">CAP: <span id="infoCap">NONE</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="icon-btn call-btn" onclick="let mob=document.getElementById('infoMobile').innerText; if(mob && mob!=='-') window.open('tel:+91'+mob)">📞</button>
+                    <button class="icon-btn wa-btn" onclick="let mob=document.getElementById('infoMobile').innerText; if(mob && mob!=='-') window.open('https://wa.me/91'+mob)">💬</button>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="limit-label">APPROVED NBFC LIMIT</div>
+                <div class="limit-amount" id="infoLimit">₹0</div>
+            </div>
         </div>
         
         <button onclick="openAddProductModal()" style="width: 100%; background:var(--warning); color:#000; padding:10px; border-radius:6px; font-weight:900; margin-bottom:8px; border: 1.5px solid #d35400; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor:pointer;">➕ ADD NEW PRODUCT (SEARCH / NON-TIEUP / MANUAL)</button>
