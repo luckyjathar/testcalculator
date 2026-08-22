@@ -1464,14 +1464,15 @@ function getDailyTheme() {
 }
 
 /* === UPDATED: QUOTATION IMAGE GENERATOR WITH DAILY EMI & FESTIVAL THEMES === */
+/* === PREMIUM UI: QUOTATION IMAGE GENERATOR WITH DAILY EMI & FESTIVALS === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
-    quoteDiv.style.width = "600px"; 
+    quoteDiv.style.width = "650px"; // ५ कॉलम्ससाठी रुंदी थोडी वाढवली (Sleek Look)
     quoteDiv.style.padding = "20px"; 
-    quoteDiv.style.background = "#fff"; 
+    quoteDiv.style.background = "#f8fafc"; // एकदम लाईट ग्रे-व्हाईट बॅकग्राउंड
     quoteDiv.style.position = "absolute"; 
     quoteDiv.style.top = "-9999px"; 
-    quoteDiv.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+    quoteDiv.style.fontFamily = "'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
 
     let c = customerQueue[activeCustomerIndex]; 
     let headerText = c?.name && c.name !== "-" ? c.name.toUpperCase() : "CUSTOMER QUOTATION"; 
@@ -1483,23 +1484,20 @@ function doGenerateCustomerImage() {
     const theme = getDailyTheme();
 
     let html = ` 
-    <div style="background: ${theme.bg}; border-radius: 12px; padding: 15px 20px; color: ${theme.text}; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);"> 
-        <h2 style="margin:0; font-size:26px; font-weight:900; letter-spacing: 1px; display:flex; justify-content:center; align-items:center; gap:10px;">
+    <div style="background: ${theme.bg}; border-radius: 16px; padding: 20px; color: ${theme.text}; text-align: center; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);"> 
+        <h2 style="margin:0; font-size:28px; font-weight:900; letter-spacing: 1px; display:flex; justify-content:center; align-items:center; gap:10px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
             <span>${theme.icon}</span> EXCLUSIVE OFFERS FOR YOU!
         </h2> 
         
-        <div style="margin:10px 0; font-size:18px; font-weight:bold; color:${theme.accent};">
-            👤 ${salesName} | 📞 ${salesMobile}
+        <div style="margin:12px 0; font-size:18px; font-weight:bold; color:#f8fafc; opacity: 0.9;">
+            👤 ${salesName} <span style="margin: 0 8px; opacity:0.5;">|</span> 📞 ${salesMobile}
         </div>
 
-        <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.3);"> 
-            <div style="font-size: 13px; color: #eee; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">YOUR APPROVED ELIGIBILITY</div> 
-            <div style="display:flex; justify-content:space-around; align-items:center; font-weight:900; font-size: 18px;"> 
-                <span style="color:#00ff87;">LIMIT: ₹${c?.limit || 0}</span> 
-                <span style="color:#ffd54f;">LTV: ${ltvLimit}%</span> 
-                <span style="color:#fff; background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:4px;">${c?.type || 'NEW'}</span> 
-                ${c?.cap ? `<span style="color:#ff7675;">CAP: ₹${c.cap}</span>` : ''} 
-            </div> 
+        <div style="background: rgba(255,255,255,0.15); padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.3); display: inline-flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: center;"> 
+            <span style="color:#a7f3d0; font-weight:900; font-size:16px;">LIMIT: ₹${c?.limit || 0}</span> 
+            <span style="color:#fde047; font-weight:900; font-size:16px;">LTV: ${ltvLimit}%</span> 
+            <span style="background: #fff; color: #333; padding:2px 10px; border-radius:12px; font-size:13px; font-weight:900;">${c?.type || 'NEW'}</span> 
+            ${c?.cap ? `<span style="background: #fecaca; color: #991b1b; padding:2px 10px; border-radius:12px; font-size:13px; font-weight:900;">CAP: ₹${c.cap}</span>` : ''} 
         </div> 
     </div>`;
 
@@ -1520,11 +1518,12 @@ function doGenerateCustomerImage() {
         if (winPop && !schemeMap.get(winPop.dIdx).badges.includes("POP")) { let entry = schemeMap.get(winPop.dIdx); entry.badges.push("POP"); }
         if (winBalance && !schemeMap.get(winBalance.dIdx).badges.includes("BAL")) { let entry = schemeMap.get(winBalance.dIdx); entry.badges.push("BAL"); }
 
+        // नवीन Pastel (सॉफ्ट) रंगाचे मॉडर्न बॅजेस
         let badgeDetails = {
-            "DP": { text: "▼ LOWEST DP", bg: "#059669", color: "#ffffff", rowBg: "#ecfdf5", accent: "#059669" },
-            "EMI": { text: "▼ LOWEST EMI", bg: "#2563eb", color: "#ffffff", rowBg: "#eff6ff", accent: "#2563eb" },
-            "POP": { text: "★ TOP CHOICE", bg: "#d97706", color: "#ffffff", rowBg: "#fffbeb", accent: "#d97706" },
-            "BAL": { text: "✦ BEST VALUE", bg: "#7c3aed", color: "#ffffff", rowBg: "#f5f3ff", accent: "#7c3aed" }
+            "DP": { text: "LOWEST DP", bg: "#dcfce7", color: "#059669" },
+            "EMI": { text: "LOWEST EMI", bg: "#dbeafe", color: "#2563eb" },
+            "POP": { text: "TOP CHOICE", bg: "#fef3c7", color: "#d97706" },
+            "BAL": { text: "BEST VALUE", bg: "#f3e8ff", color: "#7c3aed" }
         };
 
         let badgedEntries = Array.from(schemeMap.values()).filter(e => e.badges.length > 0);
@@ -1535,70 +1534,73 @@ function doGenerateCustomerImage() {
 
         let remainingSchemes = validS.filter(d => !topSchemeIDs.has(d.dIdx)).sort((a, b) => a.dp - b.dp);
 
+        // Top 4 Rows - Clean Formatting
         let top4RowsHtml = top4Entries.map((item, i) => {
             let d = item.scheme;
-            let primaryBadge = badgeDetails[item.badges[0]] || badgeDetails["DP"];
-
+            
+            // आकर्षक Pill Shaped Badges
             let bHtml = item.badges.map(b => `
-                <div style="background:${badgeDetails[b].bg}; color:${badgeDetails[b].color}; font-size:10px; font-weight:900; margin-top:4px; margin-right:4px; padding:3px 6px; border-radius:4px; display:inline-block; letter-spacing:0.5px; text-transform:uppercase;">
+                <span style="background:${badgeDetails[b].bg}; color:${badgeDetails[b].color}; font-size:10px; font-weight:800; padding:2px 8px; border-radius:12px; margin-right:4px; display:inline-block; letter-spacing:0.5px;">
                     ${badgeDetails[b].text}
-                </div>
+                </span>
             `).join('');
 
             return `
-                <tr style="background:${primaryBadge.rowBg}; border-bottom: 2px solid #cbd5e1; border-left: 6px solid ${primaryBadge.accent};">
-                    <td style="padding:12px 4px; font-size:16px; font-weight:950; color:#1e293b; line-height:1.3; text-align:left;">
-                        <span style="font-size:20px; color:var(--indigo);">${d.currentTenure}/${d.advEmi}</span><br>
-                        ${bHtml}
+                <tr style="background:#ffffff; border-bottom: 1px solid #e2e8f0; transition: 0.3s;">
+                    <td style="padding:16px 10px; text-align:left;">
+                        <div style="font-size:20px; font-weight:900; color:#0f172a;">${d.currentTenure}/${d.advEmi}</div>
+                        <div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:2px;">${bHtml}</div>
                     </td>
-                    <td style="padding:12px 4px; color:#059669; font-size:18px; font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding:12px 4px; color:#2563eb; font-size:18px; font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td>
-                    <td style="padding:12px 4px; font-size:18px; font-weight:950; color:#1e293b;">${d.inst}</td>
-                    <td style="padding:12px 4px; color:#ea580c; font-size:18px; font-weight:950;">₹${Math.round(d.daily).toLocaleString()}</td>
+                    <td style="padding:16px 5px; color:#059669; font-size:18px; font-weight:900;">₹${Math.round(d.dp).toLocaleString()}</td>
+                    <td style="padding:16px 5px; color:#2563eb; font-size:18px; font-weight:900;">₹${Math.round(d.emi).toLocaleString()}</td>
+                    <td style="padding:16px 5px; font-size:18px; font-weight:900; color:#475569;">${d.inst}</td>
+                    <td style="padding:16px 10px; color:#ea580c; font-size:18px; font-weight:900; text-align:right;">₹${Math.round(d.daily).toLocaleString()}</td>
                 </tr>
             `;
         }).join('');
 
+        // Remaining Rows
         let remainingRowsHtml = "";
         if (remainingSchemes.length > 0) {
             remainingRowsHtml += `
-                <tr style="background:#f1f5f9; border-top: 2px solid #cbd5e1; border-bottom: 2px solid #cbd5e1;">
-                    <td colspan="5" style="padding:10px; font-size:13px; font-weight:950; color:#475569; letter-spacing:0.5px; text-align:center;">
-                        👇 इतर उपलब्ध पर्याय (OTHER SCHEMES) 👇
+                <tr style="background:#f8fafc; border-bottom: 1px solid #e2e8f0;">
+                    <td colspan="5" style="padding:12px; font-size:13px; font-weight:800; color:#64748b; letter-spacing:1px; text-align:center;">
+                        — OTHER AVAILABLE SCHEMES —
                     </td>
                 </tr>
             `;
             remainingRowsHtml += remainingSchemes.map((d, i) => `
-                <tr style="background:${i%2==0?'#ffffff':'#fcfcfc'}; color:#64748b; border-bottom: 1px solid #ededed;">
-                    <td style="padding:10px 4px; font-size:18px; font-weight:900; color:#334155; text-align:left;">${d.currentTenure}/${d.advEmi}</td>
-                    <td style="padding:10px 4px; color:#10b981; font-size:18px; font-weight:900;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding:10px 4px; color:#3b82f6; font-size:18px; font-weight:900;">₹${Math.round(d.emi).toLocaleString()}</td>
-                    <td style="padding:10px 4px; font-size:18px; font-weight:900; color:#475569;">${d.inst}</td>
-                    <td style="padding:10px 4px; color:#ea580c; font-size:18px; font-weight:900;">₹${Math.round(d.daily).toLocaleString()}</td>
+                <tr style="background:${i%2==0?'#ffffff':'#fcfcfc'}; border-bottom: 1px solid #f1f5f9;">
+                    <td style="padding:12px 10px; font-size:16px; font-weight:800; color:#334155; text-align:left;">${d.currentTenure}/${d.advEmi}</td>
+                    <td style="padding:12px 5px; color:#10b981; font-size:16px; font-weight:800;">₹${Math.round(d.dp).toLocaleString()}</td>
+                    <td style="padding:12px 5px; color:#3b82f6; font-size:16px; font-weight:800;">₹${Math.round(d.emi).toLocaleString()}</td>
+                    <td style="padding:12px 5px; font-size:16px; font-weight:800; color:#64748b;">${d.inst}</td>
+                    <td style="padding:12px 10px; color:#ea580c; font-size:16px; font-weight:800; text-align:right;">₹${Math.round(d.daily).toLocaleString()}</td>
                 </tr>
             `).join('');
         }
 
+        // Product Box Container
         html += `
-        <div style="margin-bottom:20px; border-radius: 12px; overflow: hidden; border: 1px solid #dcdfe6; box-shadow: 0 4px 15px rgba(0,0,0,0.06); background:#ffffff;">
-            <div style="padding:15px; display:flex; justify-content: space-between; align-items: center; background: #f8f9fa; border-bottom: 2px solid var(--indigo);">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="font-size:22px;">📱</span>
-                    <h3 style="margin:0; color:var(--indigo); font-size:18px; font-weight:950; letter-spacing:0.5px;">${prod.name}</h3>
+        <div style="margin-bottom:25px; border-radius: 12px; overflow: hidden; background:#ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+            <div style="padding:16px 20px; display:flex; justify-content: space-between; align-items: center; background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
+                <div style="display:flex; align-items:center; gap:10px; flex: 1;">
+                    <span style="font-size:24px;">📱</span>
+                    <h3 style="margin:0; color:#1e293b; font-size:18px; font-weight:900; letter-spacing:0.5px; line-height:1.2;">${prod.name}</h3>
                 </div>
-                <div style="background: var(--indigo); color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size:15px; font-weight:950;">
+                <div style="background: #334155; color: #ffffff; padding: 6px 14px; border-radius: 8px; font-size:15px; font-weight:900; margin-left:10px; white-space:nowrap;">
                     INV: ₹${invAmt.toLocaleString()}
                 </div>
             </div>
             <div style="padding: 0;">
                 <table style="width:100%; border-collapse:collapse; text-align:center;">
-                    <thead>
-                        <tr style="background:#eef2f3; color:#2c3e50; font-size:14px; font-weight:900; text-transform:uppercase; border-bottom: 2px solid #cbd5e1;">
-                            <th style="padding:12px 4px; text-align:left;">SCHEME</th>
-                            <th style="padding:12px 4px;">DP</th>
-                            <th style="padding:12px 4px;">EMI</th>
-                            <th style="padding:12px 4px;">M</th>
-                            <th style="padding:12px 4px;">DAILY</th>
+                    <thead style="background:#f8fafc;">
+                        <tr style="color:#64748b; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px; border-bottom: 2px solid #e2e8f0;">
+                            <th style="padding:12px 10px; text-align:left;">SCHEME</th>
+                            <th style="padding:12px 5px;">DP</th>
+                            <th style="padding:12px 5px;">EMI</th>
+                            <th style="padding:12px 5px;">M</th>
+                            <th style="padding:12px 10px; text-align:right;">DAILY</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1612,7 +1614,7 @@ function doGenerateCustomerImage() {
 
     if(!hasV) { showToast("⚠️ Eligibility ke anusar koi Scheme nahi baith rahi hai!", "error"); return; }
 
-    html += `<div style="text-align:center; margin-top: 15px; color:#aaa; font-size: 14px; font-weight: bold; border-top: 1px dashed #ddd; padding-top: 15px;">Generated securely via Persistent Portal</div>`;
+    html += `<div style="text-align:center; margin-top: 10px; color:#94a3b8; font-size: 13px; font-weight: bold; border-top: 1px dashed #cbd5e1; padding-top: 15px;">Generated securely via Persistent Portal</div>`;
     quoteDiv.innerHTML = html; document.body.appendChild(quoteDiv);
 
     html2canvas(quoteDiv, {scale: 2}).then(canvas => { 
@@ -1632,7 +1634,6 @@ function doGenerateCustomerImage() {
         } else { document.getElementById('clipboardStatusAlert').style.display = 'none'; }
     });
 }
-
 /* === DEALER LINKS WITH STAR (FAVORITES) & 3-ITEM COPY FEATURE === */
 let showingOnlyStarred = false;
 
