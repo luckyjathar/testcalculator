@@ -412,7 +412,7 @@ window.onload = async function() {
 
         // २. वेबसाइट पूर्ण उघडल्यावर, बॅकग्राउंडमध्ये Master Data डाउनलोड करा (Non-blocking)
         fetchFromMasterStream(); 
-        
+        setTimeout(() => checkForExcelUpdates(), 3000);
     } catch(e) { 
         console.error("Local Data Initialization Failure", e); 
     }
@@ -1720,4 +1720,77 @@ function handleCustomerTap(idx) {
         lastTapTime = currentTime;
         lastTapIdx = idx;
     }
+}
+async function checkForExcelUpdates() {
+    try {
+        // GitHub API वापरून फक्त 'master_data.xlsx' शेवटची कधी बदलली हे चेक करणे
+        let repoUrl = "https://api.github.com/repos/luckyjathar/testcalculator/commits?path=master_data.xlsx&page=1&per_page=1";
+        let res = await fetch(repoUrl);
+        
+        if (res.ok) {
+            let data = await res.json();
+            if (data && data.length > 0) {
+                // GitHub वरील फाईलची शेवटची वेळ
+                let latestCommitTime = new Date(data[0].commit.committer.date).getTime();
+                
+                // आपल्या लोकल DB मध्ये सेव्ह असलेली वेळ
+                let localSavedTime = await getFromDB('master_data_version_time') || 0;
+
+                if (localSavedTime > 0 && latestCommitTime > localSavedTime) {
+                    // जर GitHub वर नवीन फाईल असेल, तर युजरला नोटिफिकेशन दाखवा
+                    showUpdateNotification();
+                } else if (localSavedTime === 0) {
+                    // जर पहिलीच वेळ असेल, तर ही वेळ सेव्ह करा
+                    await saveToDB('master_data_version_time', latestCommitTime);
+                }
+            }
+        }
+    } catch(e) {
+        console.log("Update check failed silently:", e);
+    }
+}
+
+// नोटिफिकेशन दाखवण्यासाठी फंक्शन
+function showUpdateNotification() {
+    let updateDiv = document.getElementById('updateNotificationBar');
+    if (!updateDiv) {
+        updateDiv = document.createElement('div');
+        updateDiv.id = 'updateNotificationBar';
+        updateDiv.innerHTML = `
+            <div style="background: var(--danger); color: white; text-align: center; padding: 10px; font-weight: bold; position: fixed; top: 0; width: 100%; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                🚀 नवीन स्कीम्स आणि ऑफर्स अपडेट झाल्या आहेत! 
+                <button onclick="forceRefreshMasterData()" style="background: white; color: var(--danger); border: none; padding: 5px 10px; margin-left: 10px; font-weight: bold; border-radius: 4px; cursor: pointer;">
+                    UPDATE NOW
+                </button>
+            </div>
+        `;
+        document.body.prepend(updateDiv);
+    }
+    updateDiv.style.display = 'block';
+}
+
+// युजरने 'UPDATE NOW' वर क्लिक केल्यावर चालणारे फंक्शन
+async function forceRefreshMasterData() {
+    let updateDiv = document.getElementById('updateNotificationBar');
+    if(updateDiv) updateDiv.innerHTML = "⏳ डाउनलोड सुरू आहे, कृपया थांबा...";
+    
+    // जुनी वेळ पुसून टाका म्हणजे नवीन डेटा घेईल
+    await saveToDB('master_data_time', 0); 
+    
+    // नव्याने डेटा आणा (मगाशी आपण बनवलेले फंक्शन)
+    await fetchFromMasterStream(true); 
+    
+    // नवीन वेळ सेव्ह करा
+    let repoUrl = "https://api.github.com/repos/luckyjathar/testcalculator/commits?path=master_data.xlsx&page=1&per_page=1";
+    let res = await fetch(repoUrl);
+    if(res.ok) {
+        let data = await res.json();
+        if(data && data.length > 0) {
+            let latestCommitTime = new Date(data[0].commit.committer.date).getTime();
+            await saveToDB('master_data_version_time', latestCommitTime);
+        }
+    }
+    
+    if(updateDiv) updateDiv.style.display = 'none';
+    showToast("✅ डेटा यशस्वीरित्या अपडेट झाला!", "success");
 }
