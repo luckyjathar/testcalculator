@@ -1025,7 +1025,7 @@ function renderCustomerQueue() {
         let shadowStyle = isSelected ? '0 0 5px rgba(9, 132, 227, 0.5)' : (isActive ? '0 0 5px rgba(0, 136, 204, 0.3)' : 'none'); 
         
         // येथे ondblclick="setActiveCustomer(${idx})" ऍड केले आहे 👇
-        return ` <div onclick="selectQueueItem(${idx})" ondblclick="setActiveCustomer(${idx})" style="cursor:pointer; display:flex; flex-direction:column; background:${bgStyle}; padding:8px; border-radius:4px; border:1px solid ${borderStyle}; box-shadow:${shadowStyle}; transition:0.2s;"> 
+        return ` <div onclick="handleCustomerTap(${idx})" style="cursor:pointer; display:flex; flex-direction:column; background:${bgStyle}; padding:8px; border-radius:4px; border:1px solid ${borderStyle}; box-shadow:${shadowStyle}; transition:0.2s;"> 
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;"> 
                 <strong style="color:var(--indigo);">👤 ${displayName} ${c.mobile ? `<span style="color:#d35400; cursor:text;" title="Double-click to select" ondblclick="highlightNumber(event, this.querySelector('.mob-num'))">(📞 <span class="mob-num">${c.mobile}</span>)</span>` : ''}</strong> 
                 <span style="color:#888; font-weight:bold;">${c.timestamp || ''}</span> 
@@ -1702,4 +1702,22 @@ function openBitlyLink(url) {
     } else { 
         showToast('⚠️ Is dealer ke liye Bitly link available nahi hai!', 'warning'); 
     } 
+}
+let lastTapTime = 0;
+let lastTapIdx = -1;
+
+function handleCustomerTap(idx) {
+    let currentTime = new Date().getTime();
+    let tapLength = currentTime - lastTapTime;
+
+    // जर दोन टॅपमधील वेळ 400 मिलीसेकंद पेक्षा कमी असेल (म्हणजेच Double Tap झाला)
+    if (tapLength < 400 && tapLength > 0 && lastTapIdx === idx) {
+        setActiveCustomer(idx); // कस्टमर ऍक्टिव्ह करा (पुढच्या पेजवर जा)
+        lastTapTime = 0; // वेळ रिसेट करा
+    } else {
+        // सिंगल टॅप झाला
+        selectQueueItem(idx); // कस्टमर फक्त सिलेक्ट (हायलाईट) करा
+        lastTapTime = currentTime;
+        lastTapIdx = idx;
+    }
 }
