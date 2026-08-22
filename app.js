@@ -192,7 +192,7 @@ function generateMessage() {
     } else if (lang === 'hi') {
         msg = `नमस्ते, ${name}! 🙏\n\nबजाज फाइनेंस में स्वागत है। आपके द्वारा खरीदे गए उत्पाद के लोन (Loan) का विवरण नीचे दिया गया है:\n\n🏬 डीलर / दुकान का नाम (Dealer/Shop): ${shop}\n📱 उत्पाद का प्रकार (Asset): ${asset}\n📌 मासिक किस्त (EMI): ₹${emi}/-\n📌 कुल किस्तें (Months): ${tenure} महीने\n📅 पहली किस्त शुरू होने की तारीख: ${startDate}\n📅 अंतिम किस्त समाप्त होने की तारीख: ${endDate}\n\n⚠️ बजाज फाइनेंस के नियम व शर्तें:\n१) आपके उत्पाद की किस्त हर महीने की 2 तारीख को आपके दिए गए बैंक खाते से कटती है।\n२) यदि लोन प्रक्रिया महीने की 23 तारीख तक पूरी हो जाती है, तो पहली किस्त अगले महीने की 2 तारीख से शुरू होती है।\n३) ECS / NACH फॉर्म पर आपके द्वारा किए गए हस्ताक्षर आपके बैंक द्वारा जांचे जाते हैं।\n४) यदि बैंक को हस्ताक्षर में कोई अंतर मिलता है, तो आपको SMS या Call के माध्यम से सूचित किया जाता है।\n५) ऐसी स्थिति में, आपको बजाज फाइनेंस कार्यालय जाकर सही हस्ताक्षर की प्रक्रिया पूरी करनी होगी।\n६) हस्ताक्षर गलत होने पर बैंक खाते से किस्त नहीं कटती है और बैंक के नियमानुसार बाउंस चार्ज (जुर्माना) लगाया जाता है। यह शुल्क सीधे बैंक के खाते में जाता है, बजाज फाइनेंस के नहीं। इस प्रक्रिया में बजाज फाइनेंस के कर्मचारी जिम्मेदार नहीं होते हैं, कृपया सभी ग्राहक ध्यान दें।\n७) किस्त बाउंस होने पर बजाज फाइनेंस की ओर से ₹500/- बाउंस शुल्क (Penalty) लगाया जाता है। साथ ही, बकाया किस्त जमा होने तक प्रतिदिन विलंब शुल्क (Late Fees) बढ़ता जाता है।\n८) अपने बैंक खाते में आवश्यक न्यूनतम राशि (Minimum Balance) के अलावा किस्त की राशि नियत तारीख से कम से कम 2 दिन पहले जमा रखें।\n९) किस्त कटी या नहीं, जानने के लिए अपने मोबाइल में 'Bajaj Finserv' ऐप चेक करें। किस्त प्राप्त होने पर आपके बैंक खाते या पासबुक में तुरंत दर्ज हो जाती है और बैंक SMS द्वारा भी सूचित करता है।\n१०) बजाज फाइनेंस कार्यालय: आदिनाथ पैराडाइज, होटल शालीमार के पास, मजगांव रोड, रत्नागिरी।\n११) महत्वपूर्ण सेवा जानकारी: अपने पंजीकृत मोबाइल नंबर से 8698010101 पर कॉल करके आप निम्नलिखित जानकारी प्राप्त कर सकते हैं (मानक कॉल शुल्क लागू)\n१२) समय से पहले लोन बंद (Foreclosure) करना चाहते हैं, तो अगली किस्त से कम से कम 10 दिन पहले बजाज फाइनेंस कार्यालय में या ऐप के माध्यम से शेष राशि का भुगतान करके लोन बंद कर सकते हैं।\n\nकिसी भी सहायता के लिए संपर्क करें। धन्यवाद! ✨`;
     } else {
-        msg = `Dear ${name}, 🙏\n\nWelcome to Bajaj Finance! Here are the complete details of your recent product loan:\n\n🏬 Dealer / Shop Name: ${shop}\n📱 Asset Category: ${asset}\n📌 Monthly EMI: ₹${emi}/-\n📌 Total Tenure: ${tenure} Months\n📅 First EMI Start Date: ${startDate}\n📅 Last EMI End Date: ${endDate}\n\n⚠️ Important Bajaj Finance Terms & Conditions:\n1) Your loan EMI will be auto-debited on the 2nd of every month from your registered bank account.\n2) If the loan processing is completed on or before the 23rd of the month, the first EMI will start on the 2nd of the upcoming month.\n3) Your signature on the ECS / NACH mandate form is verified by your bank.\n4) If the bank detects any mismatch in your signature, you will be notified via SMS or Call.\n5) In such cases, you must visit the Bajaj Finance office to complete the correct signature verification formalities.\n6) If the signature mismatches, the EMI will not be debited, and your bank will levy a bounce penalty as per their rules. These charges go directly to your bank, not Bajaj Finance. Bajaj Finance staff will not be responsible for bank-levied charges.\n7) Additionally, Bajaj Finance levies a bounce penalty of ₹500/- for missed EMIs. Daily late payment charges will also accrue until the pending EMI is cleared.\n8) Please maintain the required EMI amount along with the Minimum Account Balance in your bank account at least 2 days prior to the due date.\n9) Please use the 'Bajaj Finserv' mobile app to track your EMI deductions. Once received, the credit reflects in your bank account/passbook immediately, and you will receive a confirmation SMS from your bank.\n10) Bajaj Finance Office Address: Adinath Paradise, Near Hotel Shalimar, Mazgaon Road, Ratnagiri.\n11) Important Service Information: You can obtain the following information by calling 8698010101 from your registered mobile number (standard call charges apply)\n12) If you wish to foreclose/close your loan ahead of time, please pay the outstanding amount at our office or via the app at least 10 days before your next EMI due date.\n\Please feel free to reach out if you have any questions. Thank you! ✨`;
+        msg = `Dear ${name}, 🙏\n\nWelcome to Bajaj Finance! Here are the complete details of your recent product loan:\n\n🏬 Dealer / Shop Name: ${shop}\n📱 Asset Category: ${asset}\n📌 Monthly EMI: ₹${emi}/-\n📌 Total Tenure: ${tenure} Months\n📅 First EMI Start Date: ${startDate}\n📅 Last EMI End Date: ${endDate}\n\n⚠️ Important Bajaj Finance Terms & Conditions:\n1) Your loan EMI will be auto-debited on the 2nd of every month from your registered bank account.\n2) If the loan processing is completed on or before the 23rd of the month, the first EMI will start on the 2nd of the upcoming month.\n3) Your signature on the ECS / NACH mandate form is verified by your bank.\n4) If the bank detects any mismatch in your signature, you will be notified via SMS or Call.\n5) In such cases, you must visit the Bajaj Finance office to complete the correct signature verification formalities.\n6) If the signature mismatches, the EMI will not be debited, and your bank will levy a bounce penalty as per their rules. These charges go directly to your bank, not Bajaj Finance. Bajaj Finance staff will not be responsible for bank-levied charges.\n7) Additionally, Bajaj Finance levies a bounce penalty of ₹500/- for missed EMIs. Daily late payment charges will also accrue until the pending EMI is cleared.\n8) Please maintain the required EMI amount along with the Minimum Account Balance in your bank account at least 2 days prior to the due date.\n9) Please use the 'Bajaj Finserv' mobile app to track your EMI deductions. Once received, the credit reflects in your bank account/passbook immediately, and you will receive a confirmation SMS from your bank.\n10) Bajaj Finance Office Address: Adinath Paradise, Near Hotel Shalimar, Mazgaon Road, Ratnagiri.\n11) Important Service Information: You can obtain the following information by calling 8698010101 from your registered mobile number (standard call charges apply)\n12) If you wish to foreclose/close your loan ahead of time, please pay the outstanding amount at our office or via the app at least 10 days before your next EMI due date.\n\nPlease feel free to reach out if you have any questions. Thank you! ✨`;
     }
     document.getElementById('finalMessage').value = msg;
 }
@@ -1025,7 +1025,7 @@ function closeRecycleBin() { document.getElementById('recycleBinModal').style.di
 async function restoreCustomer(idx) { let c = recycleBin.splice(idx, 1)[0]; customerQueue.unshift(c); if(activeCustomerIndex !== -1) activeCustomerIndex++; if(selectedQueueIndex !== -1) selectedQueueIndex++; await saveQueueToLocal(); await saveToDB('persistent_recycle', recycleBin); localStorage.setItem('persistent_recycle_backup', JSON.stringify(recycleBin)); openRecycleBin(); renderCustomerQueue(); updateUniversalActionButtons(); }
 
 async function emptyRecycleBin() {
-    if(recycleBin.length === 0) { showToast("⚠️ Recycle bin pehle se hi empty hai!", "warning"); return; }
+    if(recycleBin.length === 0) { showToast("⚠️ Recycle bin pehle से hi empty hai!", "warning"); return; }
     showCustomConfirm("Are you sure you want to permanently delete all items in the Recycle Bin?", async () => { recycleBin = []; await saveToDB('persistent_recycle', recycleBin); localStorage.setItem('persistent_recycle_backup', JSON.stringify(recycleBin)); openRecycleBin(); showToast("🗑️ Recycle Bin completely emptied!", "success"); });
 }
 
@@ -1463,13 +1463,12 @@ function getDailyTheme() {
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === UPDATED: QUOTATION IMAGE GENERATOR WITH DAILY EMI & FESTIVAL THEMES === */
-/* === PREMIUM UI: QUOTATION IMAGE GENERATOR WITH DAILY EMI & FESTIVALS === */
+/* === FULLY CORRECTED QUOTATION IMAGE GENERATOR (5 COLUMNS + MODERN UI) === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
-    quoteDiv.style.width = "650px"; // ५ कॉलम्ससाठी रुंदी थोडी वाढवली (Sleek Look)
+    quoteDiv.style.width = "650px"; 
     quoteDiv.style.padding = "20px"; 
-    quoteDiv.style.background = "#f8fafc"; // एकदम लाईट ग्रे-व्हाईट बॅकग्राउंड
+    quoteDiv.style.background = "#f8fafc"; 
     quoteDiv.style.position = "absolute"; 
     quoteDiv.style.top = "-9999px"; 
     quoteDiv.style.fontFamily = "'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
@@ -1518,7 +1517,6 @@ function doGenerateCustomerImage() {
         if (winPop && !schemeMap.get(winPop.dIdx).badges.includes("POP")) { let entry = schemeMap.get(winPop.dIdx); entry.badges.push("POP"); }
         if (winBalance && !schemeMap.get(winBalance.dIdx).badges.includes("BAL")) { let entry = schemeMap.get(winBalance.dIdx); entry.badges.push("BAL"); }
 
-        // नवीन Pastel (सॉफ्ट) रंगाचे मॉडर्न बॅजेस
         let badgeDetails = {
             "DP": { text: "LOWEST DP", bg: "#dcfce7", color: "#059669" },
             "EMI": { text: "LOWEST EMI", bg: "#dbeafe", color: "#2563eb" },
@@ -1534,11 +1532,11 @@ function doGenerateCustomerImage() {
 
         let remainingSchemes = validS.filter(d => !topSchemeIDs.has(d.dIdx)).sort((a, b) => a.dp - b.dp);
 
-        // Top 4 Rows - Clean Formatting
+        // Top 4 Rows (5 Columns: Scheme, DP, EMI, M, Daily)
         let top4RowsHtml = top4Entries.map((item, i) => {
             let d = item.scheme;
-            
-            // आकर्षक Pill Shaped Badges
+            let primaryBadge = badgeDetails[item.badges[0]] || badgeDetails["DP"];
+
             let bHtml = item.badges.map(b => `
                 <span style="background:${badgeDetails[b].bg}; color:${badgeDetails[b].color}; font-size:10px; font-weight:800; padding:2px 8px; border-radius:12px; margin-right:4px; display:inline-block; letter-spacing:0.5px;">
                     ${badgeDetails[b].text}
@@ -1546,41 +1544,41 @@ function doGenerateCustomerImage() {
             `).join('');
 
             return `
-                <tr style="background:#ffffff; border-bottom: 1px solid #e2e8f0; transition: 0.3s;">
-                    <td style="padding:16px 10px; text-align:left;">
-                        <div style="font-size:20px; font-weight:900; color:#0f172a;">${d.currentTenure}/${d.advEmi}</div>
-                        <div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:2px;">${bHtml}</div>
+                <tr style="background:#ffffff; border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding:14px 8px; text-align:left;">
+                        <div style="font-size:18px; font-weight:900; color:#0f172a;">${d.currentTenure}/${d.advEmi}</div>
+                        <div style="margin-top:5px; display:flex; flex-wrap:wrap; gap:2px;">${bHtml}</div>
                     </td>
-                    <td style="padding:16px 5px; color:#059669; font-size:18px; font-weight:900;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding:16px 5px; color:#2563eb; font-size:18px; font-weight:900;">₹${Math.round(d.emi).toLocaleString()}</td>
-                    <td style="padding:16px 5px; font-size:18px; font-weight:900; color:#475569;">${d.inst}</td>
-                    <td style="padding:16px 10px; color:#ea580c; font-size:18px; font-weight:900; text-align:right;">₹${Math.round(d.daily).toLocaleString()}</td>
+                    <td style="padding:14px 4px; color:#059669; font-size:16px; font-weight:900;">₹${Math.round(d.dp).toLocaleString()}</td>
+                    <td style="padding:14px 4px; color:#2563eb; font-size:16px; font-weight:900;">₹${Math.round(d.emi).toLocaleString()}</td>
+                    <td style="padding:14px 4px; font-size:16px; font-weight:900; color:#475569;">${d.inst}</td>
+                    <td style="padding:14px 8px; color:#ea580c; font-size:16px; font-weight:900; text-align:right;">₹${Math.round(d.daily).toLocaleString()}</td>
                 </tr>
             `;
         }).join('');
 
-        // Remaining Rows
+        // Remaining Rows (5 Columns)
         let remainingRowsHtml = "";
         if (remainingSchemes.length > 0) {
             remainingRowsHtml += `
                 <tr style="background:#f8fafc; border-bottom: 1px solid #e2e8f0;">
-                    <td colspan="5" style="padding:12px; font-size:13px; font-weight:800; color:#64748b; letter-spacing:1px; text-align:center;">
+                    <td colspan="5" style="padding:10px; font-size:12px; font-weight:800; color:#64748b; letter-spacing:1px; text-align:center;">
                         — OTHER AVAILABLE SCHEMES —
                     </td>
                 </tr>
             `;
             remainingRowsHtml += remainingSchemes.map((d, i) => `
                 <tr style="background:${i%2==0?'#ffffff':'#fcfcfc'}; border-bottom: 1px solid #f1f5f9;">
-                    <td style="padding:12px 10px; font-size:16px; font-weight:800; color:#334155; text-align:left;">${d.currentTenure}/${d.advEmi}</td>
-                    <td style="padding:12px 5px; color:#10b981; font-size:16px; font-weight:800;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding:12px 5px; color:#3b82f6; font-size:16px; font-weight:800;">₹${Math.round(d.emi).toLocaleString()}</td>
-                    <td style="padding:12px 5px; font-size:16px; font-weight:800; color:#64748b;">${d.inst}</td>
-                    <td style="padding:12px 10px; color:#ea580c; font-size:16px; font-weight:800; text-align:right;">₹${Math.round(d.daily).toLocaleString()}</td>
+                    <td style="padding:10px 8px; font-size:15px; font-weight:800; color:#334155; text-align:left;">${d.currentTenure}/${d.advEmi}</td>
+                    <td style="padding:10px 4px; color:#10b981; font-size:15px; font-weight:800;">₹${Math.round(d.dp).toLocaleString()}</td>
+                    <td style="padding:10px 4px; color:#3b82f6; font-size:15px; font-weight:800;">₹${Math.round(d.emi).toLocaleString()}</td>
+                    <td style="padding:10px 4px; font-size:15px; font-weight:800; color:#64748b;">${d.inst}</td>
+                    <td style="padding:10px 8px; color:#ea580c; font-size:15px; font-weight:800; text-align:right;">₹${Math.round(d.daily).toLocaleString()}</td>
                 </tr>
             `).join('');
         }
 
-        // Product Box Container
+        // Product Box Container with 5-Column Header
         html += `
         <div style="margin-bottom:25px; border-radius: 12px; overflow: hidden; background:#ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
             <div style="padding:16px 20px; display:flex; justify-content: space-between; align-items: center; background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
@@ -1596,11 +1594,11 @@ function doGenerateCustomerImage() {
                 <table style="width:100%; border-collapse:collapse; text-align:center;">
                     <thead style="background:#f8fafc;">
                         <tr style="color:#64748b; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px; border-bottom: 2px solid #e2e8f0;">
-                            <th style="padding:12px 10px; text-align:left;">SCHEME</th>
-                            <th style="padding:12px 5px;">DP</th>
-                            <th style="padding:12px 5px;">EMI</th>
-                            <th style="padding:12px 5px;">M</th>
-                            <th style="padding:12px 10px; text-align:right;">DAILY</th>
+                            <th style="padding:12px 8px; text-align:left;">SCHEME</th>
+                            <th style="padding:12px 4px;">DP</th>
+                            <th style="padding:12px 4px;">EMI</th>
+                            <th style="padding:12px 4px;">M</th>
+                            <th style="padding:12px 8px; text-align:right;">DAILY</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1634,6 +1632,7 @@ function doGenerateCustomerImage() {
         } else { document.getElementById('clipboardStatusAlert').style.display = 'none'; }
     });
 }
+
 /* === DEALER LINKS WITH STAR (FAVORITES) & 3-ITEM COPY FEATURE === */
 let showingOnlyStarred = false;
 
