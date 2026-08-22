@@ -282,34 +282,65 @@ function parseExcelDate(val) { if (!val) return null; if (typeof val === 'number
 
 async function saveQueueToLocal(shouldCloudSync = true) { try { let compactQueue = customerQueue.map(c => { let cp = (c.products || []).map(p => { let { calculatedData, allSchemes, ...keepProduct } = p; return keepProduct; }); return { ...c, products: cp }; }); localStorage.setItem('persistent_queue_backup', JSON.stringify(compactQueue)); localStorage.setItem('persistent_active_idx_backup', activeCustomerIndex); await saveToDB('persistent_queue', compactQueue); await saveToDB('persistent_active_idx', activeCustomerIndex); if(shouldCloudSync && loggedInUserEmail) { triggerSilentCloudSync(); } } catch(e) { console.error("Local Save Interrupted", e); } }
 
-async function fetchFromMasterStream() {
+// === NEW FETCH DATA FUNCTION WITH LOCAL CACHING ===
+const CACHE_DURATION_MS = 12 * 60 * 60 * 1000; 
+
+async function fetchFromMasterStream(forceSync = false) {
     let statusBadge = document.getElementById('gitStatusBadge'); 
     let globalLoader = document.getElementById('dataLoadingIndicator');
     let searchInput1 = document.getElementById('modalMatrixSearch');
     let searchInput2 = document.getElementById('globalModelSearch');
 
-    // 🔴 १. लोडिंग इंडिकेटर दाखवणे आणि सर्च बार लॉक करणे
     if(globalLoader) {
         globalLoader.style.display = 'block';
         globalLoader.style.background = 'var(--warning)';
         globalLoader.style.color = '#000';
-        globalLoader.innerHTML = '⏳ Downloading Master Data...';
+        globalLoader.innerHTML = '⏳ Checking Data...';
     }
-    if(searchInput1) { searchInput1.disabled = true; searchInput1.placeholder = "⏳ Please wait, loading data..."; }
-    if(searchInput2) { searchInput2.disabled = true; searchInput2.placeholder = "⏳ Please wait, loading data..."; }
+    if(searchInput1) { searchInput1.disabled = true; searchInput1.placeholder = "⏳ Please wait..."; }
+    if(searchInput2) { searchInput2.disabled = true; searchInput2.placeholder = "⏳ Please wait..."; }
 
-    if(statusBadge) { 
-        statusBadge.innerHTML = '⬇️ DOWNLOADING LIVE DATA...'; 
-        statusBadge.style.color = '#f39c12'; 
-        statusBadge.style.borderColor = '#f39c12'; 
-        statusBadge.style.background = 'rgba(243, 156, 18, 0.15)'; 
-    }
-    
     try {
-        let cacheBusterUrl = GITHUB_RAW_URL + '?t=' + new Date().getTime(); 
+        let now = new Date().getTime();
+        
+        // ⚡ Check Local Cache first
+        if (!forceSync) {
+            let cachedTime = await getFromDB('master_data_time');
+            let cachedDbRecords = await getFromDB('cached_db_records');
+            let cachedDealerRecords = await getFromDB('cached_dealer_records');
+            
+            if (cachedTime && cachedDbRecords && cachedDealerRecords && (now - cachedTime < CACHE_DURATION_MS)) {
+                db_records = cachedDbRecords;
+                dealer_records = cachedDealerRecords;
+                
+                if (activeCustomerIndex !== -1) { loadCurrentProducts(); renderMatrix(); }
+                
+                if(statusBadge) { 
+                    statusBadge.innerHTML = '⚡ LOADED FROM CACHE'; 
+                    statusBadge.style.color = 'var(--success)'; 
+                    statusBadge.style.background = 'rgba(39, 174, 96, 0.15)'; 
+                }
+                
+                if(globalLoader) globalLoader.style.display = 'none'; 
+                if(searchInput1) { searchInput1.disabled = false; searchInput1.placeholder = "Type model, brand or category..."; }
+                if(searchInput2) { searchInput2.disabled = false; searchInput2.placeholder = "Type Brand or Model Name..."; }
+                
+                return;
+            }
+        }
+
+        // 🌐 Download from GitHub if no cache or forceSync
+        if(globalLoader) globalLoader.innerHTML = '⏳ Downloading Master Data...';
+        if(statusBadge) { 
+            statusBadge.innerHTML = '⬇️ DOWNLOADING LIVE DATA...'; 
+            statusBadge.style.color = '#f39c12'; 
+            statusBadge.style.background = 'rgba(243, 156, 18, 0.15)'; 
+        }
+        
+        let cacheBusterUrl = GITHUB_RAW_URL + '?t=' + now; 
         let res = await fetch(cacheBusterUrl); 
         
-        if (!res.ok) { throw new Error("Master file missing or deleted from GitHub."); }
+        if (!res.ok) throw new Error("Master file missing or deleted from GitHub."); 
         
         let dataBuffer = await res.arrayBuffer(); 
         let wb = XLSX.read(new Uint8Array(dataBuffer), { type: 'array' });
@@ -338,6 +369,11 @@ async function fetchFromMasterStream() {
             return expD >= today;
         });
 
+        // ✅ Save to DB (Caching)
+        await saveToDB('cached_db_records', db_records);
+        await saveToDB('cached_dealer_records', dealer_records);
+        await saveToDB('master_data_time', now);
+
         if (activeCustomerIndex !== -1) { loadCurrentProducts(); renderMatrix(); }
         
         if(statusBadge) { 
@@ -346,12 +382,11 @@ async function fetchFromMasterStream() {
             statusBadge.style.background = 'rgba(39, 174, 96, 0.15)'; 
         }
 
-        // 🟢 २. डेटा आल्यावर इंडिकेटर हिरवा करणे आणि सर्च अनलॉक करणे
         if(globalLoader) {
             globalLoader.style.background = 'var(--success)';
             globalLoader.style.color = '#fff';
             globalLoader.innerHTML = '✅ Data Ready!';
-            setTimeout(() => { globalLoader.style.display = 'none'; }, 2500); // 2.5 सेकंदानंतर लपवणे
+            setTimeout(() => { globalLoader.style.display = 'none'; }, 2000); 
         }
         if(searchInput1) { searchInput1.disabled = false; searchInput1.placeholder = "Type model, brand or category..."; }
         if(searchInput2) { searchInput2.disabled = false; searchInput2.placeholder = "Type Brand or Model Name..."; }
@@ -365,7 +400,6 @@ async function fetchFromMasterStream() {
             statusBadge.style.background = 'rgba(214, 48, 49, 0.15)'; 
         } 
         
-        // 🔴 ३. एरर आल्यास इंडिकेटर लाल करणे
         if(globalLoader) {
             globalLoader.style.background = 'var(--danger)';
             globalLoader.style.color = '#fff';
@@ -375,6 +409,7 @@ async function fetchFromMasterStream() {
         if(searchInput2) { searchInput2.placeholder = "⚠️ Error loading data"; }
     }
 }
+
 window.onload = async function() {
     if(loggedInUserEmail) { 
         let savedName = localStorage.getItem('persistent_user_name') || "User"; 
@@ -385,7 +420,6 @@ window.onload = async function() {
     try {
         await initDB(); 
         
-        // १. आधी युजरचा लोकल डेटा आणि Queue सेकंदात लोड करून घ्या (Superfast UI)
         let savedQ = await getFromDB('persistent_queue'); 
         if (!savedQ || savedQ.length === 0) { 
             let lsQ = localStorage.getItem('persistent_queue_backup'); 
@@ -410,13 +444,13 @@ window.onload = async function() {
         renderCustomerQueue(); 
         updateUniversalActionButtons();
 
-        // २. वेबसाइट पूर्ण उघडल्यावर, बॅकग्राउंडमध्ये Master Data डाउनलोड करा (Non-blocking)
         fetchFromMasterStream(); 
         setTimeout(() => checkForExcelUpdates(), 3000);
     } catch(e) { 
         console.error("Local Data Initialization Failure", e); 
     }
 };
+
 function openFlyerGenModal() { document.getElementById('fgSalesName').value = ''; document.getElementById('fgSalesMobile').value = ''; document.getElementById('fgDealerSearch').value = ''; document.getElementById('fgDealerList').innerHTML = ''; tempFgDealerId = ""; tempFgDealerName = ""; tempFgBitly = ""; clearFgModel(); document.getElementById('fgOfferType').value = 'NONE'; toggleFgOfferInput(); document.getElementById('fgSelectedDealerBox').style.display = 'none'; document.getElementById('flyerGeneratedLinkBox').style.display = 'none'; document.getElementById('flyerGenModal').style.display = 'flex'; }
 function toggleFgOfferInput() { let type = document.getElementById('fgOfferType').value; let box = document.getElementById('fgOfferValBox'); let label = document.getElementById('fgOfferValLabel'); let inp = document.getElementById('fgOfferValue'); if(type === "NONE") { box.style.display = 'none'; inp.value = ''; } else if(type === "FREEBIE") { box.style.display = 'block'; label.innerText = "ENTER GIFT NAME"; inp.placeholder = "E.g. Earbuds / Smartwatch"; } else { box.style.display = 'block'; label.innerText = "ENTER UPTO AMOUNT (₹)"; inp.placeholder = "E.g. 2500"; } }
 function searchFgDealer() { let q = document.getElementById('fgDealerSearch').value.toLowerCase().trim(); let list = document.getElementById('fgDealerList'); if(!q) { list.innerHTML = ''; return; } let matches = dealer_records.map(d => parseDealerObj(d)).filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q) || p.city.toLowerCase().includes(q)).slice(0, 10); list.innerHTML = matches.map(p => { let displayStr = `${p.name}${p.city ? ' - ' + p.city : ''} (${p.code})`; return `<div onclick="selectFgDealer('${p.code}', '${p.name.replace(/'/g, "\\'")}', '${p.city.replace(/'/g, "\\'")}', '${encodeURIComponent(p.bitly||'')}')" style="padding:8px; border-bottom:1px solid #eee; cursor:pointer; background:#fff; font-size:12px; font-weight:bold; color:var(--bajaj-blue);">🏪 ${displayStr}</div>`; }).join(''); }
@@ -542,7 +576,6 @@ function renderTableModel() {
     
     let thead = document.getElementById('tableHead');
     if (isCalculatedMode) {
-        // येथे T/A ला display: table-cell !important; लावले आहे
         thead.innerHTML = `<tr>
             <th style="display: table-cell !important; background:#e3f2fd; padding:10px 4px; font-size:12px;">T/A</th>
             <th style="background:#e3f2fd; padding:10px 4px; font-size:12px;">LTV%</th>
@@ -693,6 +726,7 @@ function renderTableModel() {
     
     document.getElementById('schemeResultArea').style.display = 'block';
 }
+
 function copySingleScheme(tenure, advEmi, loan, dp, emi, fixedEmi, dbd, roi, pf, btn) {
     let limit = parseFloat(document.getElementById('calcLimit').value) || 0;
     let invoice = parseFloat(document.getElementById('calcInvoice').value) || 0;
@@ -1024,7 +1058,6 @@ function renderCustomerQueue() {
         let borderStyle = isSelected ? 'var(--primary)' : (isActive ? '#0088cc' : '#ddd'); 
         let shadowStyle = isSelected ? '0 0 5px rgba(9, 132, 227, 0.5)' : (isActive ? '0 0 5px rgba(0, 136, 204, 0.3)' : 'none'); 
         
-        // येथे ondblclick="setActiveCustomer(${idx})" ऍड केले आहे 👇
         return ` <div onclick="handleCustomerTap(${idx})" style="cursor:pointer; display:flex; flex-direction:column; background:${bgStyle}; padding:8px; border-radius:4px; border:1px solid ${borderStyle}; box-shadow:${shadowStyle}; transition:0.2s;"> 
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;"> 
                 <strong style="color:var(--indigo);">👤 ${displayName} ${c.mobile ? `<span style="color:#d35400; cursor:text;" title="Double-click to select" ondblclick="highlightNumber(event, this.querySelector('.mob-num'))">(📞 <span class="mob-num">${c.mobile}</span>)</span>` : ''}</strong> 
@@ -1703,6 +1736,7 @@ function openBitlyLink(url) {
         showToast('⚠️ Is dealer ke liye Bitly link available nahi hai!', 'warning'); 
     } 
 }
+
 let lastTapTime = 0;
 let lastTapIdx = -1;
 
@@ -1710,37 +1744,30 @@ function handleCustomerTap(idx) {
     let currentTime = new Date().getTime();
     let tapLength = currentTime - lastTapTime;
 
-    // जर दोन टॅपमधील वेळ 400 मिलीसेकंद पेक्षा कमी असेल (म्हणजेच Double Tap झाला)
     if (tapLength < 400 && tapLength > 0 && lastTapIdx === idx) {
-        setActiveCustomer(idx); // कस्टमर ऍक्टिव्ह करा (पुढच्या पेजवर जा)
-        lastTapTime = 0; // वेळ रिसेट करा
+        setActiveCustomer(idx); 
+        lastTapTime = 0; 
     } else {
-        // सिंगल टॅप झाला
-        selectQueueItem(idx); // कस्टमर फक्त सिलेक्ट (हायलाईट) करा
+        selectQueueItem(idx); 
         lastTapTime = currentTime;
         lastTapIdx = idx;
     }
 }
+
 async function checkForExcelUpdates() {
     try {
-        // GitHub API वापरून फक्त 'master_data.xlsx' शेवटची कधी बदलली हे चेक करणे
         let repoUrl = "https://api.github.com/repos/luckyjathar/testcalculator/commits?path=master_data.xlsx&page=1&per_page=1";
         let res = await fetch(repoUrl);
         
         if (res.ok) {
             let data = await res.json();
             if (data && data.length > 0) {
-                // GitHub वरील फाईलची शेवटची वेळ
                 let latestCommitTime = new Date(data[0].commit.committer.date).getTime();
-                
-                // आपल्या लोकल DB मध्ये सेव्ह असलेली वेळ
                 let localSavedTime = await getFromDB('master_data_version_time') || 0;
 
                 if (localSavedTime > 0 && latestCommitTime > localSavedTime) {
-                    // जर GitHub वर नवीन फाईल असेल, तर युजरला नोटिफिकेशन दाखवा
                     showUpdateNotification();
                 } else if (localSavedTime === 0) {
-                    // जर पहिलीच वेळ असेल, तर ही वेळ सेव्ह करा
                     await saveToDB('master_data_version_time', latestCommitTime);
                 }
             }
@@ -1750,7 +1777,6 @@ async function checkForExcelUpdates() {
     }
 }
 
-// नोटिफिकेशन दाखवण्यासाठी फंक्शन
 function showUpdateNotification() {
     let updateDiv = document.getElementById('updateNotificationBar');
     if (!updateDiv) {
@@ -1769,18 +1795,13 @@ function showUpdateNotification() {
     updateDiv.style.display = 'block';
 }
 
-// युजरने 'UPDATE NOW' वर क्लिक केल्यावर चालणारे फंक्शन
 async function forceRefreshMasterData() {
     let updateDiv = document.getElementById('updateNotificationBar');
     if(updateDiv) updateDiv.innerHTML = "⏳ डाउनलोड सुरू आहे, कृपया थांबा...";
     
-    // जुनी वेळ पुसून टाका म्हणजे नवीन डेटा घेईल
     await saveToDB('master_data_time', 0); 
-    
-    // नव्याने डेटा आणा (मगाशी आपण बनवलेले फंक्शन)
     await fetchFromMasterStream(true); 
     
-    // नवीन वेळ सेव्ह करा
     let repoUrl = "https://api.github.com/repos/luckyjathar/testcalculator/commits?path=master_data.xlsx&page=1&per_page=1";
     let res = await fetch(repoUrl);
     if(res.ok) {
