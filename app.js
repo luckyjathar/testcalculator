@@ -995,8 +995,47 @@ async function emptyRecycleBin() {
     showCustomConfirm("Are you sure you want to permanently delete all items in the Recycle Bin?", async () => { recycleBin = []; await saveToDB('persistent_recycle', recycleBin); localStorage.setItem('persistent_recycle_backup', JSON.stringify(recycleBin)); openRecycleBin(); showToast("🗑️ Recycle Bin completely emptied!", "success"); });
 }
 
-function renderCustomerQueue() { let documentCount = document.getElementById('queueCount'); if(documentCount) documentCount.innerText = customerQueue.length; let list = document.getElementById('customerQueueList'); if(!list) return; let qSearch = document.getElementById('queueSearch').value.toLowerCase().trim(); let isSearching = qSearch !== ""; let filtered = customerQueue.map((c, idx) => ({...c, originalIdx: idx})).filter(c => { if(!isSearching) return true; return c.name.toLowerCase().includes(qSearch) || (c.mobile && c.mobile.includes(qSearch)) || c.limit.toString().includes(qSearch) || (c.cap && c.cap.toString().includes(qSearch)) || c.type.toLowerCase().includes(qSearch); }); if(filtered.length === 0) { list.innerHTML = `<div style="text-align:center; color:#888;">No customers found.</div>`; return; } list.innerHTML = filtered.map((c) => { let idx = c.originalIdx; let isSelected = (selectedQueueIndex === idx); let isActive = (activeCustomerIndex === idx); let displayName = (isSearching || isSelected) ? c.name : maskName(c.name); let bgStyle = isSelected ? '#e3f2fd' : (isActive ? '#f0f8ff' : '#fff'); let borderStyle = isSelected ? 'var(--primary)' : (isActive ? '#0088cc' : '#ddd'); let shadowStyle = isSelected ? '0 0 5px rgba(9, 132, 227, 0.5)' : (isActive ? '0 0 5px rgba(0, 136, 204, 0.3)' : 'none'); return ` <div onclick="selectQueueItem(${idx})" style="cursor:pointer; display:flex; flex-direction:column; background:${bgStyle}; padding:8px; border-radius:4px; border:1px solid ${borderStyle}; box-shadow:${shadowStyle}; transition:0.2s;"> <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;"> <strong style="color:var(--indigo);">👤 ${displayName} ${c.mobile ? `<span style="color:#d35400; cursor:text;" title="Double-click to select" ondblclick="highlightNumber(event, this.querySelector('.mob-num'))">(📞 <span class="mob-num">${c.mobile}</span>)</span>` : ''}</strong> <span style="color:#888; font-weight:bold;">${c.timestamp || ''}</span> </div> <div style="color:#555; font-weight:bold;"> LMT: <span style="color:var(--success)">₹${c.limit}</span> | LTV: ${c.ltv}% | CAP: ${c.cap ? '₹'+c.cap : 'NO'} | ${c.type} ${isActive ? '<span style="float:right; color:var(--primary);">[ACTIVE ✓]</span>' : ''} </div> </div>`; }).join(''); }
-
+function renderCustomerQueue() { 
+    let documentCount = document.getElementById('queueCount'); 
+    if(documentCount) documentCount.innerText = customerQueue.length; 
+    
+    let list = document.getElementById('customerQueueList'); 
+    if(!list) return; 
+    
+    let qSearch = document.getElementById('queueSearch').value.toLowerCase().trim(); 
+    let isSearching = qSearch !== ""; 
+    
+    let filtered = customerQueue.map((c, idx) => ({...c, originalIdx: idx})).filter(c => { 
+        if(!isSearching) return true; 
+        return c.name.toLowerCase().includes(qSearch) || (c.mobile && c.mobile.includes(qSearch)) || c.limit.toString().includes(qSearch) || (c.cap && c.cap.toString().includes(qSearch)) || c.type.toLowerCase().includes(qSearch); 
+    }); 
+    
+    if(filtered.length === 0) { 
+        list.innerHTML = `<div style="text-align:center; color:#888;">No customers found.</div>`; 
+        return; 
+    } 
+    
+    list.innerHTML = filtered.map((c) => { 
+        let idx = c.originalIdx; 
+        let isSelected = (selectedQueueIndex === idx); 
+        let isActive = (activeCustomerIndex === idx); 
+        let displayName = (isSearching || isSelected) ? c.name : maskName(c.name); 
+        let bgStyle = isSelected ? '#e3f2fd' : (isActive ? '#f0f8ff' : '#fff'); 
+        let borderStyle = isSelected ? 'var(--primary)' : (isActive ? '#0088cc' : '#ddd'); 
+        let shadowStyle = isSelected ? '0 0 5px rgba(9, 132, 227, 0.5)' : (isActive ? '0 0 5px rgba(0, 136, 204, 0.3)' : 'none'); 
+        
+        // येथे ondblclick="setActiveCustomer(${idx})" ऍड केले आहे 👇
+        return ` <div onclick="selectQueueItem(${idx})" ondblclick="setActiveCustomer(${idx})" style="cursor:pointer; display:flex; flex-direction:column; background:${bgStyle}; padding:8px; border-radius:4px; border:1px solid ${borderStyle}; box-shadow:${shadowStyle}; transition:0.2s;"> 
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;"> 
+                <strong style="color:var(--indigo);">👤 ${displayName} ${c.mobile ? `<span style="color:#d35400; cursor:text;" title="Double-click to select" ondblclick="highlightNumber(event, this.querySelector('.mob-num'))">(📞 <span class="mob-num">${c.mobile}</span>)</span>` : ''}</strong> 
+                <span style="color:#888; font-weight:bold;">${c.timestamp || ''}</span> 
+            </div> 
+            <div style="color:#555; font-weight:bold;"> 
+                LMT: <span style="color:var(--success)">₹${c.limit}</span> | LTV: ${c.ltv}% | CAP: ${c.cap ? '₹'+c.cap : 'NO'} | ${c.type} ${isActive ? '<span style="float:right; color:var(--primary);">[ACTIVE ✓]</span>' : ''} 
+            </div> 
+        </div>`; 
+    }).join(''); 
+}
 async function setActiveCustomer(idx) { if(db_records.length === 0) { showToast("⚠️ Master Stream se data fetch nahi hua hai. Kripya connection check karein!", "error"); return; } activeCustomerIndex = idx; await saveQueueToLocal(); document.getElementById('queueSearch').value = ''; goToFinalPage(); }
 function isLimitValid() { if (activeCustomerIndex === -1 || !customerQueue[activeCustomerIndex]) { showToast("⚠️ Kripya pehle queue mein ek customer add karein aur use 'ACTIVE' rakhein.", "warning"); return false; } return true; }
 
