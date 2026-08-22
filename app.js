@@ -1,3 +1,17 @@
+function getDailyTheme() {
+    const themes = [
+        { bg: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)", text: "#fff", accent: "#f1c40f", icon: "✨" }, // Default Blue
+        { bg: "linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%)", text: "#fff", accent: "#f1c40f", icon: "🔥" }, // Red
+        { bg: "linear-gradient(135deg, #00b09b 0%, #96c93d 100%)", text: "#fff", accent: "#f39c12", icon: "🎉" }, // Green
+        { bg: "linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%)", text: "#fff", accent: "#f1c40f", icon: "🎇" }, // Purple
+        { bg: "linear-gradient(135deg, #f12711 0%, #f5af19 100%)", text: "#fff", accent: "#2c3e50", icon: "🎆" }, // Orange/Red
+        { bg: "linear-gradient(135deg, #1d976c 0%, #93f9b9 100%)", text: "#fff", accent: "#2c3e50", icon: "🎊" }, // Light Green
+        { bg: "linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)", text: "#fff", accent: "#f1c40f", icon: "🎀" }  // Pink/Red
+    ];
+    // आजच्या तारखेनुसार थीम निवडणे
+    const today = new Date().getDay(); 
+    return themes[today % themes.length];
+}
 /* === TOAST NOTIFICATION FUNCTION === */
 let toastTimeout;
 function showToast(message, type = 'success') {
@@ -1450,10 +1464,47 @@ function proceedGenerateImageAndWhatsAppCopy() { requestWhatsAppDispatch = true;
 
 /* === UPDATED: QUOTATION IMAGE GENERATOR WITH CLEAN SLEEK FINTECH BADGES === */
 function doGenerateCustomerImage() {
-    let quoteDiv = document.createElement('div'); quoteDiv.style.width = "560px"; quoteDiv.style.padding = "25px"; quoteDiv.style.background = "#fff"; quoteDiv.style.position = "absolute"; quoteDiv.style.top = "-9999px"; quoteDiv.style.fontFamily = "'Segoe UI', sans-serif";
-    let c = customerQueue[activeCustomerIndex]; let headerText = c?.name && c.name !== "-" ? c.name.toUpperCase() : "CUSTOMER QUOTATION"; let ltvLimit = c?.ltv || 100;
-    let html = ` <div style="background: linear-gradient(135deg, var(--bajaj-blue) 0%, var(--indigo) 100%); border-radius: 12px; padding: 25px; color: white; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);"> <h2 style="margin:0; font-size:28px; font-weight:900; letter-spacing: 1px; color:#fff;">🎉 EXCLUSIVE OFFERS FOR YOU!</h2> <h3 style="margin:8px 0 18px 0; color:#87c3f7; font-size:22px;">👤 ${headerText} ${c?.mobile ? `| 📞 ${c.mobile}` : ''}</h3> <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.4); display: inline-block; width: 90%;"> <div style="font-size: 14px; color: #e0e0e0; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px;">Your Approved Eligibility</div> <div style="display:flex; justify-content:center; gap:20px; font-weight:900; font-size: 17px;"> <span style="color:#00e676;">LIMIT: ₹${c?.limit || 0}</span> <span style="color:#ffd54f;">MAX LTV: ${ltvLimit}%</span> <span style="color:#fff;">TYPE: ${c?.type || 'NEW'}</span> ${c?.cap ? `<span style="color:#ff8a65;">EMI CAP: ₹${c.cap}</span>` : ''} </div> </div> </div>`;
+    let quoteDiv = document.createElement('div'); 
+    quoteDiv.style.width = "600px"; // रुंदी थोडी वाढवली
+    quoteDiv.style.padding = "20px"; // पॅडिंग कमी केले
+    quoteDiv.style.background = "#fff"; 
+    quoteDiv.style.position = "absolute"; 
+    quoteDiv.style.top = "-9999px"; 
+    quoteDiv.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
 
+    let c = customerQueue[activeCustomerIndex]; 
+    let headerText = c?.name && c.name !== "-" ? c.name.toUpperCase() : "CUSTOMER QUOTATION"; 
+    let ltvLimit = c?.ltv || 100;
+    
+    let salesName = localStorage.getItem('portal_sales_name') || "LAKSHYA"; // सेल्समनचे नाव
+    let salesMobile = localStorage.getItem('portal_sales_mobile') || "8087313624";
+
+    // दररोज बदलणारी थीम
+    const theme = getDailyTheme();
+
+    // --- Header Section (कमी जागा घेणारा आणि स्पष्ट) ---
+    let html = ` 
+    <div style="background: ${theme.bg}; border-radius: 12px; padding: 15px 20px; color: ${theme.text}; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);"> 
+        <h2 style="margin:0; font-size:26px; font-weight:900; letter-spacing: 1px; display:flex; justify-content:center; align-items:center; gap:10px;">
+            <span>${theme.icon}</span> EXCLUSIVE OFFERS FOR YOU!
+        </h2> 
+        
+        <div style="margin:10px 0; font-size:18px; font-weight:bold; color:${theme.accent};">
+            👤 ${salesName} | 📞 ${salesMobile}
+        </div>
+
+        <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.3);"> 
+            <div style="font-size: 13px; color: #eee; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">YOUR APPROVED ELIGIBILITY</div> 
+            <div style="display:flex; justify-content:space-around; align-items:center; font-weight:900; font-size: 18px;"> 
+                <span style="color:#00ff87;">LIMIT: ₹${c?.limit || 0}</span> 
+                <span style="color:#ffd54f;">LTV: ${ltvLimit}%</span> 
+                <span style="color:#fff; background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:4px;">${c?.type || 'NEW'}</span> 
+                ${c?.cap ? `<span style="color:#ff7675;">CAP: ₹${c.cap}</span>` : ''} 
+            </div> 
+        </div> 
+    </div>`;
+
+    // ... (पुढील logic जसेच्या तसे राहील: hasV, productsToRender.forEach इ.)
     let hasV = false; let productsToRender = window.tempImageGenIndices.map(idx => current_products[idx]);
     productsToRender.forEach((prod) => {
         let validS = prod.calculatedData.filter(d => { let isLtvB = (d.curLTV > ltvLimit); let isBoundB = false; if (prod.isNonTieup && prod.inputs.mrp > 0) { if (d.loan < d.minLoan || d.loan > d.maxLoan) isBoundB = true; } return !isLtvB && !isBoundB && !d.inactive && !d.isInv50Breach && d.loan > 0; });
@@ -1486,70 +1537,68 @@ function doGenerateCustomerImage() {
 
         let remainingSchemes = validS.filter(d => !topSchemeIDs.has(d.dIdx)).sort((a, b) => a.dp - b.dp);
 
+        // Top 4 Rows
         let top4RowsHtml = top4Entries.map((item, i) => {
             let d = item.scheme;
             let primaryBadge = badgeDetails[item.badges[0]] || badgeDetails["DP"];
 
             let bHtml = item.badges.map(b => `
-                <div style="background:${badgeDetails[b].bg}; color:${badgeDetails[b].color}; font-size:10px; font-weight:900; margin-top:5px; padding:3px 7px; border-radius:4px; display:inline-block; letter-spacing:0.5px; text-transform:uppercase;">
+                <div style="background:${badgeDetails[b].bg}; color:${badgeDetails[b].color}; font-size:11px; font-weight:900; margin-top:5px; padding:4px 8px; border-radius:4px; display:inline-block; letter-spacing:0.5px; text-transform:uppercase;">
                     ${badgeDetails[b].text}
                 </div>
-            `).join('<br>');
+            `).join(''); // <br> काढून टाकला जेणेकरून एका ओळीत बसतील
 
             return `
                 <tr style="background:${primaryBadge.rowBg}; border-bottom: 2px solid #cbd5e1; border-left: 6px solid ${primaryBadge.accent};">
-                    <td style="padding:15px 6px; font-size:16px; font-weight:950; color:#1e293b; line-height:1.2;">
-                        <span style="font-size:18px;">${d.currentTenure}/${d.advEmi}</span><br>
+                    <td style="padding:15px 8px; font-size:18px; font-weight:950; color:#1e293b; line-height:1.3; text-align:left;">
+                        <span style="font-size:22px; color:var(--indigo);">${d.currentTenure}/${d.advEmi}</span><br>
                         ${bHtml}
                     </td>
-                    <td style="padding:15px 6px; color:#059669; font-size:17px; font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding:15px 6px; color:#2563eb; font-size:17px; font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td>
-                    <td style="padding:15px 6px; font-size:16px; font-weight:950; color:#1e293b;">${d.inst}</td>
-                    <td style="padding:15px 6px; color:#ea580c; font-size:17px; font-weight:950;">₹${Math.round(d.daily).toLocaleString()}</td>
+                    <td style="padding:15px 8px; color:#059669; font-size:20px; font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td>
+                    <td style="padding:15px 8px; color:#2563eb; font-size:20px; font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td>
+                    <td style="padding:15px 8px; font-size:18px; font-weight:950; color:#1e293b;">${d.inst}</td>
                 </tr>
             `;
         }).join('');
 
+        // Remaining Rows
         let remainingRowsHtml = "";
         if (remainingSchemes.length > 0) {
             remainingRowsHtml += `
                 <tr style="background:#f1f5f9; border-top: 2px solid #cbd5e1; border-bottom: 2px solid #cbd5e1;">
-                    <td colspan="5" style="padding:10px; font-size:13px; font-weight:950; color:#475569; letter-spacing:0.5px; text-align:center;">
+                    <td colspan="4" style="padding:12px; font-size:14px; font-weight:950; color:#475569; letter-spacing:0.5px; text-align:center;">
                         👇 इतर उपलब्ध पर्याय (OTHER SCHEMES) 👇
                     </td>
                 </tr>
             `;
             remainingRowsHtml += remainingSchemes.map((d, i) => `
                 <tr style="background:${i%2==0?'#ffffff':'#fcfcfc'}; color:#64748b; border-bottom: 1px solid #ededed;">
-                    <td style="padding:10px 6px; font-size:15px; font-weight:900; color:#334155;">${d.currentTenure}/${d.advEmi}</td>
-                    <td style="padding:10px 6px; color:#10b981; font-size:15px; font-weight:900;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding:10px 6px; color:#3b82f6; font-size:15px; font-weight:900;">₹${Math.round(d.emi).toLocaleString()}</td>
-                    <td style="padding:10px 6px; font-size:15px; font-weight:900; color:#475569;">${d.inst}</td>
-                    <td style="padding:10px 6px; color:#ea580c; font-size:15px; font-weight:900;">₹${Math.round(d.daily).toLocaleString()}</td>
+                    <td style="padding:12px 8px; font-size:18px; font-weight:900; color:#334155; text-align:left;">${d.currentTenure}/${d.advEmi}</td>
+                    <td style="padding:12px 8px; color:#10b981; font-size:18px; font-weight:900;">₹${Math.round(d.dp).toLocaleString()}</td>
+                    <td style="padding:12px 8px; color:#3b82f6; font-size:18px; font-weight:900;">₹${Math.round(d.emi).toLocaleString()}</td>
+                    <td style="padding:12px 8px; font-size:18px; font-weight:900; color:#475569;">${d.inst}</td>
                 </tr>
             `).join('');
         }
-
         html += `
-        <div style="margin-bottom:20px; border-radius: 12px; overflow: hidden; border: 1px solid #dcdfe6; box-shadow: 0 4px 15px rgba(0,0,0,0.06); background:#ffffff; font-family:'Segoe UI', sans-serif; border-left: 6px solid #00a86b;">
-            <div style="padding:14px 18px; display:flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; background: #ffffff;">
+        <div style="margin-bottom:20px; border-radius: 12px; overflow: hidden; border: 1px solid #dcdfe6; box-shadow: 0 4px 15px rgba(0,0,0,0.06); background:#ffffff;">
+            <div style="padding:15px; display:flex; justify-content: space-between; align-items: center; background: #f8f9fa; border-bottom: 2px solid var(--indigo);">
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="font-size:18px;">🧮</span>
-                    <h3 style="margin:0; color:#0059A3; font-size:18px; font-weight:950; letter-spacing:0.3px; text-transform:uppercase;">${prod.name}</h3>
+                    <span style="font-size:22px;">📱</span>
+                    <h3 style="margin:0; color:var(--indigo); font-size:20px; font-weight:950; letter-spacing:0.5px;">${prod.name}</h3>
                 </div>
-                <div style="background: #0059A3; color: #ffffff; padding: 6px 14px; border-radius: 6px; font-size:15px; font-weight:950;">
+                <div style="background: var(--indigo); color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size:16px; font-weight:950;">
                     INV: ₹${invAmt.toLocaleString()}
                 </div>
             </div>
             <div style="padding: 0;">
-                <table style="width:100%; border-collapse:collapse; text-align:center; font-family:'Segoe UI', sans-serif;">
+                <table style="width:100%; border-collapse:collapse; text-align:center;">
                     <thead>
-                        <tr style="background:#ffffff; color:#333333; font-size:14px; font-weight:900; text-transform:uppercase; letter-spacing:0.5px; border-bottom: 2px solid #e2e8f0;">
-                            <th style="padding:12px 6px;">SCHEME</th>
-                            <th style="padding:12px 6px;">DP</th>
-                            <th style="padding:12px 6px;">EMI</th>
-                            <th style="padding:12px 6px;">M</th>
-                            <th style="padding:12px 6px;">DAILY</th>
+                        <tr style="background:#eef2f3; color:#2c3e50; font-size:15px; font-weight:900; text-transform:uppercase; border-bottom: 2px solid #cbd5e1;">
+                            <th style="padding:12px 8px; text-align:left;">SCHEME</th>
+                            <th style="padding:12px 8px;">DP</th>
+                            <th style="padding:12px 8px;">EMI</th>
+                            <th style="padding:12px 8px;">M</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1559,7 +1608,6 @@ function doGenerateCustomerImage() {
                 </table>
             </div>
         </div>`;
-    });
 
     if(!hasV) { showToast("⚠️ Eligibility ke anusar koi Scheme nahi baith rahi hai!", "error"); return; }
 
