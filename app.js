@@ -255,7 +255,13 @@ function cleanPureShopName(raw) { if(!raw) return ""; return raw.split('#')[0].s
 function parseDealerObj(d) {
     if (!d) return { code: '', name: '', city: '', bitly: '' };
     let keys = Object.keys(d); let rawName = '', code = '', city = '', bitly = '';
-    for (let k of keys) { let val = String(d[k]).trim(); if (val.startsWith('http://') || val.startsWith('https://') || val.includes('bit.ly')) { bitly = val; break; } }
+    for (let k of keys) { 
+        let val = String(d[k]).trim(); 
+        if (val.startsWith('http://') || val.startsWith('https://') || val.includes('bit.ly') || val.includes('bfl.onelink.me') || val.includes('bajajfinserv.in')) { 
+            bitly = val; 
+            break; 
+        } 
+    }
     let nameKey = keys.find(k => ['DEALER NAME', 'SHOP NAME', 'NAME', 'SHOP', 'DEALER'].includes(k.toUpperCase().trim())); rawName = nameKey ? String(d[nameKey]).trim() : '';
     let codeKey = keys.find(k => ['DEALERID', 'DEALER CODE', 'CODE', 'ID', 'BPES RCD', 'DEALER_ID'].includes(k.toUpperCase().trim())); code = codeKey ? String(d[codeKey]).trim() : '';
     let cityKey = keys.find(k => ['CITY', 'LOCATION', 'TOWN', 'DISTRICT'].includes(k.toUpperCase().trim())); city = cityKey ? String(d[cityKey]).trim() : '';
@@ -282,7 +288,7 @@ function parseExcelDate(val) { if (!val) return null; if (typeof val === 'number
 
 async function saveQueueToLocal(shouldCloudSync = true) { try { let compactQueue = customerQueue.map(c => { let cp = (c.products || []).map(p => { let { calculatedData, allSchemes, ...keepProduct } = p; return keepProduct; }); return { ...c, products: cp }; }); localStorage.setItem('persistent_queue_backup', JSON.stringify(compactQueue)); localStorage.setItem('persistent_active_idx_backup', activeCustomerIndex); await saveToDB('persistent_queue', compactQueue); await saveToDB('persistent_active_idx', activeCustomerIndex); if(shouldCloudSync && loggedInUserEmail) { triggerSilentCloudSync(); } } catch(e) { console.error("Local Save Interrupted", e); } }
 
-// === NEW FETCH DATA FUNCTION WITH LOCAL CACHING ===
+// === FETCH MASTER DATA FUNCTION ===
 const CACHE_DURATION_MS = 12 * 60 * 60 * 1000; 
 
 async function fetchFromMasterStream(forceSync = false) {
@@ -303,7 +309,6 @@ async function fetchFromMasterStream(forceSync = false) {
     try {
         let now = new Date().getTime();
         
-        // ⚡ Check Local Cache first
         if (!forceSync) {
             let cachedTime = await getFromDB('master_data_time');
             let cachedDbRecords = await getFromDB('cached_db_records');
@@ -329,7 +334,6 @@ async function fetchFromMasterStream(forceSync = false) {
             }
         }
 
-        // 🌐 Download from GitHub if no cache or forceSync
         if(globalLoader) globalLoader.innerHTML = '⏳ Downloading Master Data...';
         if(statusBadge) { 
             statusBadge.innerHTML = '⬇️ DOWNLOADING LIVE DATA...'; 
@@ -369,7 +373,6 @@ async function fetchFromMasterStream(forceSync = false) {
             return expD >= today;
         });
 
-        // ✅ Save to DB (Caching)
         await saveToDB('cached_db_records', db_records);
         await saveToDB('cached_dealer_records', dealer_records);
         await saveToDB('master_data_time', now);
@@ -786,7 +789,7 @@ function exportDictSchemeImage(action) {
     let actionCells = clonedTable.querySelectorAll('th:last-child, td:last-child');
     actionCells.forEach(cell => cell.remove());
 
-    clledTable.style.width = "100%"; clonedTable.style.borderCollapse = "collapse";
+    clonedTable.style.width = "100%"; clonedTable.style.borderCollapse = "collapse";
     exportDiv.querySelectorAll('th, td').forEach(cell => { cell.style.padding = "10px"; cell.style.borderBottom = "1px solid #ddd"; cell.style.textAlign = "center"; });
 
     html2canvas(exportDiv, { scale: 2, useCORS: true }).then(canvas => {
@@ -1520,7 +1523,7 @@ function doGenerateCustomerImage() {
         let winDp = [...validS].sort((a,b) => a.dp - b.dp)[0]; 
         let winEmi = [...validS].sort((a,b) => a.emi - b.emi)[0]; 
         let winPop = [...validS].filter(s => s.roi === 0 || s.isFixed).sort((a,b) => a.dp - b.dp)[0] || validS[0]; 
-        let winBalance = [...validS].sort((a,b) => (a.dp + (a.emi * 2)) - (b.dp + (b.emi * 2)))[0] || validS[0];
+        let winBalance = [...validS].sort((a,b) => (a.dp + (a.emi * 2)) - (b.dp + (b.emi * 2)))[0] || validS[0]; 
         
         let schemeMap = new Map(); 
         validS.forEach(s => schemeMap.set(s.dIdx, { scheme: s, badges: [] }));
@@ -1645,14 +1648,168 @@ function doGenerateCustomerImage() {
         } else { document.getElementById('clipboardStatusAlert').style.display = 'none'; }
     });
 }
+
+/* === DEALER LINKS WITH STAR (FAVORITES) & SECURE DIRECT LINK FEATURE === */
+let showingOnlyStarred = false;
+
+function getStarredDealers() {
+    return JSON.parse(localStorage.getItem('persistent_starred_dealers') || '[]');
+}
+
+function toggleDealerStar(dealerId, event) {
+    if(event) { event.preventDefault(); event.stopPropagation(); }
+    let starred = getStarredDealers();
+    let idStr = String(dealerId).trim();
+    if (starred.includes(idStr)) {
+        starred = starred.filter(id => id !== idStr);
+        showToast("★ Dealer removed from favorites!", "warning");
+    } else {
+        starred.push(idStr);
+        showToast("★ Dealer added to favorites!", "success");
+    }
+    localStorage.setItem('persistent_starred_dealers', JSON.stringify(starred));
+    searchDealer();
+}
+
+function showOnlyStarredDealers() {
+    showingOnlyStarred = !showingOnlyStarred;
+    let btn = document.getElementById('filterStarBtn');
+    if (showingOnlyStarred) {
+        btn.style.background = "#ffb400";
+        btn.style.color = "#fff";
+        btn.innerText = "★ SHOW ALL";
+    } else {
+        btn.style.background = "#fff3cd";
+        btn.style.color = "#856404";
+        btn.innerText = "★ FAVORITES";
+    }
+    searchDealer();
+}
+
+function copyThreeDealerItems(dId, dName, encBitly, btnEl, event) {
+    if(event) { event.preventDefault(); event.stopPropagation(); }
+    let bitlyUrl = decodeURIComponent(encBitly);
+    let textToCopy = `${dId} - ${dName} - ${bitlyUrl}`;
+
+    function showSuccess() {
+        let originalText = btnEl.innerText;
+        btnEl.innerText = "COPIED! ✓";
+        btnEl.style.background = "var(--primary)";
+        btnEl.style.color = "white";
+        setTimeout(() => {
+            btnEl.innerText = originalText;
+            btnEl.style.background = "var(--indigo)";
+            btnEl.style.color = "white";
+        }, 1500);
+        showToast("📋 Dealer ID, Name & Link Copied!", "success");
+    }
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(textToCopy).then(showSuccess).catch(() => fallbackCopy(textToCopy, showSuccess));
+    } else {
+        fallbackCopy(textToCopy, showSuccess);
+    }
+}
+
+function openDealerSearchModal() { 
+    document.getElementById('dealerSearchInput').value = ''; 
+    showingOnlyStarred = false;
+    let btn = document.getElementById('filterStarBtn');
+    if(btn) { btn.style.background = "#fff3cd"; btn.style.color = "#856404"; btn.innerText = "★ FAVORITES"; }
+    searchDealer();
+    document.getElementById('dealerSearchModal').style.display = 'flex'; 
+    setTimeout(() => document.getElementById('dealerSearchInput').focus(), 100); 
+}
+
+function closeDealerSearchModal() { 
+    document.getElementById('dealerSearchModal').style.display = 'none'; 
+}
+
 function openBitlyLink(url) { 
     if (url && url !== '#' && url.trim() !== '') { 
-        if (!url.startsWith('http://') && !url.startsWith('https://')) { url = 'https://' + url; } 
-        window.open(url, '_blank'); 
+        let targetUrl = url.trim();
+        if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) { 
+            targetUrl = 'https://' + targetUrl; 
+        } 
+        window.open(targetUrl, '_blank'); 
         closeDealerSearchModal(); 
     } else { 
         showToast('⚠️ Is dealer ke liye Bitly link available nahi hai!', 'warning'); 
     } 
+}
+
+function searchDealer() {
+    let q = document.getElementById('dealerSearchInput').value.toLowerCase().trim(); 
+    let resultsDiv = document.getElementById('dealerSearchResults');
+
+    if (dealer_records.length === 0) { 
+        resultsDiv.innerHTML = '<div style="text-align:center; color:var(--danger); padding: 15px;">⚠️ Dealer data abhi load nahi hua hai.</div>'; 
+        return; 
+    }
+
+    let starredIds = getStarredDealers();
+
+    if (!q && !showingOnlyStarred) {
+        resultsDiv.innerHTML = '<div style="text-align:center; color:#888; padding: 20px;">Type Dealer ID or Name to search...</div>';
+        return;
+    }
+
+    let parsedDealers = dealer_records.map(d => parseDealerObj(d));
+
+    let matches = parsedDealers.filter(p => { 
+        if (showingOnlyStarred && !starredIds.includes(p.code)) return false;
+        if (!q && !showingOnlyStarred) return true;
+
+        return p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q) || p.city.toLowerCase().includes(q); 
+    });
+
+    matches.sort((a, b) => {
+        let isStarA = starredIds.includes(a.code);
+        let isStarB = starredIds.includes(b.code);
+
+        if (isStarA && !isStarB) return -1;
+        if (!isStarA && isStarB) return 1;
+        return 0;
+    });
+
+    let displayList = matches.slice(0, 50);
+
+    if (displayList.length === 0) { 
+        resultsDiv.innerHTML = '<div style="text-align:center; color:#d35400; padding: 15px; font-weight:bold;">कोणताही डीलर सापडला नाही!</div>'; 
+        return; 
+    }
+
+    resultsDiv.innerHTML = displayList.map(m => { 
+        let rawBitly = m.bitly || '#'; 
+        let validLink = (rawBitly && rawBitly !== '#') ? (rawBitly.startsWith('http') ? rawBitly : 'https://' + rawBitly) : '';
+        let encBitly = encodeURIComponent(validLink); 
+        let dId = m.code || '-'; 
+        let dName = m.name + (m.city ? ` - ${m.city}` : ''); 
+        let isStarred = starredIds.includes(dId);
+
+        let favBtnHtml = isStarred 
+            ? `<button onclick="toggleDealerStar('${dId}', event)" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">⭐ FAVORITED</button>`
+            : `<button onclick="toggleDealerStar('${dId}', event)" style="background:#f8f9fa; color:#555; border:1px solid #ccc; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">☆ ADD FAV</button>`;
+
+        let linkBtnHtml = validLink 
+            ? `<a href="${validLink}" target="_blank" rel="noopener noreferrer" onclick="closeDealerSearchModal()" style="flex:1; background:var(--success); color:white; border:none; padding:8px 6px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px; text-decoration:none; text-align:center; display:inline-block;">OPEN LINK ↗</a>`
+            : `<button onclick="showToast('⚠️ No Link Available', 'warning')" style="flex:1; background:#ccc; color:#666; border:none; padding:8px 6px; border-radius:4px; font-weight:bold; font-size:11px; cursor:not-allowed;">NO LINK</button>`;
+
+        return ` 
+        <div style="display:flex; flex-direction:column; background:${isStarred ? '#fffdf0' : '#fff'}; padding:10px; border-radius:6px; border:1px solid ${isStarred ? '#ffb400' : '#ddd'}; box-shadow: 0 2px 4px rgba(0,0,0,0.05); gap: 8px;"> 
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div style="flex: 1;">
+                    <strong style="color:var(--indigo); display:block; font-size: 14px;">🏪 ${dName}</strong>
+                    <span style="color:#555; font-size: 11px; font-weight:bold;">ID: <span style="color:var(--primary); font-weight:900;">${dId}</span></span>
+                </div>
+                <div>${favBtnHtml}</div>
+            </div>
+            <div style="display:flex; gap: 5px; border-top: 1px dashed #eee; padding-top: 8px;">
+                ${linkBtnHtml}
+                <button onclick="copyThreeDealerItems('${dId}', '${dName.replace(/'/g, "\\'")}', '${encBitly}', this, event)" style="flex:1.5; background:var(--indigo); color:white; border:none; padding:8px 6px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">📋 COPY DATA</button>
+            </div>
+        </div>`; 
+    }).join('');
 }
 
 let lastTapTime = 0;
