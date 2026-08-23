@@ -1463,7 +1463,7 @@ function getDailyTheme() {
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === FULLY CORRECTED QUOTATION IMAGE GENERATOR (ROCK SOLID LAYOUT) === */
+/* === FULLY CORRECTED QUOTATION IMAGE GENERATOR (CENTER ALIGNED COLUMNS) === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
     quoteDiv.style.width = "720px";
@@ -1545,30 +1545,30 @@ function doGenerateCustomerImage() {
 
         let remainingSchemes = validS.filter(d => !topSchemeIDs.has(d.dIdx)).sort((a, b) => a.dp - b.dp);
 
-        // Top 4 Rows
+        // Top 4 Rows - Center Aligned
         let top4RowsHtml = top4Entries.map((item, i) => {
             let d = item.scheme;
             let bHtml = item.badges.map(b => `
-                <span style="background:${badgeDetails[b].bg}; color:${badgeDetails[b].color}; font-size:10px; font-weight:800; padding:3px 8px; border-radius:12px; margin-right:4px; margin-top:4px; display:inline-block; letter-spacing:0.5px;">
+                <span style="background:${badgeDetails[b].bg}; color:${badgeDetails[b].color}; font-size:10px; font-weight:800; padding:3px 8px; border-radius:12px; display:inline-block; letter-spacing:0.5px;">
                     ${badgeDetails[b].text}
                 </span>
             `).join('');
 
             return `
                 <tr style="background:#ffffff; border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding:14px 10px; text-align:left;">
+                    <td style="padding:14px 10px; text-align:center;">
                         <div style="font-size:18px; font-weight:900; color:#0f172a;">${d.currentTenure}/${d.advEmi}</div>
-                        <div style="margin-top:2px;">${bHtml}</div>
+                        <div style="margin-top:4px; display:flex; flex-wrap:wrap; justify-content:center; gap:4px;">${bHtml}</div>
                     </td>
-                    <td style="padding:14px 4px; color:#059669; font-size:16px; font-weight:900;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding:14px 4px; color:#2563eb; font-size:16px; font-weight:900;">₹${Math.round(d.emi).toLocaleString()}</td>
-                    <td style="padding:14px 4px; font-size:16px; font-weight:900; color:#475569;">${d.inst}</td>
-                    <td style="padding:14px 10px; color:#ea580c; font-size:16px; font-weight:900; text-align:right;">₹${Math.round(d.daily).toLocaleString()}</td>
+                    <td style="padding:14px 4px; color:#059669; font-size:16px; font-weight:900; text-align:center;">₹${Math.round(d.dp).toLocaleString()}</td>
+                    <td style="padding:14px 4px; color:#2563eb; font-size:16px; font-weight:900; text-align:center;">₹${Math.round(d.emi).toLocaleString()}</td>
+                    <td style="padding:14px 4px; font-size:16px; font-weight:900; color:#475569; text-align:center;">${d.inst}</td>
+                    <td style="padding:14px 10px; color:#ea580c; font-size:16px; font-weight:900; text-align:center;">₹${Math.round(d.daily).toLocaleString()}</td>
                 </tr>
             `;
         }).join('');
 
-        // Remaining Rows
+        // Remaining Rows - Center Aligned
         let remainingRowsHtml = "";
         if (remainingSchemes.length > 0) {
             remainingRowsHtml += `
@@ -1580,16 +1580,16 @@ function doGenerateCustomerImage() {
             `;
             remainingRowsHtml += remainingSchemes.map((d, i) => `
                 <tr style="background:${i%2==0?'#ffffff':'#fcfcfc'}; border-bottom: 1px solid #f1f5f9;">
-                    <td style="padding:10px 10px; font-size:15px; font-weight:800; color:#334155; text-align:left;">${d.currentTenure}/${d.advEmi}</td>
-                    <td style="padding:10px 4px; color:#10b981; font-size:15px; font-weight:800;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding:10px 4px; color:#3b82f6; font-size:15px; font-weight:800;">₹${Math.round(d.emi).toLocaleString()}</td>
-                    <td style="padding:10px 4px; font-size:15px; font-weight:800; color:#64748b;">${d.inst}</td>
-                    <td style="padding:10px 10px; color:#ea580c; font-size:15px; font-weight:800; text-align:right;">₹${Math.round(d.daily).toLocaleString()}</td>
+                    <td style="padding:10px 10px; font-size:15px; font-weight:800; color:#334155; text-align:center;">${d.currentTenure}/${d.advEmi}</td>
+                    <td style="padding:10px 4px; color:#10b981; font-size:15px; font-weight:800; text-align:center;">₹${Math.round(d.dp).toLocaleString()}</td>
+                    <td style="padding:10px 4px; color:#3b82f6; font-size:15px; font-weight:800; text-align:center;">₹${Math.round(d.emi).toLocaleString()}</td>
+                    <td style="padding:10px 4px; font-size:15px; font-weight:800; color:#64748b; text-align:center;">${d.inst}</td>
+                    <td style="padding:10px 10px; color:#ea580c; font-size:15px; font-weight:800; text-align:center;">₹${Math.round(d.daily).toLocaleString()}</td>
                 </tr>
             `).join('');
         }
 
-        // Product Box Container with Fixed Table Layout
+        // Product Box Container with Fixed Table Layout and Center Aligned Headers
         html += `
         <div style="margin-bottom:25px; border-radius: 12px; overflow: hidden; background:#ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
             <div style="padding:16px 20px; background: #f1f5f9; border-bottom: 2px solid #cbd5e1; display: table; width: 100%; box-sizing: border-box;">
@@ -1607,11 +1607,11 @@ function doGenerateCustomerImage() {
                 <table style="width:100%; border-collapse:collapse; text-align:center; table-layout:fixed;">
                     <thead style="background:#f8fafc;">
                         <tr style="color:#64748b; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px; border-bottom: 2px solid #e2e8f0;">
-                            <th style="padding:12px 10px; text-align:left; width:28%;">SCHEME</th>
-                            <th style="padding:12px 4px; width:17%;">DP</th>
-                            <th style="padding:12px 4px; width:17%;">EMI</th>
-                            <th style="padding:12px 4px; width:13%;">M</th>
-                            <th style="padding:12px 10px; text-align:right; width:25%;">DAILY</th>
+                            <th style="padding:12px 10px; text-align:center; width:28%;">SCHEME</th>
+                            <th style="padding:12px 4px; text-align:center; width:17%;">DP</th>
+                            <th style="padding:12px 4px; text-align:center; width:17%;">EMI</th>
+                            <th style="padding:12px 4px; text-align:center; width:13%;">M</th>
+                            <th style="padding:12px 10px; text-align:center; width:25%;">DAILY</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1645,7 +1645,6 @@ function doGenerateCustomerImage() {
         } else { document.getElementById('clipboardStatusAlert').style.display = 'none'; }
     });
 }
-
 function openBitlyLink(url) { 
     if (url && url !== '#' && url.trim() !== '') { 
         if (!url.startsWith('http://') && !url.startsWith('https://')) { url = 'https://' + url; } 
