@@ -1466,7 +1466,7 @@ function getDailyTheme() {
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === FULLY RE-DESIGNED QUOTATION IMAGE GENERATOR (STRICTLY NO BANNER & MAX FONTS) === */
+/* === FULLY RE-DESIGNED QUOTATION IMAGE GENERATOR (TENURE & BADGE SPLIT) === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
     quoteDiv.style.width = "780px";
@@ -1612,8 +1612,13 @@ function doGenerateCustomerImage() {
                         <div style="font-size: 26px; font-weight: 900; color: #2563eb;">₹${Math.round(schemeObj.emi).toLocaleString()}</div>
                     </div>
                 </div>
-                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid ${themeColor}30; font-size: 15px; font-weight: 900; color: #475569; display: flex; justify-content: center; align-items: center; gap: 8px;">
-                    TENURE <span style="background: #fff; padding: 5px 12px; border-radius: 4px; border: 1px solid #e2e8f0;">📅 ${schemeObj.inst} MONTHS</span>
+                <!-- Updated Tenure Layout: Split Left & Right -->
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid ${themeColor}30; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-size: 15px; font-weight: 900; color: #334155;">TENURE</div>
+                    <div style="background: #fff; padding: 6px 14px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 15px; font-weight: 900; color: #475569; display: flex; flex-direction: column; align-items: center; line-height: 1.2;">
+                        <span>📅 ${schemeObj.inst}</span>
+                        <span style="font-size: 11px;">MONTHS</span>
+                    </div>
                 </div>
             </div>`;
         };
@@ -1624,7 +1629,7 @@ function doGenerateCustomerImage() {
         
         html += `</div>`;
 
-        // Other Schemes Table (Notice: No BEST VALUE Banner in between)
+        // Other Schemes Table
         if(otherSchemes.length > 0) {
             html += `
                 <div style="text-align: center; margin-bottom: 15px; font-size: 18px; font-weight: 900; color: #021B5A;">
