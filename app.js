@@ -1466,12 +1466,12 @@ function getDailyTheme() {
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === FULLY CORRECTED QUOTATION IMAGE GENERATOR (CENTER ALIGNED COLUMNS) === */
+/* === FULLY RE-DESIGNED QUOTATION IMAGE GENERATOR (ALL ELIGIBLE SCHEMES) === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
-    quoteDiv.style.width = "720px";
-    quoteDiv.style.padding = "20px"; 
-    quoteDiv.style.background = "#f8fafc"; 
+    quoteDiv.style.width = "780px";
+    quoteDiv.style.padding = "15px"; 
+    quoteDiv.style.background = "#f0f2f5"; 
     quoteDiv.style.position = "absolute"; 
     quoteDiv.style.top = "-9999px"; 
     quoteDiv.style.boxSizing = "border-box";
@@ -1480,28 +1480,69 @@ function doGenerateCustomerImage() {
     let c = customerQueue[activeCustomerIndex]; 
     let ltvLimit = c?.ltv || 100;
     
-    let salesName = localStorage.getItem('portal_sales_name') || "LAKSHYA"; 
-    let salesMobile = localStorage.getItem('portal_sales_mobile') || "8087313624";
+    let salesName = localStorage.getItem('portal_sales_name') || "SALES EXECUTIVE"; 
+    let salesMobile = localStorage.getItem('portal_sales_mobile') || "0000000000";
 
-    const theme = getDailyTheme();
+    // 1. Header Section (Dark Blue with Gold accents & 100% Approved Badge)
+    let html = `
+    <div style="background: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #021B5A 0%, #0D3A96 100%); padding: 25px 20px 20px 20px; color: #fff; position: relative; text-align: center;">
+            
+            <!-- 100% Approved Badge -->
+            <div style="position: absolute; right: 25px; top: 15px; width: 110px; height: 110px; background: linear-gradient(135deg, #ffd700, #b8860b); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 4px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 10;">
+                <div style="position:absolute; width:100%; height:100%; border-radius:50%; border:2px dashed rgba(255,255,255,0.5);"></div>
+                <div style="font-size: 26px; font-weight: 900; color: #021B5A; line-height: 1.1; margin-top:5px;">100%</div>
+                <div style="font-size: 11px; font-weight: 800; color: #fff; background: #021B5A; padding: 2px 8px; border-radius: 10px; margin-top: 2px; letter-spacing: 0.5px;">APPROVED</div>
+            </div>
 
-    let html = ` 
-    <div style="background: ${theme.bg}; border-radius: 16px; padding: 20px; color: ${theme.text}; text-align: center; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);"> 
-        <h2 style="margin:0; font-size:28px; font-weight:900; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-            <span style="display:inline-block; margin-right:8px;">${theme.icon}</span>EXCLUSIVE OFFERS FOR YOU!
-        </h2> 
-        
-        <div style="margin:12px 0; font-size:18px; font-weight:bold; color:#f8fafc; opacity: 0.9;">
-            👤 ${salesName} <span style="margin: 0 8px; opacity:0.5;">|</span> 📞 ${salesMobile}
+            <!-- Title -->
+            <h2 style="margin:0; font-size: 32px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase;">
+                🎉 EXCLUSIVE <span style="color: #FFC107;">OFFERS</span> FOR YOU! ✨
+            </h2> 
+            
+            <!-- Sales Executive Info -->
+            <div style="margin: 15px 0 20px 0; font-size: 16px; font-weight: 600; color: #e2e8f0; letter-spacing: 0.5px;">
+                <span style="display:inline-flex; align-items:center;">👤 <span style="margin-left:5px;">${salesName.toUpperCase()}</span></span> 
+                <span style="margin: 0 15px; opacity: 0.5;">|</span> 
+                <span style="display:inline-flex; align-items:center;">📞 <span style="margin-left:5px;">${salesMobile}</span></span>
+            </div>
+
+            <!-- Divider -->
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px; opacity: 0.8;">
+                <div style="height: 1px; background: #fff; width: 150px;"></div>
+                <div style="font-size: 14px; font-weight: bold; letter-spacing: 2px;">YOUR APPROVED ELIGIBILITY</div>
+                <div style="height: 1px; background: #fff; width: 150px;"></div>
+            </div>
+
+            <!-- Customer Eligibility Stats -->
+            <div style="display: flex; justify-content: center; gap: 30px; align-items: center; padding-right: 80px;">
+                <div style="text-align: left; display: flex; align-items: center; gap: 10px;">
+                    <div style="font-size: 30px;">💳</div>
+                    <div>
+                        <div style="font-size: 11px; color: #94a3b8; font-weight: bold; letter-spacing: 1px;">LIMIT</div>
+                        <div style="font-size: 18px; font-weight: 900; color: #34d399;">₹${c?.limit ? c.limit.toLocaleString() : 0}</div>
+                    </div>
+                </div>
+                <div style="width: 1px; height: 35px; background: rgba(255,255,255,0.2);"></div>
+                <div style="text-align: left; display: flex; align-items: center; gap: 10px;">
+                    <div style="font-size: 30px;">📈</div>
+                    <div>
+                        <div style="font-size: 11px; color: #94a3b8; font-weight: bold; letter-spacing: 1px;">MAX LTV</div>
+                        <div style="font-size: 18px; font-weight: 900; color: #fbbf24;">${ltvLimit}%</div>
+                    </div>
+                </div>
+                <div style="width: 1px; height: 35px; background: rgba(255,255,255,0.2);"></div>
+                <div style="text-align: left; display: flex; align-items: center; gap: 10px;">
+                    <div style="font-size: 30px;">🏷️</div>
+                    <div>
+                        <div style="font-size: 11px; color: #94a3b8; font-weight: bold; letter-spacing: 1px;">TYPE</div>
+                        <div style="font-size: 16px; font-weight: 900; color: #fff;">${c?.type || 'NEW'}</div>
+                    </div>
+                </div>
+            </div> 
         </div>
-
-        <div style="background: rgba(255,255,255,0.15); padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.3); display: inline-block;"> 
-            <span style="color:#a7f3d0; font-weight:900; font-size:16px; margin: 0 8px;">LIMIT: ₹${c?.limit || 0}</span> 
-            <span style="color:#fde047; font-weight:900; font-size:16px; margin: 0 8px;">LTV: ${ltvLimit}%</span> 
-            <span style="background: #fff; color: #333; padding:2px 10px; border-radius:12px; font-size:13px; font-weight:900; margin: 0 8px;">${c?.type || 'NEW'}</span> 
-            ${c?.cap ? `<span style="background: #fecaca; color: #991b1b; padding:2px 10px; border-radius:12px; font-size:13px; font-weight:900; margin: 0 8px;">CAP: ₹${c.cap}</span>` : ''} 
-        </div> 
-    </div>`;
+        <div style="padding: 20px;">
+    `;
 
     let hasV = false; 
     let productsToRender = window.tempImageGenIndices.map(idx => current_products[idx]);
@@ -1520,135 +1561,199 @@ function doGenerateCustomerImage() {
         hasV = true; 
         let invAmt = prod.inputs.inv > 0 ? prod.inputs.inv : prod.inputs.mrp;
 
-        let winDp = [...validS].sort((a,b) => a.dp - b.dp)[0]; 
-        let winEmi = [...validS].sort((a,b) => a.emi - b.emi)[0]; 
-        let winPop = [...validS].filter(s => s.roi === 0 || s.isFixed).sort((a,b) => a.dp - b.dp)[0] || validS[0]; 
-        let winBalance = [...validS].sort((a,b) => (a.dp + (a.emi * 2)) - (b.dp + (b.emi * 2)))[0] || validS[0]; 
+        // Logic to get exactly 3 unique top schemes for highlight cards
+        let sortedByDp = [...validS].sort((a,b) => a.dp - b.dp);
+        let winDp = sortedByDp[0];
         
-        let schemeMap = new Map(); 
-        validS.forEach(s => schemeMap.set(s.dIdx, { scheme: s, badges: [] }));
+        let remainingAfterDp = validS.filter(s => s.dIdx !== winDp.dIdx);
+        let sortedByEmi = [...remainingAfterDp].sort((a,b) => a.emi - b.emi);
+        let winEmi = sortedByEmi[0] || validS[1];
+        
+        let remainingAfterEmi = remainingAfterDp.filter(s => s.dIdx !== (winEmi ? winEmi.dIdx : -1));
+        let winPop = remainingAfterEmi.sort((a,b) => a.currentTenure - b.currentTenure)[0] || validS[2];
+        
+        let top3IDs = [winDp?.dIdx, winEmi?.dIdx, winPop?.dIdx].filter(Boolean);
+        let otherSchemes = validS.filter(s => !top3IDs.includes(s.dIdx)).sort((a,b) => a.dp - b.dp);
 
-        if (winDp) { let entry = schemeMap.get(winDp.dIdx); entry.badges.push("DP"); }
-        if (winEmi && !schemeMap.get(winEmi.dIdx).badges.includes("EMI")) { let entry = schemeMap.get(winEmi.dIdx); entry.badges.push("EMI"); }
-        if (winPop && !schemeMap.get(winPop.dIdx).badges.includes("POP")) { let entry = schemeMap.get(winPop.dIdx); entry.badges.push("POP"); }
-        if (winBalance && !schemeMap.get(winBalance.dIdx).badges.includes("BAL")) { let entry = schemeMap.get(winBalance.dIdx); entry.badges.push("BAL"); }
+        // Product Header
+        html += `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                    <div style="font-size: 32px;">📱</div>
+                    <div style="font-size: 20px; font-weight: 900; color: #021B5A; line-height: 1.2;">
+                        ${prod.name.toUpperCase()}
+                    </div>
+                </div>
+                <div style="background: #0D3A96; color: #fff; padding: 8px 20px; border-radius: 8px; text-align: center; box-shadow: 0 4px 6px rgba(13,58,150,0.3);">
+                    <div style="font-size: 10px; font-weight: bold; letter-spacing: 1px; opacity: 0.9;">INVOICE VALUE</div>
+                    <div style="font-size: 22px; font-weight: 900;">₹${invAmt.toLocaleString()}</div>
+                </div>
+            </div>
+        `;
 
-        let badgeDetails = {
-            "DP": { text: "LOWEST DP", bg: "#dcfce7", color: "#059669" },
-            "EMI": { text: "LOWEST EMI", bg: "#dbeafe", color: "#2563eb" },
-            "POP": { text: "TOP CHOICE", bg: "#fef3c7", color: "#d97706" },
-            "BAL": { text: "BEST VALUE", bg: "#f3e8ff", color: "#7c3aed" }
+        // Top 3 Scheme Cards
+        html += `<div style="display: flex; gap: 15px; margin-bottom: 20px;">`;
+        
+        const createCard = (schemeObj, badgeText, themeColor, bgLight, badgeBg) => {
+            if(!schemeObj) return `<div style="flex:1;"></div>`;
+            return `
+            <div style="flex: 1; background: ${bgLight}; border: 1px solid ${themeColor}40; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.03);">
+                <div style="font-size: 16px; font-weight: 900; color: ${themeColor};">${schemeObj.currentTenure}/${schemeObj.advEmi} SCHEME</div>
+                <div style="display: inline-block; background: ${badgeBg}; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 900; margin: 10px 0; box-shadow: 0 2px 4px ${themeColor}40;">
+                    ${badgeText}
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <div style="text-align: left;">
+                        <div style="font-size: 10px; color: #555; font-weight: bold;">DP <span style="font-size:8px;">(Down Payment)</span></div>
+                        <div style="font-size: 20px; font-weight: 900; color: #059669;">₹${Math.round(schemeObj.dp).toLocaleString()}</div>
+                    </div>
+                    <div style="width: 1px; height: 30px; background: #ddd;"></div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 10px; color: #555; font-weight: bold;">EMI <span style="font-size:8px;">(Monthly)</span></div>
+                        <div style="font-size: 20px; font-weight: 900; color: #2563eb;">₹${Math.round(schemeObj.emi).toLocaleString()}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding-top: 12px; border-top: 1px solid ${themeColor}30; font-size: 12px; font-weight: 800; color: #475569; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                    TENURE <span style="background: #fff; padding: 3px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">📅 ${schemeObj.inst} MONTHS</span>
+                </div>
+            </div>`;
         };
 
-        let badgedEntries = Array.from(schemeMap.values()).filter(e => e.badges.length > 0);
-        badgedEntries.sort((a, b) => b.badges.length - a.badges.length);
-        let top4Entries = badgedEntries.slice(0, 4);
-        let top4Schemes = top4Entries.map(e => e.scheme).sort((a, b) => a.dp - b.dp);
-        let topSchemeIDs = new Set(top4Schemes.map(s => s.dIdx));
+        html += createCard(winDp, '▼ LOWEST DP', '#059669', '#f0fdf4', '#10b981'); 
+        html += createCard(winEmi, '▼ LOWEST EMI', '#2563eb', '#eff6ff', '#3b82f6'); 
+        html += createCard(winPop, '★ TOP CHOICE', '#d97706', '#fffbeb', '#f59e0b'); 
+        
+        html += `</div>`;
 
-        let remainingSchemes = validS.filter(d => !topSchemeIDs.has(d.dIdx)).sort((a, b) => a.dp - b.dp);
-
-        // Top 4 Rows - Center Aligned
-        let top4RowsHtml = top4Entries.map((item, i) => {
-            let d = item.scheme;
-            let bHtml = item.badges.map(b => `
-                <span style="background:${badgeDetails[b].bg}; color:${badgeDetails[b].color}; font-size:10px; font-weight:800; padding:3px 8px; border-radius:12px; display:inline-block; letter-spacing:0.5px;">
-                    ${badgeDetails[b].text}
-                </span>
-            `).join('');
-
-            return `
-                <tr style="background:#ffffff; border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding:14px 10px; text-align:center;">
-                        <div style="font-size:18px; font-weight:900; color:#0f172a;">${d.currentTenure}/${d.advEmi}</div>
-                        <div style="margin-top:4px; display:flex; flex-wrap:wrap; justify-content:center; gap:4px;">${bHtml}</div>
-                    </td>
-                    <td style="padding:14px 4px; color:#059669; font-size:16px; font-weight:900; text-align:center;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding:14px 4px; color:#2563eb; font-size:16px; font-weight:900; text-align:center;">₹${Math.round(d.emi).toLocaleString()}</td>
-                    <td style="padding:14px 4px; font-size:16px; font-weight:900; color:#475569; text-align:center;">${d.inst}</td>
-                    <td style="padding:14px 10px; color:#ea580c; font-size:16px; font-weight:900; text-align:center;">₹${Math.round(d.daily).toLocaleString()}</td>
-                </tr>
-            `;
-        }).join('');
-
-        // Remaining Rows - Center Aligned
-        let remainingRowsHtml = "";
-        if (remainingSchemes.length > 0) {
-            remainingRowsHtml += `
-                <tr style="background:#f8fafc; border-bottom: 1px solid #e2e8f0;">
-                    <td colspan="5" style="padding:10px; font-size:12px; font-weight:800; color:#64748b; letter-spacing:1px; text-align:center;">
-                        — OTHER AVAILABLE SCHEMES —
-                    </td>
-                </tr>
-            `;
-            remainingRowsHtml += remainingSchemes.map((d, i) => `
-                <tr style="background:${i%2==0?'#ffffff':'#fcfcfc'}; border-bottom: 1px solid #f1f5f9;">
-                    <td style="padding:10px 10px; font-size:15px; font-weight:800; color:#334155; text-align:center;">${d.currentTenure}/${d.advEmi}</td>
-                    <td style="padding:10px 4px; color:#10b981; font-size:15px; font-weight:800; text-align:center;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding:10px 4px; color:#3b82f6; font-size:15px; font-weight:800; text-align:center;">₹${Math.round(d.emi).toLocaleString()}</td>
-                    <td style="padding:10px 4px; font-size:15px; font-weight:800; color:#64748b; text-align:center;">${d.inst}</td>
-                    <td style="padding:10px 10px; color:#ea580c; font-size:15px; font-weight:800; text-align:center;">₹${Math.round(d.daily).toLocaleString()}</td>
-                </tr>
-            `).join('');
-        }
-
-        // Product Box Container with Fixed Table Layout and Center Aligned Headers
+        // Best Value Banner
         html += `
-        <div style="margin-bottom:25px; border-radius: 12px; overflow: hidden; background:#ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
-            <div style="padding:16px 20px; background: #f1f5f9; border-bottom: 2px solid #cbd5e1; display: table; width: 100%; box-sizing: border-box;">
-                <div style="display: table-cell; vertical-align: middle; text-align: left;">
-                    <span style="font-size:20px; vertical-align: middle; margin-right: 8px;">📱</span>
-                    <h3 style="margin:0; display: inline-block; vertical-align: middle; color:#1e293b; font-size:18px; font-weight:900; letter-spacing:0.5px; line-height:1.2;">${prod.name}</h3>
+            <div style="background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 8px; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div style="color: #7c3aed; font-weight: 900; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size:20px;">💎</span> BEST VALUE FOR YOU
                 </div>
-                <div style="display: table-cell; vertical-align: middle; text-align: right; width: 30%;">
-                    <span style="background: #334155; color: #ffffff; padding: 6px 14px; border-radius: 8px; font-size:15px; font-weight:900; white-space:nowrap;">
-                        INV: ₹${invAmt.toLocaleString()}
-                    </span>
+                <div style="color: #475569; font-size: 12px; font-weight: 600;">
+                    Best combination of DP & EMI
+                </div>
+                <div style="color: #64748b; font-size: 11px; font-weight: 500;">
+                    Smart choice for premium benefits!
                 </div>
             </div>
-            <div style="padding: 0;">
-                <table style="width:100%; border-collapse:collapse; text-align:center; table-layout:fixed;">
-                    <thead style="background:#f8fafc;">
-                        <tr style="color:#64748b; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:1px; border-bottom: 2px solid #e2e8f0;">
-                            <th style="padding:12px 10px; text-align:center; width:28%;">SCHEME</th>
-                            <th style="padding:12px 4px; text-align:center; width:17%;">DP</th>
-                            <th style="padding:12px 4px; text-align:center; width:17%;">EMI</th>
-                            <th style="padding:12px 4px; text-align:center; width:13%;">M</th>
-                            <th style="padding:12px 10px; text-align:center; width:25%;">DAILY</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${top4RowsHtml}
-                        ${remainingRowsHtml}
-                    </tbody>
-                </table>
-            </div>
-        </div>`;
+        `;
+
+        // Other Schemes Table (Lists ALL remaining eligible schemes)
+        if(otherSchemes.length > 0) {
+            html += `
+                <div style="text-align: center; margin-bottom: 12px; font-size: 14px; font-weight: 800; color: #021B5A;">
+                    👇 इतर उपलब्ध पर्याय (OTHER SCHEMES) 👇
+                </div>
+                <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: center;">
+                        <thead style="background: #021B5A; color: #fff;">
+                            <tr>
+                                <th style="padding: 12px; font-size: 12px; letter-spacing: 0.5px;">SCHEME</th>
+                                <th style="padding: 12px; font-size: 12px; letter-spacing: 0.5px;">DP (DOWN PAYMENT)</th>
+                                <th style="padding: 12px; font-size: 12px; letter-spacing: 0.5px;">EMI (MONTHLY)</th>
+                                <th style="padding: 12px; font-size: 12px; letter-spacing: 0.5px;">TENURE (MONTHS)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Loop over all remaining schemes without truncation
+            otherSchemes.forEach((d, i) => {
+                html += `
+                    <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'}; border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 12px; font-weight: 800; color: #334155; font-size: 14px;">${d.currentTenure}/${d.advEmi}</td>
+                        <td style="padding: 12px; font-weight: 900; color: #059669; font-size: 14px;">₹${Math.round(d.dp).toLocaleString()}</td>
+                        <td style="padding: 12px; font-weight: 900; color: #2563eb; font-size: 14px;">₹${Math.round(d.emi).toLocaleString()}</td>
+                        <td style="padding: 12px; font-weight: 800; color: #475569; font-size: 14px; display:flex; align-items:center; justify-content:center; gap:6px;">📅 ${d.inst}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
     });
 
-    if(!hasV) { showToast("⚠️ Eligibility ke anusar koi Scheme nahi baith rahi hai!", "error"); return; }
+    if(!hasV) { showToast("⚠️ Eligibility नुसार कोणतीही Scheme बसत नाहीये!", "error"); return; }
 
-    html += `<div style="text-align:center; margin-top: 10px; color:#94a3b8; font-size: 13px; font-weight: bold; border-top: 1px dashed #cbd5e1; padding-top: 15px;">Generated securely via Persistent Portal</div>`;
-    quoteDiv.innerHTML = html; document.body.appendChild(quoteDiv);
+    // Footer Trust Badges & Watermark
+    html += `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-top: 10px;">
+                <div style="display:flex; align-items:center; gap:10px; flex:1;">
+                    <div style="font-size:28px; color:#10b981;">🛡️</div>
+                    <div><div style="font-size:11px; font-weight:900; color:#1e293b;">100% Secure</div><div style="font-size:9px; color:#64748b; font-weight:600;">Safe & Trusted</div></div>
+                </div>
+                <div style="width:1px; height:25px; background:#cbd5e1;"></div>
+                <div style="display:flex; align-items:center; gap:10px; flex:1; justify-content:center;">
+                    <div style="font-size:28px; color:#3b82f6;">⚡</div>
+                    <div><div style="font-size:11px; font-weight:900; color:#1e293b;">Instant Approval</div><div style="font-size:9px; color:#64748b; font-weight:600;">Quick Disbursal</div></div>
+                </div>
+                <div style="width:1px; height:25px; background:#cbd5e1;"></div>
+                <div style="display:flex; align-items:center; gap:10px; flex:1; justify-content:center;">
+                    <div style="font-size:28px; color:#8b5cf6;">%</div>
+                    <div><div style="font-size:11px; font-weight:900; color:#1e293b;">Best EMI Options</div><div style="font-size:9px; color:#64748b; font-weight:600;">Flexible Tenure</div></div>
+                </div>
+                <div style="width:1px; height:25px; background:#cbd5e1;"></div>
+                <div style="display:flex; align-items:center; gap:10px; flex:1; justify-content:flex-end;">
+                    <div style="font-size:28px; color:#f59e0b;">🎧</div>
+                    <div><div style="font-size:11px; font-weight:900; color:#1e293b;">24x7 Support</div><div style="font-size:9px; color:#64748b; font-weight:600;">Always here for you</div></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Persistent Portal Bottom Bar -->
+        <div style="background: #021B5A; color: #e2e8f0; text-align: center; padding: 12px; font-size: 13px; font-weight: 600; letter-spacing: 0.5px;">
+            🔒 Generated securely via <span style="color: #4ade80; font-weight: 800;">Persistent Portal</span>
+        </div>
+    </div>`;
+    
+    quoteDiv.innerHTML = html; 
+    document.body.appendChild(quoteDiv);
 
-    html2canvas(quoteDiv, {scale: 2}).then(canvas => { 
-        let imgDataUrl = canvas.toDataURL("image/png"); document.getElementById('generatedImage').src = imgDataUrl; document.getElementById('imageViewerModal').style.display = 'flex'; document.body.removeChild(quoteDiv); 
+    html2canvas(quoteDiv, {scale: 2, useCORS: true, backgroundColor: null}).then(canvas => { 
+        let imgDataUrl = canvas.toDataURL("image/png"); 
+        document.getElementById('generatedImage').src = imgDataUrl; 
+        document.getElementById('imageViewerModal').style.display = 'flex'; 
+        document.body.removeChild(quoteDiv); 
+        
         if(requestWhatsAppDispatch) {
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             if (isMobile) {
-                let a = document.createElement("a"); a.href = imgDataUrl; let safeName = c?.name !== "-" ? c.name.replace(/\s+/g, '_') : "Customer"; a.download = `Quotation_${safeName}.png`; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("✅ Image downloaded! WhatsApp opening...", "success");
+                let a = document.createElement("a"); 
+                a.href = imgDataUrl; 
+                let safeName = c?.name !== "-" ? c.name.replace(/\s+/g, '_') : "Customer"; 
+                a.download = `Quotation_${safeName}.png`; 
+                document.body.appendChild(a); 
+                a.click(); 
+                document.body.removeChild(a); 
+                showToast("✅ Image downloaded! WhatsApp opening...", "success");
                 setTimeout(() => { let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); }, 500);
             } else {
                 document.getElementById('clipboardStatusAlert').style.display = 'none';
                 canvas.toBlob(blob => {
-                    try { navigator.clipboard.write([ new ClipboardItem({ "image/png": blob }) ]).then(() => { document.getElementById('clipboardStatusAlert').style.display = 'block'; setTimeout(() => { let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); }, 500); }).catch(err => { showCustomAlert("📋 Long Press karke Copy Image karein."); let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); }); } 
-                    catch (e) { let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); }
+                    try { 
+                        navigator.clipboard.write([ new ClipboardItem({ "image/png": blob }) ]).then(() => { 
+                            document.getElementById('clipboardStatusAlert').style.display = 'block'; 
+                            setTimeout(() => { let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); }, 500); 
+                        }).catch(err => { 
+                            showCustomAlert("📋 Long Press karke Copy Image karein."); 
+                            let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); 
+                        }); 
+                    } catch (e) { 
+                        let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); 
+                    }
                 }, 'image/png');
             }
-        } else { document.getElementById('clipboardStatusAlert').style.display = 'none'; }
+        } else { 
+            document.getElementById('clipboardStatusAlert').style.display = 'none'; 
+        }
     });
 }
-
 /* === DEALER LINKS WITH STAR (FAVORITES) & SECURE DIRECT LINK FEATURE === */
 let showingOnlyStarred = false;
 
