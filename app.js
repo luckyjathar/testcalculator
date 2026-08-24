@@ -1466,7 +1466,7 @@ function getDailyTheme() {
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === FULLY RE-DESIGNED QUOTATION IMAGE GENERATOR (2x2 GRID, NO ICON, DAILY EMI ADDED) === */
+/* === FULLY RE-DESIGNED QUOTATION IMAGE GENERATOR (UPDATED COLUMNS & GREEN DAILY SAVE) === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
     quoteDiv.style.width = "780px";
@@ -1582,7 +1582,7 @@ function doGenerateCustomerImage() {
             { scheme: winEmi, badge: '▼ LOWEST EMI', color: '#2563eb', bgLight: '#eff6ff', badgeBg: '#3b82f6' },
             { scheme: winPop, badge: '★ TOP CHOICE', color: '#d97706', bgLight: '#fffbeb', badgeBg: '#f59e0b' },
             { scheme: winBal, badge: '💎 BEST VALUE', color: '#7c3aed', bgLight: '#f5f3ff', badgeBg: '#8b5cf6' }
-        ].filter(item => item.scheme); // Keep only defined schemes
+        ].filter(item => item.scheme);
 
         let otherSchemes = validS.filter(s => !top4IDs.includes(s.dIdx)).sort((a,b) => a.dp - b.dp);
 
@@ -1602,14 +1602,14 @@ function doGenerateCustomerImage() {
             </div>
         `;
 
-        // Top 4 Scheme Cards in 2x2 Grid
-        html += `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">`;
+        // Top 4 Scheme Cards in 2x2 Flex Layout
+        html += `<div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; justify-content: space-between;">`;
         
         const createCard = (item) => {
             if(!item) return ``;
             let s = item.scheme;
             return `
-            <div style="background: ${item.bgLight}; border: 1px solid ${item.color}40; border-radius: 12px; padding: 16px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.03);">
+            <div style="width: calc(50% - 8px); box-sizing: border-box; background: ${item.bgLight}; border: 1px solid ${item.color}40; border-radius: 12px; padding: 16px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.03); margin-bottom: 5px;">
                 <div style="font-size: 20px; font-weight: 900; color: ${item.color};">${s.currentTenure}/${s.advEmi} SCHEME</div>
                 <div style="display: inline-block; background: ${item.badgeBg}; color: #fff; padding: 6px 16px; border-radius: 4px; font-size: 13px; font-weight: 900; margin: 12px 0; box-shadow: 0 2px 4px ${item.color}40;">
                     ${item.badge}
@@ -1626,9 +1626,9 @@ function doGenerateCustomerImage() {
                     </div>
                 </div>
                 
-                <!-- Daily EMI Box -->
-                <div style="margin-top: 12px; font-size: 13px; font-weight: 900; color: #ea580c; background: #fff; border: 1px dashed #fdba74; border-radius: 6px; padding: 6px;">
-                    DAILY EMI: ₹${Math.round(s.daily).toLocaleString()}
+                <!-- Daily Save Box (Green Font) -->
+                <div style="margin-top: 15px; font-size: 13px; font-weight: 900; color: #059669; background: #f0fdf4; border: 1px dashed #34d399; border-radius: 6px; padding: 6px;">
+                    DAILY SAVE: ₹${Math.round(s.daily).toLocaleString()}
                 </div>
 
                 <!-- Updated Tenure Layout: Split Left & Right, NO Icon -->
@@ -1648,7 +1648,7 @@ function doGenerateCustomerImage() {
         
         html += `</div>`;
 
-        // Other Schemes Table
+        // Other Schemes Table (Updated Sequence & Green Daily Save)
         if(otherSchemes.length > 0) {
             html += `
                 <div style="text-align: center; margin-bottom: 15px; font-size: 18px; font-weight: 900; color: #021B5A;">
@@ -1661,8 +1661,8 @@ function doGenerateCustomerImage() {
                                 <th style="padding: 14px 10px; font-size: 14px; letter-spacing: 0.5px;">SCHEME</th>
                                 <th style="padding: 14px 10px; font-size: 14px; letter-spacing: 0.5px;">DP</th>
                                 <th style="padding: 14px 10px; font-size: 14px; letter-spacing: 0.5px;">EMI</th>
-                                <th style="padding: 14px 10px; font-size: 14px; letter-spacing: 0.5px;">DAILY</th>
                                 <th style="padding: 14px 10px; font-size: 14px; letter-spacing: 0.5px;">TENURE</th>
+                                <th style="padding: 14px 10px; font-size: 14px; letter-spacing: 0.5px;">DAILY SAVE</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1674,13 +1674,13 @@ function doGenerateCustomerImage() {
                         <td style="padding: 14px 10px; font-weight: 900; color: #334155; font-size: 16px;">${d.currentTenure}/${d.advEmi}</td>
                         <td style="padding: 14px 10px; font-weight: 900; color: #059669; font-size: 16px;">₹${Math.round(d.dp).toLocaleString()}</td>
                         <td style="padding: 14px 10px; font-weight: 900; color: #2563eb; font-size: 16px;">₹${Math.round(d.emi).toLocaleString()}</td>
-                        <td style="padding: 14px 10px; font-weight: 900; color: #ea580c; font-size: 16px;">₹${Math.round(d.daily).toLocaleString()}</td>
                         <td style="padding: 14px 10px; font-weight: 900; color: #475569; font-size: 16px;">
                             <div style="display:flex; flex-direction:column; align-items:center; line-height:1.1;">
                                 <span style="font-size:16px;">${d.inst}</span>
                                 <span style="font-size:9px;">MONTHS</span>
                             </div>
                         </td>
+                        <td style="padding: 14px 10px; font-weight: 900; color: #059669; font-size: 16px;">₹${Math.round(d.daily).toLocaleString()}</td>
                     </tr>
                 `;
             });
