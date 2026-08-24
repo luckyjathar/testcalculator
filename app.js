@@ -1466,7 +1466,7 @@ function getDailyTheme() {
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === FULLY RE-DESIGNED QUOTATION IMAGE GENERATOR (ALL ELIGIBLE SCHEMES) === */
+/* === FULLY RE-DESIGNED QUOTATION IMAGE GENERATOR (NO BANNER & LARGER FONTS) === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
     quoteDiv.style.width = "780px";
@@ -1575,46 +1575,46 @@ function doGenerateCustomerImage() {
         let top3IDs = [winDp?.dIdx, winEmi?.dIdx, winPop?.dIdx].filter(Boolean);
         let otherSchemes = validS.filter(s => !top3IDs.includes(s.dIdx)).sort((a,b) => a.dp - b.dp);
 
-        // Product Header
+        // Product Header (Bigger fonts)
         html += `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
                     <div style="font-size: 32px;">📱</div>
-                    <div style="font-size: 20px; font-weight: 900; color: #021B5A; line-height: 1.2;">
+                    <div style="font-size: 24px; font-weight: 900; color: #021B5A; line-height: 1.2;">
                         ${prod.name.toUpperCase()}
                     </div>
                 </div>
-                <div style="background: #0D3A96; color: #fff; padding: 8px 20px; border-radius: 8px; text-align: center; box-shadow: 0 4px 6px rgba(13,58,150,0.3);">
-                    <div style="font-size: 10px; font-weight: bold; letter-spacing: 1px; opacity: 0.9;">INVOICE VALUE</div>
-                    <div style="font-size: 22px; font-weight: 900;">₹${invAmt.toLocaleString()}</div>
+                <div style="background: #0D3A96; color: #fff; padding: 10px 24px; border-radius: 8px; text-align: center; box-shadow: 0 4px 6px rgba(13,58,150,0.3);">
+                    <div style="font-size: 11px; font-weight: bold; letter-spacing: 1px; opacity: 0.9;">INVOICE VALUE</div>
+                    <div style="font-size: 24px; font-weight: 900;">₹${invAmt.toLocaleString()}</div>
                 </div>
             </div>
         `;
 
-        // Top 3 Scheme Cards
-        html += `<div style="display: flex; gap: 15px; margin-bottom: 20px;">`;
+        // Top 3 Scheme Cards (Bigger fonts)
+        html += `<div style="display: flex; gap: 15px; margin-bottom: 25px;">`;
         
         const createCard = (schemeObj, badgeText, themeColor, bgLight, badgeBg) => {
             if(!schemeObj) return `<div style="flex:1;"></div>`;
             return `
-            <div style="flex: 1; background: ${bgLight}; border: 1px solid ${themeColor}40; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.03);">
-                <div style="font-size: 16px; font-weight: 900; color: ${themeColor};">${schemeObj.currentTenure}/${schemeObj.advEmi} SCHEME</div>
-                <div style="display: inline-block; background: ${badgeBg}; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 900; margin: 10px 0; box-shadow: 0 2px 4px ${themeColor}40;">
+            <div style="flex: 1; background: ${bgLight}; border: 1px solid ${themeColor}40; border-radius: 12px; padding: 18px 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.03);">
+                <div style="font-size: 18px; font-weight: 900; color: ${themeColor};">${schemeObj.currentTenure}/${schemeObj.advEmi} SCHEME</div>
+                <div style="display: inline-block; background: ${badgeBg}; color: #fff; padding: 5px 14px; border-radius: 4px; font-size: 13px; font-weight: 900; margin: 12px 0; box-shadow: 0 2px 4px ${themeColor}40;">
                     ${badgeText}
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
                     <div style="text-align: left;">
-                        <div style="font-size: 10px; color: #555; font-weight: bold;">DP <span style="font-size:8px;">(Down Payment)</span></div>
-                        <div style="font-size: 20px; font-weight: 900; color: #059669;">₹${Math.round(schemeObj.dp).toLocaleString()}</div>
+                        <div style="font-size: 12px; color: #555; font-weight: bold;">DP <span style="font-size:10px;">(Down)</span></div>
+                        <div style="font-size: 24px; font-weight: 900; color: #059669;">₹${Math.round(schemeObj.dp).toLocaleString()}</div>
                     </div>
-                    <div style="width: 1px; height: 30px; background: #ddd;"></div>
+                    <div style="width: 1px; height: 35px; background: #ddd;"></div>
                     <div style="text-align: right;">
-                        <div style="font-size: 10px; color: #555; font-weight: bold;">EMI <span style="font-size:8px;">(Monthly)</span></div>
-                        <div style="font-size: 20px; font-weight: 900; color: #2563eb;">₹${Math.round(schemeObj.emi).toLocaleString()}</div>
+                        <div style="font-size: 12px; color: #555; font-weight: bold;">EMI <span style="font-size:10px;">(Monthly)</span></div>
+                        <div style="font-size: 24px; font-weight: 900; color: #2563eb;">₹${Math.round(schemeObj.emi).toLocaleString()}</div>
                     </div>
                 </div>
-                <div style="margin-top: 15px; padding-top: 12px; border-top: 1px solid ${themeColor}30; font-size: 12px; font-weight: 800; color: #475569; display: flex; justify-content: center; align-items: center; gap: 8px;">
-                    TENURE <span style="background: #fff; padding: 3px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">📅 ${schemeObj.inst} MONTHS</span>
+                <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid ${themeColor}30; font-size: 14px; font-weight: 800; color: #475569; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                    TENURE <span style="background: #fff; padding: 4px 10px; border-radius: 4px; border: 1px solid #e2e8f0;">📅 ${schemeObj.inst} MONTHS</span>
                 </div>
             </div>`;
         };
@@ -1625,35 +1625,22 @@ function doGenerateCustomerImage() {
         
         html += `</div>`;
 
-        // Best Value Banner
-        html += `
-            <div style="background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 8px; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <div style="color: #7c3aed; font-weight: 900; font-size: 14px; display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size:20px;">💎</span> BEST VALUE FOR YOU
-                </div>
-                <div style="color: #475569; font-size: 12px; font-weight: 600;">
-                    Best combination of DP & EMI
-                </div>
-                <div style="color: #64748b; font-size: 11px; font-weight: 500;">
-                    Smart choice for premium benefits!
-                </div>
-            </div>
-        `;
+        // Best Value Banner is COMPLETELY REMOVED here as requested
 
-        // Other Schemes Table (Lists ALL remaining eligible schemes)
+        // Other Schemes Table (Bigger fonts)
         if(otherSchemes.length > 0) {
             html += `
-                <div style="text-align: center; margin-bottom: 12px; font-size: 14px; font-weight: 800; color: #021B5A;">
+                <div style="text-align: center; margin-bottom: 15px; font-size: 16px; font-weight: 900; color: #021B5A;">
                     👇 इतर उपलब्ध पर्याय (OTHER SCHEMES) 👇
                 </div>
                 <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
                     <table style="width: 100%; border-collapse: collapse; text-align: center;">
                         <thead style="background: #021B5A; color: #fff;">
                             <tr>
-                                <th style="padding: 12px; font-size: 12px; letter-spacing: 0.5px;">SCHEME</th>
-                                <th style="padding: 12px; font-size: 12px; letter-spacing: 0.5px;">DP (DOWN PAYMENT)</th>
-                                <th style="padding: 12px; font-size: 12px; letter-spacing: 0.5px;">EMI (MONTHLY)</th>
-                                <th style="padding: 12px; font-size: 12px; letter-spacing: 0.5px;">TENURE (MONTHS)</th>
+                                <th style="padding: 14px; font-size: 14px; letter-spacing: 0.5px;">SCHEME</th>
+                                <th style="padding: 14px; font-size: 14px; letter-spacing: 0.5px;">DP (DOWN PAYMENT)</th>
+                                <th style="padding: 14px; font-size: 14px; letter-spacing: 0.5px;">EMI (MONTHLY)</th>
+                                <th style="padding: 14px; font-size: 14px; letter-spacing: 0.5px;">TENURE (MONTHS)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1663,10 +1650,10 @@ function doGenerateCustomerImage() {
             otherSchemes.forEach((d, i) => {
                 html += `
                     <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'}; border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 12px; font-weight: 800; color: #334155; font-size: 14px;">${d.currentTenure}/${d.advEmi}</td>
-                        <td style="padding: 12px; font-weight: 900; color: #059669; font-size: 14px;">₹${Math.round(d.dp).toLocaleString()}</td>
-                        <td style="padding: 12px; font-weight: 900; color: #2563eb; font-size: 14px;">₹${Math.round(d.emi).toLocaleString()}</td>
-                        <td style="padding: 12px; font-weight: 800; color: #475569; font-size: 14px; display:flex; align-items:center; justify-content:center; gap:6px;">📅 ${d.inst}</td>
+                        <td style="padding: 14px; font-weight: 900; color: #334155; font-size: 16px;">${d.currentTenure}/${d.advEmi}</td>
+                        <td style="padding: 14px; font-weight: 900; color: #059669; font-size: 16px;">₹${Math.round(d.dp).toLocaleString()}</td>
+                        <td style="padding: 14px; font-weight: 900; color: #2563eb; font-size: 16px;">₹${Math.round(d.emi).toLocaleString()}</td>
+                        <td style="padding: 14px; font-weight: 900; color: #475569; font-size: 16px; display:flex; align-items:center; justify-content:center; gap:6px;">📅 ${d.inst}</td>
                     </tr>
                 `;
             });
