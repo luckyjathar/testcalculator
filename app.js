@@ -1466,7 +1466,7 @@ function getDailyTheme() {
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR (UPDATED HEADER) === */
+/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR (UPDATED) === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
     quoteDiv.style.width = "720px";
@@ -1480,36 +1480,27 @@ function doGenerateCustomerImage() {
     let c = customerQueue[activeCustomerIndex]; 
     let ltvLimit = c?.ltv || 100;
     
-    // सेल्समनचे अचूक डीफॉल्ट नाव आणि नंबर
-    let salesName = localStorage.getItem('portal_sales_name') || "LAKSHYA"; 
-    let salesMobile = localStorage.getItem('portal_sales_mobile') || "8087313624";
-    
-    // कस्टमरचे नाव आणि नंबर फेच करणे
-    let custName = c?.name && c.name !== "-" ? c.name.toUpperCase() : "VALUED CUSTOMER";
+    // Customer Name Formatting: Title Case (Capitalize 1st Word)
+    let rawName = c?.name && c.name !== "-" ? c.name : "Valued Customer";
+    let custName = rawName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
     let custMobile = c?.mobile && c.mobile !== "" ? c.mobile : "N/A";
 
-    // 1. Top Modern Gradient Header (Large Fonts & Full Rectangle Usage)
+    // 1. Top Modern Gradient Header (No Salesman Info, Large Fonts)
     let html = `
     <div style="background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid #e2e8f0;">
         
         <!-- Header Banner -->
-        <div style="background: linear-gradient(180deg, #095797 0%, #153e75 100%); padding: 26px 20px 26px 20px; color: #ffffff; text-align: center; border-radius: 16px 16px 0 0;">
-            <h2 style="margin:0; font-size: 32px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
+        <div style="background: linear-gradient(180deg, #095797 0%, #153e75 100%); padding: 30px 20px 30px 20px; color: #ffffff; text-align: center; border-radius: 16px 16px 0 0;">
+            <h2 style="margin: 0 0 24px 0; font-size: 32px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
                 🎉 EXCLUSIVE OFFERS FOR YOU!
             </h2> 
-            
-            <div style="margin: 16px 0 24px 0; font-size: 20px; font-weight: 900; color: #e2e8f0; letter-spacing: 1px; display: flex; justify-content: center; align-items: center; gap: 12px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
-                <span>👤 ${salesName.toUpperCase()}</span> 
-                <span style="color: #94a3b8;">|</span> 
-                <span>📞 ${salesMobile}</span>
-            </div>
 
             <!-- Approved Eligibility Container (Customer Info + Limits) -->
             <div style="display: block; width: 94%; margin: 0 auto; background: rgba(255, 255, 255, 0.08); border: 2px dashed rgba(255,255,255,0.4); border-radius: 12px; padding: 18px 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 
                 <!-- Customer Details -->
                 <div style="font-size: 20px; font-weight: 900; color: #ffffff; letter-spacing: 1px; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 12px; display: flex; justify-content: space-between; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
-                    <span>🧑 CUST: <span style="color: #bfdbfe;">${custName}</span></span>
+                    <span>🧑 Customer Name: <span style="color: #bfdbfe;">${custName}</span></span>
                     <span>📱 <span style="color: #bfdbfe;">${custMobile}</span></span>
                 </div>
 
@@ -1530,7 +1521,7 @@ function doGenerateCustomerImage() {
     let hasV = false; 
     let productsToRender = window.tempImageGenIndices.map(idx => current_products[idx]);
     
-    productsToRender.forEach((prod) => {
+    productsToRender.forEach((prod, index) => {
         let validS = prod.calculatedData.filter(d => { 
             let isLtvB = (d.curLTV > ltvLimit); 
             let isBoundB = false; 
@@ -1555,9 +1546,12 @@ function doGenerateCustomerImage() {
         let highlightIds = [winDp?.dIdx, winEmi?.dIdx].filter(Boolean);
         let otherSchemes = validS.filter(s => !highlightIds.includes(s.dIdx)).sort((a,b) => a.dp - b.dp);
 
+        // Adjust margin for the last product to fill the space till the bottom perfectly
+        let marginBottom = (index === productsToRender.length - 1) ? '0px' : '15px';
+
         // Product Card Frame
         html += `
-            <div style="border: 1px solid #dbeafe; border-radius: 12px; overflow: hidden; background: #ffffff; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); position: relative;">
+            <div style="border: 1px solid #dbeafe; border-radius: 12px; overflow: hidden; background: #ffffff; margin-bottom: ${marginBottom}; box-shadow: 0 2px 8px rgba(0,0,0,0.03); position: relative;">
                 
                 <!-- Left Decorative Highlight Bar -->
                 <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: #059669;"></div>
@@ -1663,11 +1657,8 @@ function doGenerateCustomerImage() {
         return; 
     }
 
-    // Clean Footer
+    // Completely removed the Persistent Portal Footer 
     html += `
-            <div style="text-align: center; font-size: 12px; font-weight: 700; color: #94a3b8; padding-top: 12px;">
-                Generated securely via Persistent Portal
-            </div>
         </div>
     </div>`;
     
