@@ -1466,7 +1466,7 @@ function getDailyTheme() {
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR (COMPACT HEADER) === */
+/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR (SINGLE UNIFIED TABLE) === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
     quoteDiv.style.width = "720px";
@@ -1489,7 +1489,7 @@ function doGenerateCustomerImage() {
     let html = `
     <div style="background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid #e2e8f0;">
         
-        <!-- Header Banner (Reduced Padding & Margins) -->
+        <!-- Header Banner -->
         <div style="background: linear-gradient(180deg, #095797 0%, #153e75 100%); padding: 18px 16px 20px 16px; color: #ffffff; text-align: center; border-radius: 16px 16px 0 0;">
             <h2 style="margin: 0 0 12px 0; font-size: 28px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
                 🎉 EXCLUSIVE OFFERS FOR YOU!
@@ -1546,20 +1546,19 @@ function doGenerateCustomerImage() {
         let highlightIds = [winDp?.dIdx, winEmi?.dIdx].filter(Boolean);
         let otherSchemes = validS.filter(s => !highlightIds.includes(s.dIdx)).sort((a,b) => a.dp - b.dp);
 
-        // Adjust margin for the last product to fill the space till the bottom perfectly
         let marginBottom = (index === productsToRender.length - 1) ? '0px' : '15px';
 
-        // Product Card Frame
+        // Product Card Frame (One Single Block)
         html += `
-            <div style="border: 1px solid #dbeafe; border-radius: 12px; overflow: hidden; background: #ffffff; margin-bottom: ${marginBottom}; box-shadow: 0 2px 8px rgba(0,0,0,0.03); position: relative;">
+            <div style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: #ffffff; margin-bottom: ${marginBottom}; box-shadow: 0 2px 8px rgba(0,0,0,0.03); position: relative;">
                 
-                <!-- Left Decorative Highlight Bar -->
-                <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: #059669;"></div>
+                <!-- Left Decorative Highlight Bar (Continuous) -->
+                <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: #059669; z-index: 10;"></div>
 
                 <!-- Product Title Header -->
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 18px 12px 18px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
-                    <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
-                        <span style="font-size: 22px;">📱</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 16px 24px; border-bottom: 1px solid #e2e8f0; background: #ffffff;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <span style="font-size: 24px;">📱</span>
                         <div style="font-size: 18px; font-weight: 900; color: #034887; line-height: 1.3;">
                             ${prod.name.toUpperCase()}
                         </div>
@@ -1570,11 +1569,11 @@ function doGenerateCustomerImage() {
                     </div>
                 </div>
 
-                <!-- Schemes Table (Increased Fonts) -->
+                <!-- Schemes Table (Single Unified Table) -->
                 <table style="width: 100%; border-collapse: collapse; text-align: center;">
-                    <thead style="background: #ffffff; color: #334155; border-bottom: 1px solid #e2e8f0;">
-                        <tr style="font-size: 15px; font-weight: 900; letter-spacing: 0.5px;">
-                            <th style="padding: 12px; width: 26%;">SCHEME</th>
+                    <thead style="background: #f8fafc; color: #1e293b; border-bottom: 1px solid #e2e8f0;">
+                        <tr style="font-size: 14px; font-weight: 900; letter-spacing: 0.5px;">
+                            <th style="padding: 12px 10px 12px 24px; width: 26%; text-align: center;">SCHEME</th>
                             <th style="padding: 12px; width: 20%;">DP</th>
                             <th style="padding: 12px; width: 22%;">EMI</th>
                             <th style="padding: 12px; width: 14%;">M</th>
@@ -1584,11 +1583,11 @@ function doGenerateCustomerImage() {
                     <tbody>
         `;
 
-        // 1. Highlighted Lowest DP Row (Extra Large Fonts)
+        // 1. Highlighted Lowest DP Row
         if (winDp) {
             html += `
                 <tr style="background: #f0fdf4; border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 16px 10px; text-align: center; border-left: 6px solid #059669;">
+                    <td style="padding: 16px 10px 16px 24px; text-align: center;">
                         <div style="font-size: 18px; font-weight: 900; color: #0f172a;">${winDp.currentTenure}/${winDp.advEmi}</div>
                         <div style="display: flex; flex-direction: column; gap: 4px; align-items: center; margin-top: 8px;">
                             <span style="background: #059669; color: white; font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">▼ LOWEST DP</span>
@@ -1604,11 +1603,11 @@ function doGenerateCustomerImage() {
             `;
         }
 
-        // 2. Highlighted Lowest EMI Row (Extra Large Fonts)
+        // 2. Highlighted Lowest EMI Row
         if (winEmi && winEmi.dIdx !== winDp.dIdx) {
             html += `
                 <tr style="background: #eff6ff; border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 16px 10px; text-align: center; border-left: 6px solid #2563eb;">
+                    <td style="padding: 16px 10px 16px 24px; text-align: center;">
                         <div style="font-size: 18px; font-weight: 900; color: #0f172a;">${winEmi.currentTenure}/${winEmi.advEmi}</div>
                         <div style="display: flex; flex-direction: column; gap: 4px; align-items: center; margin-top: 8px;">
                             <span style="background: #2563eb; color: white; font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">▼ LOWEST EMI</span>
@@ -1622,29 +1621,21 @@ function doGenerateCustomerImage() {
             `;
         }
 
-        // 3. Other Available Schemes Divider
-        if (otherSchemes.length > 0) {
+        // 3. Other Schemes Rows (No Divider Row, seamless integration)
+        otherSchemes.forEach((d, i) => {
+            let isLast = (i === otherSchemes.length - 1);
+            let bBorder = isLast ? 'none' : '1px solid #e2e8f0';
+            
             html += `
-                <tr style="background: #f8fafc; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
-                    <td colspan="5" style="padding: 12px; font-size: 15px; font-weight: 900; color: #64748b; letter-spacing: 0.5px;">
-                        👇 OTHER AVAILABLE SCHEMES 👇
-                    </td>
+                <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'}; border-bottom: ${bBorder};">
+                    <td style="padding: 14px 10px 14px 24px; font-size: 17px; font-weight: 900; color: #334155; text-align: center;">${d.currentTenure}/${d.advEmi}</td>
+                    <td style="padding: 14px 10px; font-size: 19px; font-weight: 900; color: #059669;">₹${Math.round(d.dp).toLocaleString()}</td>
+                    <td style="padding: 14px 10px; font-size: 19px; font-weight: 900; color: #095797;">₹${Math.round(d.emi).toLocaleString()}</td>
+                    <td style="padding: 14px 10px; font-size: 17px; font-weight: 900; color: #334155;">${d.inst}</td>
+                    <td style="padding: 14px 10px; font-size: 18px; font-weight: 900; color: #ea580c;">₹${Math.round(d.daily).toLocaleString()}</td>
                 </tr>
             `;
-
-            // Other Schemes Rows (Increased Fonts)
-            otherSchemes.forEach((d, i) => {
-                html += `
-                    <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#fcfdfe'}; border-bottom: 1px solid #f1f5f9;">
-                        <td style="padding: 14px 10px; font-size: 17px; font-weight: 900; color: #334155;">${d.currentTenure}/${d.advEmi}</td>
-                        <td style="padding: 14px 10px; font-size: 19px; font-weight: 900; color: #059669;">₹${Math.round(d.dp).toLocaleString()}</td>
-                        <td style="padding: 14px 10px; font-size: 19px; font-weight: 900; color: #095797;">₹${Math.round(d.emi).toLocaleString()}</td>
-                        <td style="padding: 14px 10px; font-size: 17px; font-weight: 900; color: #334155;">${d.inst}</td>
-                        <td style="padding: 14px 10px; font-size: 18px; font-weight: 900; color: #ea580c;">₹${Math.round(d.daily).toLocaleString()}</td>
-                    </tr>
-                `;
-            });
-        }
+        });
 
         html += `
                     </tbody>
