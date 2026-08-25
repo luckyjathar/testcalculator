@@ -1466,10 +1466,10 @@ function getDailyTheme() {
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR (UNIFIED HUGE FONTS & PRO BORDER) === */
+/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR (NO OUTER BOX, BLUE LINE, MASSIVE FONTS) === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
-    quoteDiv.style.width = "720px";
+    quoteDiv.style.width = "780px"; /* रुंदी थोडी वाढवली जेणेकरून मोठे फॉन्ट छान बसतील */
     quoteDiv.style.padding = "16px"; 
     quoteDiv.style.background = "#f8fafc"; 
     quoteDiv.style.position = "absolute"; 
@@ -1490,22 +1490,22 @@ function doGenerateCustomerImage() {
     <div style="background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid #e2e8f0;">
         
         <!-- Header Banner -->
-        <div style="background: linear-gradient(180deg, #095797 0%, #153e75 100%); padding: 18px 16px 20px 16px; color: #ffffff; text-align: center; border-radius: 16px 16px 0 0;">
-            <h2 style="margin: 0 0 12px 0; font-size: 28px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
+        <div style="background: linear-gradient(180deg, #095797 0%, #153e75 100%); padding: 20px 16px 22px 16px; color: #ffffff; text-align: center; border-radius: 16px 16px 0 0;">
+            <h2 style="margin: 0 0 14px 0; font-size: 30px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
                 🎉 EXCLUSIVE OFFERS FOR YOU!
             </h2> 
 
             <!-- Approved Eligibility Container -->
-            <div style="display: block; width: 96%; margin: 0 auto; background: rgba(255, 255, 255, 0.08); border: 2px dashed rgba(255,255,255,0.4); border-radius: 10px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="display: block; width: 96%; margin: 0 auto; background: rgba(255, 255, 255, 0.08); border: 2px dashed rgba(255,255,255,0.4); border-radius: 10px; padding: 14px 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                 
                 <!-- Customer Details -->
-                <div style="font-size: 19px; font-weight: 900; color: #ffffff; letter-spacing: 0.5px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; display: flex; justify-content: space-between; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
+                <div style="font-size: 21px; font-weight: 900; color: #ffffff; letter-spacing: 0.5px; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; display: flex; justify-content: space-between; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
                     <span>🧑 Customer Name: <span style="color: #bfdbfe;">${custName}</span></span>
                     <span>📱 <span style="color: #bfdbfe;">${custMobile}</span></span>
                 </div>
 
                 <!-- Eligibility Details -->
-                <div style="display: flex; gap: 16px; font-size: 22px; font-weight: 900; align-items: center; justify-content: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                <div style="display: flex; gap: 18px; font-size: 24px; font-weight: 900; align-items: center; justify-content: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
                     <span>LIMIT: <b style="color: #34d399;">₹${c?.limit ? c.limit.toLocaleString() : 0}</b></span>
                     <span style="opacity: 0.5;">|</span>
                     <span>MAX LTV: <b style="color: #facc15;">${ltvLimit}%</b></span>
@@ -1515,7 +1515,7 @@ function doGenerateCustomerImage() {
             </div>
         </div>
 
-        <div style="padding: 16px;">
+        <div style="padding: 20px;">
     `;
 
     let hasV = false; 
@@ -1546,41 +1546,45 @@ function doGenerateCustomerImage() {
         let highlightIds = [winDp?.dIdx, winEmi?.dIdx].filter(Boolean);
         let otherSchemes = validS.filter(s => !highlightIds.includes(s.dIdx)).sort((a,b) => a.dp - b.dp);
 
-        // Combine all schemes into one array for a single continuous loop
+        // Combine all schemes into one array
         let allSchemes = [];
         if (winDp) allSchemes.push({ ...winDp, isWinDp: true });
         if (winEmi && (!winDp || winEmi.dIdx !== winDp.dIdx)) allSchemes.push({ ...winEmi, isWinEmi: true });
         otherSchemes.forEach(s => allSchemes.push(s));
 
-        let marginBottom = (index === productsToRender.length - 1) ? '0px' : '15px';
+        let marginBottom = (index === productsToRender.length - 1) ? '0px' : '20px';
 
-        // Product Card Frame (Green Line integrated perfectly into the left border)
+        /* 
+           Product Card Frame 
+           बाहेरची करडी लाईन (Border) काढून टाकली आहे. 
+           फक्त डावीकडे जाड निळी (Blue) लाईन आणि हलकी शॅडो ठेवली आहे. 
+        */
         html += `
-            <div style="border: 1px solid #cbd5e1; border-left: 8px solid #059669; border-radius: 12px; overflow: hidden; background: #ffffff; margin-bottom: ${marginBottom}; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
+            <div style="border-left: 12px solid #034887; background: #ffffff; margin-bottom: ${marginBottom}; box-shadow: 0 4px 15px rgba(0,0,0,0.06);">
                 
                 <!-- Product Title Header -->
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 18px 20px 16px 20px; border-bottom: 1px solid #e2e8f0; background: #ffffff;">
-                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                        <span style="font-size: 26px;">📱</span>
-                        <div style="font-size: 20px; font-weight: 900; color: #034887; line-height: 1.3;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 22px 20px 20px 20px; border-bottom: 2px solid #e2e8f0; background: #ffffff;">
+                    <div style="display: flex; align-items: center; gap: 14px; flex: 1;">
+                        <span style="font-size: 32px;">📱</span>
+                        <div style="font-size: 24px; font-weight: 900; color: #034887; line-height: 1.3;">
                             ${prod.name.toUpperCase()}
                         </div>
                     </div>
-                    <div style="background: #034887; color: #fff; padding: 8px 18px; border-radius: 8px; text-align: center; min-width: 110px; box-shadow: 0 2px 6px rgba(3,72,135,0.3);">
-                        <div style="font-size: 11px; font-weight: 800; color: #93c5fd; letter-spacing: 0.5px;">INV VALUE</div>
-                        <div style="font-size: 18px; font-weight: 900;">₹${invAmt.toLocaleString()}</div>
+                    <div style="background: #034887; color: #fff; padding: 10px 20px; border-radius: 8px; text-align: center; min-width: 120px; box-shadow: 0 3px 8px rgba(3,72,135,0.3);">
+                        <div style="font-size: 12px; font-weight: 800; color: #93c5fd; letter-spacing: 0.5px;">INV VALUE</div>
+                        <div style="font-size: 22px; font-weight: 900;">₹${invAmt.toLocaleString()}</div>
                     </div>
                 </div>
 
-                <!-- SINGLE UNIFIED SCHEMES TABLE (Uniform Large Fonts) -->
+                <!-- SINGLE UNIFIED SCHEMES TABLE (Massive Fonts) -->
                 <table style="width: 100%; border-collapse: collapse; text-align: center;">
-                    <thead style="background: #f8fafc; color: #334155; border-bottom: 2px solid #e2e8f0;">
-                        <tr style="font-size: 16px; font-weight: 900; letter-spacing: 0.5px;">
-                            <th style="padding: 14px 10px; width: 26%;">SCHEME</th>
-                            <th style="padding: 14px 10px; width: 20%;">DP</th>
-                            <th style="padding: 14px 10px; width: 22%;">EMI</th>
-                            <th style="padding: 14px 10px; width: 14%;">M</th>
-                            <th style="padding: 14px 10px; width: 18%;">DAILY</th>
+                    <thead style="background: #f8fafc; color: #334155; border-bottom: 2px solid #cbd5e1;">
+                        <tr style="font-size: 18px; font-weight: 900; letter-spacing: 0.5px;">
+                            <th style="padding: 16px 10px; width: 26%;">SCHEME</th>
+                            <th style="padding: 16px 10px; width: 20%;">DP</th>
+                            <th style="padding: 16px 10px; width: 22%;">EMI</th>
+                            <th style="padding: 16px 10px; width: 14%;">M</th>
+                            <th style="padding: 16px 10px; width: 18%;">DAILY</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1595,25 +1599,25 @@ function doGenerateCustomerImage() {
             // Build badges if applicable
             let badges = [];
             if (d.isWinDp) {
-                badges.push('<span style="background: #059669; color: white; font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; width: 85%;">▼ LOWEST DP</span>');
-                badges.push('<span style="background: #d97706; color: white; font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; width: 85%;">★ TOP CHOICE</span>');
-                badges.push('<span style="background: #7c3aed; color: white; font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; width: 85%;">✦ BEST VALUE</span>');
+                badges.push('<span style="background: #059669; color: white; font-size: 13px; font-weight: 900; padding: 5px 12px; border-radius: 6px; width: 85%;">▼ LOWEST DP</span>');
+                badges.push('<span style="background: #d97706; color: white; font-size: 13px; font-weight: 900; padding: 5px 12px; border-radius: 6px; width: 85%;">★ TOP CHOICE</span>');
+                badges.push('<span style="background: #7c3aed; color: white; font-size: 13px; font-weight: 900; padding: 5px 12px; border-radius: 6px; width: 85%;">✦ BEST VALUE</span>');
             } else if (d.isWinEmi) {
-                badges.push('<span style="background: #2563eb; color: white; font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; width: 85%;">▼ LOWEST EMI</span>');
+                badges.push('<span style="background: #2563eb; color: white; font-size: 13px; font-weight: 900; padding: 5px 12px; border-radius: 6px; width: 85%;">▼ LOWEST EMI</span>');
             }
             let badgeHtml = badges.length > 0 ? `<div style="display: flex; flex-direction: column; gap: 4px; align-items: center; margin-top: 8px;">${badges.join('')}</div>` : '';
 
-            // Render Row with UNIFORM 26px FONT SIZE across all columns and rows
+            // Render Row with UNIFORM 30px FONT SIZE across all columns and rows
             html += `
                 <tr style="background: ${bgCol}; border-bottom: ${bBorder};">
-                    <td style="padding: 18px 10px; text-align: center;">
-                        <div style="font-size: 26px; font-weight: 900; color: #0f172a;">${d.currentTenure}/${d.advEmi}</div>
+                    <td style="padding: 22px 10px; text-align: center;">
+                        <div style="font-size: 30px; font-weight: 900; color: #0f172a;">${d.currentTenure}/${d.advEmi}</div>
                         ${badgeHtml}
                     </td>
-                    <td style="padding: 18px 10px; font-size: 26px; font-weight: 900; color: #059669;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding: 18px 10px; font-size: 26px; font-weight: 900; color: #095797;">₹${Math.round(d.emi).toLocaleString()}</td>
-                    <td style="padding: 18px 10px; font-size: 26px; font-weight: 900; color: #1e293b;">${d.inst}</td>
-                    <td style="padding: 18px 10px; font-size: 26px; font-weight: 900; color: #ea580c;">₹${Math.round(d.daily).toLocaleString()}</td>
+                    <td style="padding: 22px 10px; font-size: 30px; font-weight: 900; color: #059669;">₹${Math.round(d.dp).toLocaleString()}</td>
+                    <td style="padding: 22px 10px; font-size: 30px; font-weight: 900; color: #095797;">₹${Math.round(d.emi).toLocaleString()}</td>
+                    <td style="padding: 22px 10px; font-size: 30px; font-weight: 900; color: #1e293b;">${d.inst}</td>
+                    <td style="padding: 22px 10px; font-size: 30px; font-weight: 900; color: #ea580c;">₹${Math.round(d.daily).toLocaleString()}</td>
                 </tr>
             `;
         });
