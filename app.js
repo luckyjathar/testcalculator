@@ -1466,7 +1466,7 @@ function getDailyTheme() {
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR (UPDATED) === */
+/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR (LARGER TABLE FONTS) === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
     quoteDiv.style.width = "720px";
@@ -1570,10 +1570,10 @@ function doGenerateCustomerImage() {
                     </div>
                 </div>
 
-                <!-- Schemes Table -->
-                <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px;">
+                <!-- Schemes Table (Increased Fonts) -->
+                <table style="width: 100%; border-collapse: collapse; text-align: center;">
                     <thead style="background: #ffffff; color: #334155; border-bottom: 1px solid #e2e8f0;">
-                        <tr style="font-size: 13px; font-weight: 900; letter-spacing: 0.5px;">
+                        <tr style="font-size: 15px; font-weight: 900; letter-spacing: 0.5px;">
                             <th style="padding: 12px; width: 26%;">SCHEME</th>
                             <th style="padding: 12px; width: 20%;">DP</th>
                             <th style="padding: 12px; width: 22%;">EMI</th>
@@ -1584,40 +1584,40 @@ function doGenerateCustomerImage() {
                     <tbody>
         `;
 
-        // 1. Highlighted Lowest DP Row
+        // 1. Highlighted Lowest DP Row (Extra Large Fonts)
         if (winDp) {
             html += `
                 <tr style="background: #f0fdf4; border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 14px 10px; text-align: center; border-left: 6px solid #059669;">
-                        <div style="font-size: 16px; font-weight: 900; color: #0f172a;">${winDp.currentTenure}/${winDp.advEmi}</div>
-                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center; margin-top: 6px;">
-                            <span style="background: #059669; color: white; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">▼ LOWEST DP</span>
-                            <span style="background: #d97706; color: white; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">★ TOP CHOICE</span>
-                            <span style="background: #7c3aed; color: white; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">✦ BEST VALUE</span>
+                    <td style="padding: 16px 10px; text-align: center; border-left: 6px solid #059669;">
+                        <div style="font-size: 18px; font-weight: 900; color: #0f172a;">${winDp.currentTenure}/${winDp.advEmi}</div>
+                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center; margin-top: 8px;">
+                            <span style="background: #059669; color: white; font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">▼ LOWEST DP</span>
+                            <span style="background: #d97706; color: white; font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">★ TOP CHOICE</span>
+                            <span style="background: #7c3aed; color: white; font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">✦ BEST VALUE</span>
                         </div>
                     </td>
-                    <td style="padding: 14px 10px; font-size: 20px; font-weight: 900; color: #059669;">₹${Math.round(winDp.dp).toLocaleString()}</td>
-                    <td style="padding: 14px 10px; font-size: 20px; font-weight: 900; color: #095797;">₹${Math.round(winDp.emi).toLocaleString()}</td>
-                    <td style="padding: 14px 10px; font-size: 17px; font-weight: 900; color: #1e293b;">${winDp.inst}</td>
-                    <td style="padding: 14px 10px; font-size: 19px; font-weight: 900; color: #ea580c;">₹${Math.round(winDp.daily).toLocaleString()}</td>
+                    <td style="padding: 16px 10px; font-size: 22px; font-weight: 900; color: #059669;">₹${Math.round(winDp.dp).toLocaleString()}</td>
+                    <td style="padding: 16px 10px; font-size: 22px; font-weight: 900; color: #095797;">₹${Math.round(winDp.emi).toLocaleString()}</td>
+                    <td style="padding: 16px 10px; font-size: 19px; font-weight: 900; color: #1e293b;">${winDp.inst}</td>
+                    <td style="padding: 16px 10px; font-size: 21px; font-weight: 900; color: #ea580c;">₹${Math.round(winDp.daily).toLocaleString()}</td>
                 </tr>
             `;
         }
 
-        // 2. Highlighted Lowest EMI Row
+        // 2. Highlighted Lowest EMI Row (Extra Large Fonts)
         if (winEmi && winEmi.dIdx !== winDp.dIdx) {
             html += `
                 <tr style="background: #eff6ff; border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 14px 10px; text-align: center; border-left: 6px solid #2563eb;">
-                        <div style="font-size: 16px; font-weight: 900; color: #0f172a;">${winEmi.currentTenure}/${winEmi.advEmi}</div>
-                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center; margin-top: 6px;">
-                            <span style="background: #2563eb; color: white; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">▼ LOWEST EMI</span>
+                    <td style="padding: 16px 10px; text-align: center; border-left: 6px solid #2563eb;">
+                        <div style="font-size: 18px; font-weight: 900; color: #0f172a;">${winEmi.currentTenure}/${winEmi.advEmi}</div>
+                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center; margin-top: 8px;">
+                            <span style="background: #2563eb; color: white; font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">▼ LOWEST EMI</span>
                         </div>
                     </td>
-                    <td style="padding: 14px 10px; font-size: 20px; font-weight: 900; color: #059669;">₹${Math.round(winEmi.dp).toLocaleString()}</td>
-                    <td style="padding: 14px 10px; font-size: 20px; font-weight: 900; color: #095797;">₹${Math.round(winEmi.emi).toLocaleString()}</td>
-                    <td style="padding: 14px 10px; font-size: 17px; font-weight: 900; color: #1e293b;">${winEmi.inst}</td>
-                    <td style="padding: 14px 10px; font-size: 19px; font-weight: 900; color: #ea580c;">₹${Math.round(winEmi.daily).toLocaleString()}</td>
+                    <td style="padding: 16px 10px; font-size: 22px; font-weight: 900; color: #059669;">₹${Math.round(winEmi.dp).toLocaleString()}</td>
+                    <td style="padding: 16px 10px; font-size: 22px; font-weight: 900; color: #095797;">₹${Math.round(winEmi.emi).toLocaleString()}</td>
+                    <td style="padding: 16px 10px; font-size: 19px; font-weight: 900; color: #1e293b;">${winEmi.inst}</td>
+                    <td style="padding: 16px 10px; font-size: 21px; font-weight: 900; color: #ea580c;">₹${Math.round(winEmi.daily).toLocaleString()}</td>
                 </tr>
             `;
         }
@@ -1626,20 +1626,21 @@ function doGenerateCustomerImage() {
         if (otherSchemes.length > 0) {
             html += `
                 <tr style="background: #f8fafc; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
-                    <td colspan="5" style="padding: 10px; font-size: 13px; font-weight: 900; color: #64748b; letter-spacing: 0.5px;">
+                    <td colspan="5" style="padding: 12px; font-size: 15px; font-weight: 900; color: #64748b; letter-spacing: 0.5px;">
                         👇 OTHER AVAILABLE SCHEMES 👇
                     </td>
                 </tr>
             `;
 
+            // Other Schemes Rows (Increased Fonts)
             otherSchemes.forEach((d, i) => {
                 html += `
                     <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#fcfdfe'}; border-bottom: 1px solid #f1f5f9;">
-                        <td style="padding: 12px 10px; font-size: 15px; font-weight: 900; color: #334155;">${d.currentTenure}/${d.advEmi}</td>
-                        <td style="padding: 12px 10px; font-size: 17px; font-weight: 900; color: #059669;">₹${Math.round(d.dp).toLocaleString()}</td>
-                        <td style="padding: 12px 10px; font-size: 17px; font-weight: 900; color: #095797;">₹${Math.round(d.emi).toLocaleString()}</td>
-                        <td style="padding: 12px 10px; font-size: 15px; font-weight: 900; color: #334155;">${d.inst}</td>
-                        <td style="padding: 12px 10px; font-size: 16px; font-weight: 900; color: #ea580c;">₹${Math.round(d.daily).toLocaleString()}</td>
+                        <td style="padding: 14px 10px; font-size: 17px; font-weight: 900; color: #334155;">${d.currentTenure}/${d.advEmi}</td>
+                        <td style="padding: 14px 10px; font-size: 19px; font-weight: 900; color: #059669;">₹${Math.round(d.dp).toLocaleString()}</td>
+                        <td style="padding: 14px 10px; font-size: 19px; font-weight: 900; color: #095797;">₹${Math.round(d.emi).toLocaleString()}</td>
+                        <td style="padding: 14px 10px; font-size: 17px; font-weight: 900; color: #334155;">${d.inst}</td>
+                        <td style="padding: 14px 10px; font-size: 18px; font-weight: 900; color: #ea580c;">₹${Math.round(d.daily).toLocaleString()}</td>
                     </tr>
                 `;
             });
