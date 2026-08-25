@@ -1466,82 +1466,53 @@ function getDailyTheme() {
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === FULLY RE-DESIGNED QUOTATION IMAGE GENERATOR (UPDATED COLUMNS & GREEN DAILY SAVE) === */
+/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
-    quoteDiv.style.width = "780px";
-    quoteDiv.style.padding = "15px"; 
-    quoteDiv.style.background = "#f0f2f5"; 
+    quoteDiv.style.width = "720px";
+    quoteDiv.style.padding = "16px"; 
+    quoteDiv.style.background = "#f8fafc"; 
     quoteDiv.style.position = "absolute"; 
     quoteDiv.style.top = "-9999px"; 
     quoteDiv.style.boxSizing = "border-box";
-    quoteDiv.style.fontFamily = "'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+    quoteDiv.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
 
     let c = customerQueue[activeCustomerIndex]; 
     let ltvLimit = c?.ltv || 100;
     
-    let salesName = localStorage.getItem('portal_sales_name') || "SALES EXECUTIVE"; 
-    let salesMobile = localStorage.getItem('portal_sales_mobile') || "0000000000";
+    let salesName = localStorage.getItem('portal_sales_name') || "RESHMA SOLKAR"; 
+    let salesMobile = localStorage.getItem('portal_sales_mobile') || "8087231243";
 
-    // 1. Header Section
+    // 1. Top Modern Gradient Header
     let html = `
-    <div style="background: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden;">
-        <div style="background: linear-gradient(135deg, #021B5A 0%, #0D3A96 100%); padding: 25px 20px 20px 20px; color: #fff; position: relative; text-align: center;">
-            
-            <!-- 100% Approved Badge -->
-            <div style="position: absolute; right: 25px; top: 15px; width: 110px; height: 110px; background: linear-gradient(135deg, #ffd700, #b8860b); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 4px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 10;">
-                <div style="position:absolute; width:100%; height:100%; border-radius:50%; border:2px dashed rgba(255,255,255,0.5);"></div>
-                <div style="font-size: 26px; font-weight: 900; color: #021B5A; line-height: 1.1; margin-top:5px;">100%</div>
-                <div style="font-size: 11px; font-weight: 800; color: #fff; background: #021B5A; padding: 2px 8px; border-radius: 10px; margin-top: 2px; letter-spacing: 0.5px;">APPROVED</div>
-            </div>
-
-            <!-- Title -->
-            <h2 style="margin:0; font-size: 34px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase;">
-                🎉 EXCLUSIVE <span style="color: #FFC107;">OFFERS</span> FOR YOU! ✨
+    <div style="background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid #e2e8f0;">
+        
+        <!-- Header Banner -->
+        <div style="background: linear-gradient(180deg, #095797 0%, #153e75 100%); padding: 22px 20px 18px 20px; color: #ffffff; text-align: center; border-radius: 16px 16px 0 0;">
+            <h2 style="margin:0; font-size: 26px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase;">
+                🎉 EXCLUSIVE OFFERS FOR YOU!
             </h2> 
             
-            <!-- Sales Executive Info -->
-            <div style="margin: 15px 0 20px 0; font-size: 18px; font-weight: 600; color: #e2e8f0; letter-spacing: 0.5px;">
-                <span style="display:inline-flex; align-items:center;">👤 <span style="margin-left:5px;">${salesName.toUpperCase()}</span></span> 
-                <span style="margin: 0 15px; opacity: 0.5;">|</span> 
-                <span style="display:inline-flex; align-items:center;">📞 <span style="margin-left:5px;">${salesMobile}</span></span>
+            <div style="margin: 10px 0 14px 0; font-size: 15px; font-weight: 800; color: #cbd5e1; letter-spacing: 0.5px; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                <span>👤 ${salesName.toUpperCase()}</span> 
+                <span>|</span> 
+                <span>📞 ${salesMobile}</span>
             </div>
 
-            <!-- Divider -->
-            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px; opacity: 0.8;">
-                <div style="height: 1px; background: #fff; width: 150px;"></div>
-                <div style="font-size: 14px; font-weight: bold; letter-spacing: 2px;">YOUR APPROVED ELIGIBILITY</div>
-                <div style="height: 1px; background: #fff; width: 150px;"></div>
+            <!-- Approved Eligibility Container -->
+            <div style="display: inline-block; background: rgba(255, 255, 255, 0.08); border: 1px dashed rgba(255,255,255,0.3); border-radius: 10px; padding: 10px 24px;">
+                <div style="font-size: 11px; font-weight: 800; color: #94a3b8; letter-spacing: 1.5px; margin-bottom: 4px;">YOUR APPROVED ELIGIBILITY</div>
+                <div style="display: flex; gap: 14px; font-size: 13px; font-weight: 900; align-items: center; justify-content: center;">
+                    <span>LIMIT: <b style="color: #34d399;">₹${c?.limit ? c.limit.toLocaleString() : 0}</b></span>
+                    <span style="opacity: 0.4;">•</span>
+                    <span>MAX LTV: <b style="color: #facc15;">${ltvLimit}%</b></span>
+                    <span style="opacity: 0.4;">•</span>
+                    <span>TYPE: <b style="color: #ffffff;">${c?.type || 'EMI CARD'}</b></span>
+                </div>
             </div>
-
-            <!-- Customer Eligibility Stats -->
-            <div style="display: flex; justify-content: center; gap: 30px; align-items: center; padding-right: 80px;">
-                <div style="text-align: left; display: flex; align-items: center; gap: 10px;">
-                    <div style="font-size: 32px;">💳</div>
-                    <div>
-                        <div style="font-size: 12px; color: #94a3b8; font-weight: bold; letter-spacing: 1px;">LIMIT</div>
-                        <div style="font-size: 20px; font-weight: 900; color: #34d399;">₹${c?.limit ? c.limit.toLocaleString() : 0}</div>
-                    </div>
-                </div>
-                <div style="width: 1px; height: 35px; background: rgba(255,255,255,0.2);"></div>
-                <div style="text-align: left; display: flex; align-items: center; gap: 10px;">
-                    <div style="font-size: 32px;">📈</div>
-                    <div>
-                        <div style="font-size: 12px; color: #94a3b8; font-weight: bold; letter-spacing: 1px;">MAX LTV</div>
-                        <div style="font-size: 20px; font-weight: 900; color: #fbbf24;">${ltvLimit}%</div>
-                    </div>
-                </div>
-                <div style="width: 1px; height: 35px; background: rgba(255,255,255,0.2);"></div>
-                <div style="text-align: left; display: flex; align-items: center; gap: 10px;">
-                    <div style="font-size: 32px;">🏷️</div>
-                    <div>
-                        <div style="font-size: 12px; color: #94a3b8; font-weight: bold; letter-spacing: 1px;">TYPE</div>
-                        <div style="font-size: 18px; font-weight: 900; color: #fff;">${c?.type || 'NEW'}</div>
-                    </div>
-                </div>
-            </div> 
         </div>
-        <div style="padding: 20px;">
+
+        <div style="padding: 16px 20px 20px 20px;">
     `;
 
     let hasV = false; 
@@ -1561,167 +1532,130 @@ function doGenerateCustomerImage() {
         hasV = true; 
         let invAmt = prod.inputs.inv > 0 ? prod.inputs.inv : prod.inputs.mrp;
 
-        // Get Top 4 Schemes
+        // Sorting Logic to Match Badges
         let sortedByDp = [...validS].sort((a,b) => a.dp - b.dp);
         let winDp = sortedByDp[0];
         
         let remainingAfterDp = validS.filter(s => s.dIdx !== winDp.dIdx);
         let sortedByEmi = [...remainingAfterDp].sort((a,b) => a.emi - b.emi);
-        let winEmi = sortedByEmi[0] || validS[1];
+        let winEmi = sortedByEmi[0] || sortedByDp[1] || winDp;
         
-        let remainingAfterEmi = remainingAfterDp.filter(s => s.dIdx !== (winEmi ? winEmi.dIdx : -1));
-        let winPop = remainingAfterEmi.sort((a,b) => a.currentTenure - b.currentTenure)[0] || validS[2];
+        let highlightIds = [winDp?.dIdx, winEmi?.dIdx].filter(Boolean);
+        let otherSchemes = validS.filter(s => !highlightIds.includes(s.dIdx)).sort((a,b) => a.dp - b.dp);
 
-        let remainingAfterPop = remainingAfterEmi.filter(s => s.dIdx !== (winPop ? winPop.dIdx : -1));
-        let winBal = remainingAfterPop.sort((a,b) => (a.dp + a.emi) - (b.dp + b.emi))[0] || validS[3];
-        
-        let top4IDs = [winDp?.dIdx, winEmi?.dIdx, winPop?.dIdx, winBal?.dIdx].filter(Boolean);
-        
-        let top4Schemes = [
-            { scheme: winDp, badge: '▼ LOWEST DP', color: '#059669', bgLight: '#f0fdf4', badgeBg: '#10b981' },
-            { scheme: winEmi, badge: '▼ LOWEST EMI', color: '#2563eb', bgLight: '#eff6ff', badgeBg: '#3b82f6' },
-            { scheme: winPop, badge: '★ TOP CHOICE', color: '#d97706', bgLight: '#fffbeb', badgeBg: '#f59e0b' },
-            { scheme: winBal, badge: '💎 BEST VALUE', color: '#7c3aed', bgLight: '#f5f3ff', badgeBg: '#8b5cf6' }
-        ].filter(item => item.scheme);
-
-        let otherSchemes = validS.filter(s => !top4IDs.includes(s.dIdx)).sort((a,b) => a.dp - b.dp);
-
-        // Product Header
+        // Product Card Frame
         html += `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                    <div style="font-size: 34px;">📱</div>
-                    <div style="font-size: 24px; font-weight: 900; color: #021B5A; line-height: 1.2;">
-                        ${prod.name.toUpperCase()}
+            <div style="border: 1px solid #dbeafe; border-radius: 12px; overflow: hidden; background: #ffffff; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); position: relative;">
+                
+                <!-- Left Decorative Highlight Bar -->
+                <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: #059669;"></div>
+
+                <!-- Product Title Header -->
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 18px 12px 18px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                        <span style="font-size: 20px;">📱</span>
+                        <div style="font-size: 17px; font-weight: 900; color: #034887; line-height: 1.3;">
+                            ${prod.name.toUpperCase()}
+                        </div>
+                    </div>
+                    <div style="background: #034887; color: #fff; padding: 6px 14px; border-radius: 6px; text-align: center; min-width: 100px;">
+                        <div style="font-size: 9px; font-weight: 800; color: #93c5fd; letter-spacing: 0.5px;">INV:</div>
+                        <div style="font-size: 15px; font-weight: 900;">₹${invAmt.toLocaleString()}</div>
                     </div>
                 </div>
-                <div style="background: #0D3A96; color: #fff; padding: 12px 26px; border-radius: 8px; text-align: center; box-shadow: 0 4px 6px rgba(13,58,150,0.3);">
-                    <div style="font-size: 13px; font-weight: bold; letter-spacing: 1px; opacity: 0.9;">INVOICE VALUE</div>
-                    <div style="font-size: 26px; font-weight: 900;">₹${invAmt.toLocaleString()}</div>
-                </div>
-            </div>
+
+                <!-- Schemes Table -->
+                <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px;">
+                    <thead style="background: #ffffff; color: #334155; border-bottom: 1px solid #e2e8f0;">
+                        <tr style="font-size: 12px; font-weight: 900; letter-spacing: 0.5px;">
+                            <th style="padding: 10px; width: 26%;">SCHEME</th>
+                            <th style="padding: 10px; width: 20%;">DP</th>
+                            <th style="padding: 10px; width: 22%;">EMI</th>
+                            <th style="padding: 10px; width: 14%;">M</th>
+                            <th style="padding: 10px; width: 18%;">DAILY</th>
+                        </tr>
+                    </thead>
+                    <tbody>
         `;
 
-        // Top 4 Scheme Cards in 2x2 Flex Layout
-        html += `<div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; justify-content: space-between;">`;
-        
-        const createCard = (item) => {
-            if(!item) return ``;
-            let s = item.scheme;
-            return `
-            <div style="width: calc(50% - 8px); box-sizing: border-box; background: ${item.bgLight}; border: 1px solid ${item.color}40; border-radius: 12px; padding: 16px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.03); margin-bottom: 5px;">
-                <div style="font-size: 20px; font-weight: 900; color: ${item.color};">${s.currentTenure}/${s.advEmi} SCHEME</div>
-                <div style="display: inline-block; background: ${item.badgeBg}; color: #fff; padding: 6px 16px; border-radius: 4px; font-size: 13px; font-weight: 900; margin: 12px 0; box-shadow: 0 2px 4px ${item.color}40;">
-                    ${item.badge}
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
-                    <div style="text-align: left;">
-                        <div style="font-size: 12px; color: #555; font-weight: bold;">DP <span style="font-size:10px;">(Down)</span></div>
-                        <div style="font-size: 24px; font-weight: 900; color: #059669;">₹${Math.round(s.dp).toLocaleString()}</div>
-                    </div>
-                    <div style="width: 1px; height: 35px; background: #ddd;"></div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 12px; color: #555; font-weight: bold;">EMI <span style="font-size:10px;">(Monthly)</span></div>
-                        <div style="font-size: 24px; font-weight: 900; color: #2563eb;">₹${Math.round(s.emi).toLocaleString()}</div>
-                    </div>
-                </div>
-                
-                <!-- Daily Save Box (Green Font) -->
-                <div style="margin-top: 15px; font-size: 13px; font-weight: 900; color: #059669; background: #f0fdf4; border: 1px dashed #34d399; border-radius: 6px; padding: 6px;">
-                    DAILY SAVE: ₹${Math.round(s.daily).toLocaleString()}
-                </div>
-
-                <!-- Updated Tenure Layout: Split Left & Right, NO Icon -->
-                <div style="margin-top: 15px; padding-top: 12px; border-top: 1px solid ${item.color}30; display: flex; justify-content: space-between; align-items: center;">
-                    <div style="font-size: 15px; font-weight: 900; color: #334155; letter-spacing: 0.5px;">TENURE</div>
-                    <div style="background: #fff; padding: 6px 16px; border-radius: 6px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; line-height: 1.1; min-width: 60px;">
-                        <span style="font-size: 18px; font-weight: 900; color: #1e293b;">${s.inst}</span>
-                        <span style="font-size: 10px; font-weight: 900; color: #64748b; margin-top:2px;">MONTHS</span>
-                    </div>
-                </div>
-            </div>`;
-        };
-
-        top4Schemes.forEach(item => {
-            html += createCard(item);
-        });
-        
-        html += `</div>`;
-
-        // Other Schemes Table (Updated Sequence & Green Daily Save)
-        if(otherSchemes.length > 0) {
+        // 1. Highlighted Lowest DP Row
+        if (winDp) {
             html += `
-                <div style="text-align: center; margin-bottom: 15px; font-size: 18px; font-weight: 900; color: #021B5A;">
-                    👇 इतर उपलब्ध पर्याय (OTHER SCHEMES) 👇
-                </div>
-                <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
-                    <table style="width: 100%; border-collapse: collapse; text-align: center;">
-                        <thead style="background: #021B5A; color: #fff;">
-                            <tr>
-                                <th style="padding: 14px 10px; font-size: 14px; letter-spacing: 0.5px;">SCHEME</th>
-                                <th style="padding: 14px 10px; font-size: 14px; letter-spacing: 0.5px;">DP</th>
-                                <th style="padding: 14px 10px; font-size: 14px; letter-spacing: 0.5px;">EMI</th>
-                                <th style="padding: 14px 10px; font-size: 14px; letter-spacing: 0.5px;">TENURE</th>
-                                <th style="padding: 14px 10px; font-size: 14px; letter-spacing: 0.5px;">DAILY SAVE</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <tr style="background: #f0fdf4; border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 12px 10px; text-align: center; border-left: 5px solid #059669;">
+                        <div style="font-size: 15px; font-weight: 900; color: #0f172a;">${winDp.currentTenure}/${winDp.advEmi}</div>
+                        <div style="display: flex; flex-direction: column; gap: 3px; align-items: center; margin-top: 4px;">
+                            <span style="background: #059669; color: white; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 4px;">▼ LOWEST DP</span>
+                            <span style="background: #d97706; color: white; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 4px;">★ TOP CHOICE</span>
+                            <span style="background: #7c3aed; color: white; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 4px;">✦ BEST VALUE</span>
+                        </div>
+                    </td>
+                    <td style="padding: 12px 10px; font-size: 18px; font-weight: 900; color: #059669;">₹${Math.round(winDp.dp).toLocaleString()}</td>
+                    <td style="padding: 12px 10px; font-size: 18px; font-weight: 900; color: #095797;">₹${Math.round(winDp.emi).toLocaleString()}</td>
+                    <td style="padding: 12px 10px; font-size: 15px; font-weight: 900; color: #1e293b;">${winDp.inst}</td>
+                    <td style="padding: 12px 10px; font-size: 17px; font-weight: 900; color: #ea580c;">₹${Math.round(winDp.daily).toLocaleString()}</td>
+                </tr>
             `;
-            
+        }
+
+        // 2. Highlighted Lowest EMI Row
+        if (winEmi && winEmi.dIdx !== winDp.dIdx) {
+            html += `
+                <tr style="background: #eff6ff; border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 12px 10px; text-align: center; border-left: 5px solid #2563eb;">
+                        <div style="font-size: 15px; font-weight: 900; color: #0f172a;">${winEmi.currentTenure}/${winEmi.advEmi}</div>
+                        <div style="display: flex; flex-direction: column; gap: 3px; align-items: center; margin-top: 4px;">
+                            <span style="background: #2563eb; color: white; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 4px;">▼ LOWEST EMI</span>
+                        </div>
+                    </td>
+                    <td style="padding: 12px 10px; font-size: 18px; font-weight: 900; color: #059669;">₹${Math.round(winEmi.dp).toLocaleString()}</td>
+                    <td style="padding: 12px 10px; font-size: 18px; font-weight: 900; color: #095797;">₹${Math.round(winEmi.emi).toLocaleString()}</td>
+                    <td style="padding: 12px 10px; font-size: 15px; font-weight: 900; color: #1e293b;">${winEmi.inst}</td>
+                    <td style="padding: 12px 10px; font-size: 17px; font-weight: 900; color: #ea580c;">₹${Math.round(winEmi.daily).toLocaleString()}</td>
+                </tr>
+            `;
+        }
+
+        // 3. Other Available Schemes Divider
+        if (otherSchemes.length > 0) {
+            html += `
+                <tr style="background: #f8fafc; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
+                    <td colspan="5" style="padding: 8px; font-size: 12px; font-weight: 900; color: #64748b; letter-spacing: 0.5px;">
+                        👇 OTHER AVAILABLE SCHEMES 👇
+                    </td>
+                </tr>
+            `;
+
             otherSchemes.forEach((d, i) => {
                 html += `
-                    <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'}; border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 14px 10px; font-weight: 900; color: #334155; font-size: 16px;">${d.currentTenure}/${d.advEmi}</td>
-                        <td style="padding: 14px 10px; font-weight: 900; color: #059669; font-size: 16px;">₹${Math.round(d.dp).toLocaleString()}</td>
-                        <td style="padding: 14px 10px; font-weight: 900; color: #2563eb; font-size: 16px;">₹${Math.round(d.emi).toLocaleString()}</td>
-                        <td style="padding: 14px 10px; font-weight: 900; color: #475569; font-size: 16px;">
-                            <div style="display:flex; flex-direction:column; align-items:center; line-height:1.1;">
-                                <span style="font-size:16px;">${d.inst}</span>
-                                <span style="font-size:9px;">MONTHS</span>
-                            </div>
-                        </td>
-                        <td style="padding: 14px 10px; font-weight: 900; color: #059669; font-size: 16px;">₹${Math.round(d.daily).toLocaleString()}</td>
+                    <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#fcfdfe'}; border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 10px; font-size: 14px; font-weight: 900; color: #334155;">${d.currentTenure}/${d.advEmi}</td>
+                        <td style="padding: 10px; font-size: 16px; font-weight: 900; color: #059669;">₹${Math.round(d.dp).toLocaleString()}</td>
+                        <td style="padding: 10px; font-size: 16px; font-weight: 900; color: #095797;">₹${Math.round(d.emi).toLocaleString()}</td>
+                        <td style="padding: 10px; font-size: 14px; font-weight: 900; color: #334155;">${d.inst}</td>
+                        <td style="padding: 10px; font-size: 15px; font-weight: 900; color: #ea580c;">₹${Math.round(d.daily).toLocaleString()}</td>
                     </tr>
                 `;
             });
-            
-            html += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
         }
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
     });
 
-    if(!hasV) { showToast("⚠️ Eligibility नुसार कोणतीही Scheme बसत नाहीये!", "error"); return; }
+    if(!hasV) { 
+        showToast("⚠️ No eligible schemes found for this customer!", "error"); 
+        return; 
+    }
 
-    // Footer
+    // Clean Footer
     html += `
-            <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-top: 10px;">
-                <div style="display:flex; align-items:center; gap:10px; flex:1;">
-                    <div style="font-size:28px; color:#10b981;">🛡️</div>
-                    <div><div style="font-size:12px; font-weight:900; color:#1e293b;">100% Secure</div><div style="font-size:10px; color:#64748b; font-weight:700;">Safe & Trusted</div></div>
-                </div>
-                <div style="width:1px; height:25px; background:#cbd5e1;"></div>
-                <div style="display:flex; align-items:center; gap:10px; flex:1; justify-content:center;">
-                    <div style="font-size:28px; color:#3b82f6;">⚡</div>
-                    <div><div style="font-size:12px; font-weight:900; color:#1e293b;">Instant Approval</div><div style="font-size:10px; color:#64748b; font-weight:700;">Quick Disbursal</div></div>
-                </div>
-                <div style="width:1px; height:25px; background:#cbd5e1;"></div>
-                <div style="display:flex; align-items:center; gap:10px; flex:1; justify-content:center;">
-                    <div style="font-size:28px; color:#8b5cf6;">%</div>
-                    <div><div style="font-size:12px; font-weight:900; color:#1e293b;">Best EMI Options</div><div style="font-size:10px; color:#64748b; font-weight:700;">Flexible Tenure</div></div>
-                </div>
-                <div style="width:1px; height:25px; background:#cbd5e1;"></div>
-                <div style="display:flex; align-items:center; gap:10px; flex:1; justify-content:flex-end;">
-                    <div style="font-size:28px; color:#f59e0b;">🎧</div>
-                    <div><div style="font-size:12px; font-weight:900; color:#1e293b;">24x7 Support</div><div style="font-size:10px; color:#64748b; font-weight:700;">Always here for you</div></div>
-                </div>
+            <div style="text-align: center; font-size: 11px; font-weight: 700; color: #94a3b8; padding-top: 10px;">
+                Generated securely via Persistent Portal
             </div>
-        </div>
-        
-        <div style="background: #021B5A; color: #e2e8f0; text-align: center; padding: 12px; font-size: 14px; font-weight: 700; letter-spacing: 0.5px;">
-            🔒 Generated securely via <span style="color: #4ade80; font-weight: 900;">Persistent Portal</span>
         </div>
     </div>`;
     
@@ -1740,30 +1674,29 @@ function doGenerateCustomerImage() {
                 let a = document.createElement("a"); 
                 a.href = imgDataUrl; 
                 let safeName = c?.name !== "-" ? c.name.replace(/\s+/g, '_') : "Customer"; 
-                a.download = `Quotation_${safeName}.png`; 
+                a.download = `Offer_${safeName}.png`; 
                 document.body.appendChild(a); 
                 a.click(); 
                 document.body.removeChild(a); 
-                showToast("✅ Image downloaded! WhatsApp opening...", "success");
-                setTimeout(() => { let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); }, 500);
+                showToast("✅ Image downloaded! Opening WhatsApp...", "success");
+                setTimeout(() => { 
+                    let mobile = c?.mobile || ""; 
+                    if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); 
+                }, 500);
             } else {
-                document.getElementById('clipboardStatusAlert').style.display = 'none';
                 canvas.toBlob(blob => {
                     try { 
                         navigator.clipboard.write([ new ClipboardItem({ "image/png": blob }) ]).then(() => { 
-                            document.getElementById('clipboardStatusAlert').style.display = 'block'; 
-                            setTimeout(() => { let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); }, 500); 
-                        }).catch(err => { 
-                            showCustomAlert("📋 Long Press karke Copy Image karein."); 
-                            let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); 
+                            showToast("📋 Image copied to clipboard!", "success");
+                            let mobile = c?.mobile || ""; 
+                            if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); 
                         }); 
                     } catch (e) { 
-                        let mobile = c?.mobile || ""; if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); 
+                        let mobile = c?.mobile || ""; 
+                        if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); 
                     }
                 }, 'image/png');
             }
-        } else { 
-            document.getElementById('clipboardStatusAlert').style.display = 'none'; 
         }
     });
 }
