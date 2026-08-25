@@ -1466,7 +1466,7 @@ function getDailyTheme() {
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR (SINGLE UNIFIED TABLE) === */
+/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR (UNIFIED HUGE FONTS & PRO BORDER) === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
     quoteDiv.style.width = "720px";
@@ -1480,12 +1480,12 @@ function doGenerateCustomerImage() {
     let c = customerQueue[activeCustomerIndex]; 
     let ltvLimit = c?.ltv || 100;
     
-    // Customer Name Formatting: Title Case (Capitalize 1st Word)
+    // Customer Name Formatting: Title Case
     let rawName = c?.name && c.name !== "-" ? c.name : "Valued Customer";
     let custName = rawName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
     let custMobile = c?.mobile && c.mobile !== "" ? c.mobile : "N/A";
 
-    // 1. Top Modern Gradient Header (Compact Spacing, Large Fonts)
+    // 1. Top Modern Gradient Header
     let html = `
     <div style="background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid #e2e8f0;">
         
@@ -1535,7 +1535,7 @@ function doGenerateCustomerImage() {
         hasV = true; 
         let invAmt = prod.inputs.inv > 0 ? prod.inputs.inv : prod.inputs.mrp;
 
-        // Sorting Logic to Match Badges
+        // Sorting Logic for Badges
         let sortedByDp = [...validS].sort((a,b) => a.dp - b.dp);
         let winDp = sortedByDp[0];
         
@@ -1546,93 +1546,74 @@ function doGenerateCustomerImage() {
         let highlightIds = [winDp?.dIdx, winEmi?.dIdx].filter(Boolean);
         let otherSchemes = validS.filter(s => !highlightIds.includes(s.dIdx)).sort((a,b) => a.dp - b.dp);
 
+        // Combine all schemes into one array for a single continuous loop
+        let allSchemes = [];
+        if (winDp) allSchemes.push({ ...winDp, isWinDp: true });
+        if (winEmi && (!winDp || winEmi.dIdx !== winDp.dIdx)) allSchemes.push({ ...winEmi, isWinEmi: true });
+        otherSchemes.forEach(s => allSchemes.push(s));
+
         let marginBottom = (index === productsToRender.length - 1) ? '0px' : '15px';
 
-        // Product Card Frame (One Single Block)
+        // Product Card Frame (Green Line integrated perfectly into the left border)
         html += `
-            <div style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: #ffffff; margin-bottom: ${marginBottom}; box-shadow: 0 2px 8px rgba(0,0,0,0.03); position: relative;">
+            <div style="border: 1px solid #cbd5e1; border-left: 8px solid #059669; border-radius: 12px; overflow: hidden; background: #ffffff; margin-bottom: ${marginBottom}; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
                 
-                <!-- Left Decorative Highlight Bar (Continuous) -->
-                <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: #059669; z-index: 10;"></div>
-
                 <!-- Product Title Header -->
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 16px 24px; border-bottom: 1px solid #e2e8f0; background: #ffffff;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 18px 20px 16px 20px; border-bottom: 1px solid #e2e8f0; background: #ffffff;">
                     <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                        <span style="font-size: 24px;">📱</span>
-                        <div style="font-size: 18px; font-weight: 900; color: #034887; line-height: 1.3;">
+                        <span style="font-size: 26px;">📱</span>
+                        <div style="font-size: 20px; font-weight: 900; color: #034887; line-height: 1.3;">
                             ${prod.name.toUpperCase()}
                         </div>
                     </div>
-                    <div style="background: #034887; color: #fff; padding: 8px 16px; border-radius: 8px; text-align: center; min-width: 110px; box-shadow: 0 2px 5px rgba(3,72,135,0.3);">
-                        <div style="font-size: 10px; font-weight: 800; color: #93c5fd; letter-spacing: 0.5px;">INV VALUE</div>
-                        <div style="font-size: 17px; font-weight: 900;">₹${invAmt.toLocaleString()}</div>
+                    <div style="background: #034887; color: #fff; padding: 8px 18px; border-radius: 8px; text-align: center; min-width: 110px; box-shadow: 0 2px 6px rgba(3,72,135,0.3);">
+                        <div style="font-size: 11px; font-weight: 800; color: #93c5fd; letter-spacing: 0.5px;">INV VALUE</div>
+                        <div style="font-size: 18px; font-weight: 900;">₹${invAmt.toLocaleString()}</div>
                     </div>
                 </div>
 
-                <!-- Schemes Table (Single Unified Table) -->
+                <!-- SINGLE UNIFIED SCHEMES TABLE (Uniform Large Fonts) -->
                 <table style="width: 100%; border-collapse: collapse; text-align: center;">
-                    <thead style="background: #f8fafc; color: #1e293b; border-bottom: 1px solid #e2e8f0;">
-                        <tr style="font-size: 14px; font-weight: 900; letter-spacing: 0.5px;">
-                            <th style="padding: 12px 10px 12px 24px; width: 26%; text-align: center;">SCHEME</th>
-                            <th style="padding: 12px; width: 20%;">DP</th>
-                            <th style="padding: 12px; width: 22%;">EMI</th>
-                            <th style="padding: 12px; width: 14%;">M</th>
-                            <th style="padding: 12px; width: 18%;">DAILY</th>
+                    <thead style="background: #f8fafc; color: #334155; border-bottom: 2px solid #e2e8f0;">
+                        <tr style="font-size: 16px; font-weight: 900; letter-spacing: 0.5px;">
+                            <th style="padding: 14px 10px; width: 26%;">SCHEME</th>
+                            <th style="padding: 14px 10px; width: 20%;">DP</th>
+                            <th style="padding: 14px 10px; width: 22%;">EMI</th>
+                            <th style="padding: 14px 10px; width: 14%;">M</th>
+                            <th style="padding: 14px 10px; width: 18%;">DAILY</th>
                         </tr>
                     </thead>
                     <tbody>
         `;
 
-        // 1. Highlighted Lowest DP Row
-        if (winDp) {
-            html += `
-                <tr style="background: #f0fdf4; border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 16px 10px 16px 24px; text-align: center;">
-                        <div style="font-size: 18px; font-weight: 900; color: #0f172a;">${winDp.currentTenure}/${winDp.advEmi}</div>
-                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center; margin-top: 8px;">
-                            <span style="background: #059669; color: white; font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">▼ LOWEST DP</span>
-                            <span style="background: #d97706; color: white; font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">★ TOP CHOICE</span>
-                            <span style="background: #7c3aed; color: white; font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">✦ BEST VALUE</span>
-                        </div>
-                    </td>
-                    <td style="padding: 16px 10px; font-size: 22px; font-weight: 900; color: #059669;">₹${Math.round(winDp.dp).toLocaleString()}</td>
-                    <td style="padding: 16px 10px; font-size: 22px; font-weight: 900; color: #095797;">₹${Math.round(winDp.emi).toLocaleString()}</td>
-                    <td style="padding: 16px 10px; font-size: 19px; font-weight: 900; color: #1e293b;">${winDp.inst}</td>
-                    <td style="padding: 16px 10px; font-size: 21px; font-weight: 900; color: #ea580c;">₹${Math.round(winDp.daily).toLocaleString()}</td>
-                </tr>
-            `;
-        }
-
-        // 2. Highlighted Lowest EMI Row
-        if (winEmi && winEmi.dIdx !== winDp.dIdx) {
-            html += `
-                <tr style="background: #eff6ff; border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 16px 10px 16px 24px; text-align: center;">
-                        <div style="font-size: 18px; font-weight: 900; color: #0f172a;">${winEmi.currentTenure}/${winEmi.advEmi}</div>
-                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center; margin-top: 8px;">
-                            <span style="background: #2563eb; color: white; font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">▼ LOWEST EMI</span>
-                        </div>
-                    </td>
-                    <td style="padding: 16px 10px; font-size: 22px; font-weight: 900; color: #059669;">₹${Math.round(winEmi.dp).toLocaleString()}</td>
-                    <td style="padding: 16px 10px; font-size: 22px; font-weight: 900; color: #095797;">₹${Math.round(winEmi.emi).toLocaleString()}</td>
-                    <td style="padding: 16px 10px; font-size: 19px; font-weight: 900; color: #1e293b;">${winEmi.inst}</td>
-                    <td style="padding: 16px 10px; font-size: 21px; font-weight: 900; color: #ea580c;">₹${Math.round(winEmi.daily).toLocaleString()}</td>
-                </tr>
-            `;
-        }
-
-        // 3. Other Schemes Rows (No Divider Row, seamless integration)
-        otherSchemes.forEach((d, i) => {
-            let isLast = (i === otherSchemes.length - 1);
+        // Render all schemes uniformly with HUGE font sizes
+        allSchemes.forEach((d, i) => {
+            let isLast = (i === allSchemes.length - 1);
             let bBorder = isLast ? 'none' : '1px solid #e2e8f0';
+            let bgCol = (d.isWinDp) ? '#f0fdf4' : (d.isWinEmi ? '#eff6ff' : (i % 2 === 0 ? '#ffffff' : '#f8fafc'));
             
+            // Build badges if applicable
+            let badges = [];
+            if (d.isWinDp) {
+                badges.push('<span style="background: #059669; color: white; font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; width: 85%;">▼ LOWEST DP</span>');
+                badges.push('<span style="background: #d97706; color: white; font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; width: 85%;">★ TOP CHOICE</span>');
+                badges.push('<span style="background: #7c3aed; color: white; font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; width: 85%;">✦ BEST VALUE</span>');
+            } else if (d.isWinEmi) {
+                badges.push('<span style="background: #2563eb; color: white; font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 6px; width: 85%;">▼ LOWEST EMI</span>');
+            }
+            let badgeHtml = badges.length > 0 ? `<div style="display: flex; flex-direction: column; gap: 4px; align-items: center; margin-top: 8px;">${badges.join('')}</div>` : '';
+
+            // Render Row with UNIFORM 26px FONT SIZE across all columns and rows
             html += `
-                <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'}; border-bottom: ${bBorder};">
-                    <td style="padding: 14px 10px 14px 24px; font-size: 17px; font-weight: 900; color: #334155; text-align: center;">${d.currentTenure}/${d.advEmi}</td>
-                    <td style="padding: 14px 10px; font-size: 19px; font-weight: 900; color: #059669;">₹${Math.round(d.dp).toLocaleString()}</td>
-                    <td style="padding: 14px 10px; font-size: 19px; font-weight: 900; color: #095797;">₹${Math.round(d.emi).toLocaleString()}</td>
-                    <td style="padding: 14px 10px; font-size: 17px; font-weight: 900; color: #334155;">${d.inst}</td>
-                    <td style="padding: 14px 10px; font-size: 18px; font-weight: 900; color: #ea580c;">₹${Math.round(d.daily).toLocaleString()}</td>
+                <tr style="background: ${bgCol}; border-bottom: ${bBorder};">
+                    <td style="padding: 18px 10px; text-align: center;">
+                        <div style="font-size: 26px; font-weight: 900; color: #0f172a;">${d.currentTenure}/${d.advEmi}</div>
+                        ${badgeHtml}
+                    </td>
+                    <td style="padding: 18px 10px; font-size: 26px; font-weight: 900; color: #059669;">₹${Math.round(d.dp).toLocaleString()}</td>
+                    <td style="padding: 18px 10px; font-size: 26px; font-weight: 900; color: #095797;">₹${Math.round(d.emi).toLocaleString()}</td>
+                    <td style="padding: 18px 10px; font-size: 26px; font-weight: 900; color: #1e293b;">${d.inst}</td>
+                    <td style="padding: 18px 10px; font-size: 26px; font-weight: 900; color: #ea580c;">₹${Math.round(d.daily).toLocaleString()}</td>
                 </tr>
             `;
         });
