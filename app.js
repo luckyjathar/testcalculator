@@ -1302,19 +1302,31 @@ function renderRows(pIdx) {
         if (d.isInv50Breach) { isBoundB = true; }
 
         let rowClass = (d.isFixed ? "fixed-row " : "") + (isLtvB || isBoundB ? "ltv-breach " : "") + (d.isExpired && !isInactive ? "expired-row " : "") + (isInactive ? "inactive-row " : "");
-        let toggleBtnHTML = isInactive ? `<button class="action-btn" style="background:var(--success);" onclick="toggleInactive(${pIdx}, ${d.dIdx})">ADD</button>` : `<button class="action-btn" style="background:var(--danger);" onclick="toggleInactive(${pIdx}, ${d.dIdx})">DISABLE</button>`;
+        
+        // नवीन Single Dropdown Button (ACT)
+        let actionMenuBtnHtml = `
+        <div style="position:relative; display:inline-block;">
+            <button onclick="toggleActionMenu(${pIdx}, ${d.dIdx}, event)" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:bold; cursor:pointer; font-size: 11px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); min-width: 65px; letter-spacing:0.5px;">ACT ▼</button>
+            
+            <div id="actMenu_${pIdx}_${d.dIdx}" class="act-menu-dropdown" style="display:none; position:absolute; right:0; top:100%; background:white; border:1px solid #e2e8f0; box-shadow:0 10px 25px rgba(0,0,0,0.15); border-radius:8px; z-index:9999; min-width:130px; flex-direction:column; overflow:hidden; margin-top:5px;">
+                <button onclick="copySchemeText(${pIdx}, ${d.dIdx}, this); document.getElementById('actMenu_${pIdx}_${d.dIdx}').style.display='none';" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'" style="background:#fff; border:none; padding:12px 15px; text-align:left; cursor:pointer; width:100%; border-bottom:1px solid #f1f5f9; font-size:12px; font-weight:bold; color:var(--dark); transition:0.2s;">📋 COPY</button>
+                <button onclick="openEditSchemeModal(${pIdx}, ${d.dIdx}); document.getElementById('actMenu_${pIdx}_${d.dIdx}').style.display='none';" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'" style="background:#fff; border:none; padding:12px 15px; text-align:left; cursor:pointer; width:100%; border-bottom:1px solid #f1f5f9; font-size:12px; font-weight:bold; color:#d97706; transition:0.2s;">✏️ EDIT</button>
+                <button onclick="toggleInactive(${pIdx}, ${d.dIdx}); document.getElementById('actMenu_${pIdx}_${d.dIdx}').style.display='none';" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'" style="background:#fff; border:none; padding:12px 15px; text-align:left; cursor:pointer; width:100%; font-size:12px; font-weight:bold; color:${isInactive ? '#059669' : '#dc2626'}; transition:0.2s;">${isInactive ? '✅ ADD' : '🚫 DISABLE'}</button>
+            </div>
+        </div>`;
+        
         let expInfo = d.expiryDateStr ? `<div style="font-size:10px; color:#555; margin-top:2px; font-weight:bold;">Exp: ${d.expiryDateStr}</div>` : ''; let expiredWarning = d.isExpired ? `<div style="color:#d35400; font-size:9px; font-weight:900; margin-top:3px; line-height:1.2; background:#ffeaa7; padding:2px; border-radius:3px;">⚠️ EXPIRED<br>Check Live</div>` : '';
+        
         return `<tr id="row_${pIdx}_${d.dIdx}" class="${rowClass}">
             <td class="hidden-col">${d.category}</td><td class="hidden-col">${+parseFloat(d.dbd).toFixed(3)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.dbdAmt||0).toLocaleString()}</span></td><td class="hidden-col">₹${d.pf}</td><td class="hidden-col">${+parseFloat(d.roi).toFixed(2)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.roiAmt||0).toLocaleString()}</span></td><td class="hidden-col">${d.fixedEmi > 0 ? '₹'+d.fixedEmi : 'N/A'}</td><td class="hidden-col" id="ltv_${pIdx}_${d.dIdx}">${Math.round(d.curLTV)}%</td><td class="hidden-col" id="nd_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--bajaj-blue);">₹${Math.round(d.netDisb).toLocaleString()}</td><td class="hidden-col" id="extra_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--danger);">₹${Math.round(d.extra).toLocaleString()}</td>
             ${isNT ? `<td class="bound-col">${d.minLoan > 0 ? '₹' + d.minLoan : '0'}</td><td class="bound-col">${d.maxLoan < 9999999 ? '₹' + d.maxLoan : 'NO'}</td>` : `<td style="color:#777;">₹${Math.floor(d.nbfcMaxL)}</td>`}
             <td><div class="stepper"><button class="step-btn" onclick="step(${pIdx},${d.dIdx},-${d.isFixed ? d.fixedEmi : 1000})">-</button><input id="l_${pIdx}_${d.dIdx}" type="number" value="${Math.floor(d.loan)}" class="step-inp" onchange="manual(${pIdx},${d.dIdx})" onblur="manual(${pIdx},${d.dIdx})"><button class="step-btn" onclick="step(${pIdx},${d.dIdx},${d.isFixed ? d.fixedEmi : 1000})">+</button></div></td>
             <td id="ta_${pIdx}_${d.dIdx}" style="font-weight:900;">${d.currentTenure}/${d.advEmi}${expInfo}${expiredWarning}</td>
             <td id="dp_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td><td id="emi_${pIdx}_${d.dIdx}" style="color:var(--primary); font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td><td id="inst_${pIdx}_${d.dIdx}" style="font-weight:900;">${d.inst}</td><td id="day_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950;">₹${Math.round(d.daily).toLocaleString()}</td>
-            <td><div style="display:flex; flex-direction:column; gap:2px; min-width: 40px;"><button class="action-btn btn-copy" onclick="copySchemeText(${pIdx}, ${d.dIdx}, this)">COPY</button><button class="action-btn" style="background:var(--warning); color:#000;" onclick="openEditSchemeModal(${pIdx}, ${d.dIdx})">EDIT</button>${toggleBtnHTML}</div></td>
+            <td style="padding: 6px; text-align: center;">${actionMenuBtnHtml}</td>
         </tr>`;
     }).join('');
 }
-
 function step(pIdx, dIdx, amt) { let el = document.getElementById(`l_${pIdx}_${dIdx}`); el.value = Math.max(0, parseInt(el.value) + amt); manual(pIdx, dIdx); }
 
 function manual(pIdx, dIdx) {
@@ -1920,3 +1932,29 @@ async function forceRefreshMasterData() {
     if(updateDiv) updateDiv.style.display = 'none';
     showToast("✅ डेटा यशस्वीरित्या अपडेट झाला!", "success");
 }
+/* === ACTION DROPDOWN MENU CONTROLLER === */
+function toggleActionMenu(pIdx, dIdx, event) {
+    event.stopPropagation();
+    
+    // आधी सुरु असलेले इतर सगळे मेनू बंद करा
+    document.querySelectorAll('.act-menu-dropdown').forEach(el => {
+        if (el.id !== `actMenu_${pIdx}_${dIdx}`) {
+            el.style.display = 'none';
+        }
+    });
+    
+    // जो क्लिक केलाय तो टॉगल करा
+    let menu = document.getElementById(`actMenu_${pIdx}_${dIdx}`);
+    if(menu.style.display === 'none' || menu.style.display === '') {
+        menu.style.display = 'flex';
+    } else {
+        menu.style.display = 'none';
+    }
+}
+
+// स्क्रीनवर कुठेही बाहेर क्लिक केल्यास मेनू बंद होईल
+document.addEventListener('click', function() {
+    document.querySelectorAll('.act-menu-dropdown').forEach(el => {
+        el.style.display = 'none';
+    });
+});
