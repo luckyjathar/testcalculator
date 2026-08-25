@@ -1466,7 +1466,7 @@ function getDailyTheme() {
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR (LARGER TABLE FONTS) === */
+/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR (COMPACT HEADER) === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
     quoteDiv.style.width = "720px";
@@ -1485,27 +1485,27 @@ function doGenerateCustomerImage() {
     let custName = rawName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
     let custMobile = c?.mobile && c.mobile !== "" ? c.mobile : "N/A";
 
-    // 1. Top Modern Gradient Header (No Salesman Info, Large Fonts)
+    // 1. Top Modern Gradient Header (Compact Spacing, Large Fonts)
     let html = `
     <div style="background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid #e2e8f0;">
         
-        <!-- Header Banner -->
-        <div style="background: linear-gradient(180deg, #095797 0%, #153e75 100%); padding: 30px 20px 30px 20px; color: #ffffff; text-align: center; border-radius: 16px 16px 0 0;">
-            <h2 style="margin: 0 0 24px 0; font-size: 32px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
+        <!-- Header Banner (Reduced Padding & Margins) -->
+        <div style="background: linear-gradient(180deg, #095797 0%, #153e75 100%); padding: 18px 16px 20px 16px; color: #ffffff; text-align: center; border-radius: 16px 16px 0 0;">
+            <h2 style="margin: 0 0 12px 0; font-size: 28px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
                 🎉 EXCLUSIVE OFFERS FOR YOU!
             </h2> 
 
-            <!-- Approved Eligibility Container (Customer Info + Limits) -->
-            <div style="display: block; width: 94%; margin: 0 auto; background: rgba(255, 255, 255, 0.08); border: 2px dashed rgba(255,255,255,0.4); border-radius: 12px; padding: 18px 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            <!-- Approved Eligibility Container -->
+            <div style="display: block; width: 96%; margin: 0 auto; background: rgba(255, 255, 255, 0.08); border: 2px dashed rgba(255,255,255,0.4); border-radius: 10px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                 
                 <!-- Customer Details -->
-                <div style="font-size: 20px; font-weight: 900; color: #ffffff; letter-spacing: 1px; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 12px; display: flex; justify-content: space-between; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
+                <div style="font-size: 19px; font-weight: 900; color: #ffffff; letter-spacing: 0.5px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; display: flex; justify-content: space-between; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
                     <span>🧑 Customer Name: <span style="color: #bfdbfe;">${custName}</span></span>
                     <span>📱 <span style="color: #bfdbfe;">${custMobile}</span></span>
                 </div>
 
                 <!-- Eligibility Details -->
-                <div style="display: flex; gap: 24px; font-size: 24px; font-weight: 900; align-items: center; justify-content: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                <div style="display: flex; gap: 16px; font-size: 22px; font-weight: 900; align-items: center; justify-content: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
                     <span>LIMIT: <b style="color: #34d399;">₹${c?.limit ? c.limit.toLocaleString() : 0}</b></span>
                     <span style="opacity: 0.5;">|</span>
                     <span>MAX LTV: <b style="color: #facc15;">${ltvLimit}%</b></span>
@@ -1515,7 +1515,7 @@ function doGenerateCustomerImage() {
             </div>
         </div>
 
-        <div style="padding: 20px;">
+        <div style="padding: 16px;">
     `;
 
     let hasV = false; 
@@ -1557,7 +1557,7 @@ function doGenerateCustomerImage() {
                 <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: #059669;"></div>
 
                 <!-- Product Title Header -->
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 14px 20px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 18px 12px 18px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
                     <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
                         <span style="font-size: 22px;">📱</span>
                         <div style="font-size: 18px; font-weight: 900; color: #034887; line-height: 1.3;">
@@ -1658,7 +1658,6 @@ function doGenerateCustomerImage() {
         return; 
     }
 
-    // Completely removed the Persistent Portal Footer 
     html += `
         </div>
     </div>`;
