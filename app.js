@@ -1466,7 +1466,7 @@ function getDailyTheme() {
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR === */
+/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR (UPDATED HEADER) === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
     quoteDiv.style.width = "720px";
@@ -1480,39 +1480,51 @@ function doGenerateCustomerImage() {
     let c = customerQueue[activeCustomerIndex]; 
     let ltvLimit = c?.ltv || 100;
     
-    let salesName = localStorage.getItem('portal_sales_name') || "RESHMA SOLKAR"; 
-    let salesMobile = localStorage.getItem('portal_sales_mobile') || "8087231243";
+    // सेल्समनचे अचूक डीफॉल्ट नाव आणि नंबर
+    let salesName = localStorage.getItem('portal_sales_name') || "LAKSHYA"; 
+    let salesMobile = localStorage.getItem('portal_sales_mobile') || "8087313624";
+    
+    // कस्टमरचे नाव आणि नंबर फेच करणे
+    let custName = c?.name && c.name !== "-" ? c.name.toUpperCase() : "VALUED CUSTOMER";
+    let custMobile = c?.mobile && c.mobile !== "" ? c.mobile : "N/A";
 
-    // 1. Top Modern Gradient Header
+    // 1. Top Modern Gradient Header (Large Fonts & Full Rectangle Usage)
     let html = `
     <div style="background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid #e2e8f0;">
         
         <!-- Header Banner -->
-        <div style="background: linear-gradient(180deg, #095797 0%, #153e75 100%); padding: 22px 20px 18px 20px; color: #ffffff; text-align: center; border-radius: 16px 16px 0 0;">
-            <h2 style="margin:0; font-size: 26px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase;">
+        <div style="background: linear-gradient(180deg, #095797 0%, #153e75 100%); padding: 26px 20px 26px 20px; color: #ffffff; text-align: center; border-radius: 16px 16px 0 0;">
+            <h2 style="margin:0; font-size: 32px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
                 🎉 EXCLUSIVE OFFERS FOR YOU!
             </h2> 
             
-            <div style="margin: 10px 0 14px 0; font-size: 15px; font-weight: 800; color: #cbd5e1; letter-spacing: 0.5px; display: flex; justify-content: center; align-items: center; gap: 8px;">
+            <div style="margin: 16px 0 24px 0; font-size: 20px; font-weight: 900; color: #e2e8f0; letter-spacing: 1px; display: flex; justify-content: center; align-items: center; gap: 12px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
                 <span>👤 ${salesName.toUpperCase()}</span> 
-                <span>|</span> 
+                <span style="color: #94a3b8;">|</span> 
                 <span>📞 ${salesMobile}</span>
             </div>
 
-            <!-- Approved Eligibility Container -->
-            <div style="display: inline-block; background: rgba(255, 255, 255, 0.08); border: 1px dashed rgba(255,255,255,0.3); border-radius: 10px; padding: 10px 24px;">
-                <div style="font-size: 11px; font-weight: 800; color: #94a3b8; letter-spacing: 1.5px; margin-bottom: 4px;">YOUR APPROVED ELIGIBILITY</div>
-                <div style="display: flex; gap: 14px; font-size: 13px; font-weight: 900; align-items: center; justify-content: center;">
+            <!-- Approved Eligibility Container (Customer Info + Limits) -->
+            <div style="display: block; width: 94%; margin: 0 auto; background: rgba(255, 255, 255, 0.08); border: 2px dashed rgba(255,255,255,0.4); border-radius: 12px; padding: 18px 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                
+                <!-- Customer Details -->
+                <div style="font-size: 20px; font-weight: 900; color: #ffffff; letter-spacing: 1px; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 12px; display: flex; justify-content: space-between; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
+                    <span>🧑 CUST: <span style="color: #bfdbfe;">${custName}</span></span>
+                    <span>📱 <span style="color: #bfdbfe;">${custMobile}</span></span>
+                </div>
+
+                <!-- Eligibility Details -->
+                <div style="display: flex; gap: 24px; font-size: 24px; font-weight: 900; align-items: center; justify-content: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
                     <span>LIMIT: <b style="color: #34d399;">₹${c?.limit ? c.limit.toLocaleString() : 0}</b></span>
-                    <span style="opacity: 0.4;">•</span>
+                    <span style="opacity: 0.5;">|</span>
                     <span>MAX LTV: <b style="color: #facc15;">${ltvLimit}%</b></span>
-                    <span style="opacity: 0.4;">•</span>
-                    <span>TYPE: <b style="color: #ffffff;">${c?.type || 'EMI CARD'}</b></span>
+                    <span style="opacity: 0.5;">|</span>
+                    <span>TYPE: <b style="color: #ffffff;">${c?.type || 'NEW'}</b></span>
                 </div>
             </div>
         </div>
 
-        <div style="padding: 16px 20px 20px 20px;">
+        <div style="padding: 20px;">
     `;
 
     let hasV = false; 
@@ -1545,34 +1557,34 @@ function doGenerateCustomerImage() {
 
         // Product Card Frame
         html += `
-            <div style="border: 1px solid #dbeafe; border-radius: 12px; overflow: hidden; background: #ffffff; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); position: relative;">
+            <div style="border: 1px solid #dbeafe; border-radius: 12px; overflow: hidden; background: #ffffff; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); position: relative;">
                 
                 <!-- Left Decorative Highlight Bar -->
-                <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: #059669;"></div>
+                <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: #059669;"></div>
 
                 <!-- Product Title Header -->
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 18px 12px 18px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
-                    <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
-                        <span style="font-size: 20px;">📱</span>
-                        <div style="font-size: 17px; font-weight: 900; color: #034887; line-height: 1.3;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 14px 20px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                        <span style="font-size: 22px;">📱</span>
+                        <div style="font-size: 18px; font-weight: 900; color: #034887; line-height: 1.3;">
                             ${prod.name.toUpperCase()}
                         </div>
                     </div>
-                    <div style="background: #034887; color: #fff; padding: 6px 14px; border-radius: 6px; text-align: center; min-width: 100px;">
-                        <div style="font-size: 9px; font-weight: 800; color: #93c5fd; letter-spacing: 0.5px;">INV:</div>
-                        <div style="font-size: 15px; font-weight: 900;">₹${invAmt.toLocaleString()}</div>
+                    <div style="background: #034887; color: #fff; padding: 8px 16px; border-radius: 8px; text-align: center; min-width: 110px; box-shadow: 0 2px 5px rgba(3,72,135,0.3);">
+                        <div style="font-size: 10px; font-weight: 800; color: #93c5fd; letter-spacing: 0.5px;">INV VALUE</div>
+                        <div style="font-size: 17px; font-weight: 900;">₹${invAmt.toLocaleString()}</div>
                     </div>
                 </div>
 
                 <!-- Schemes Table -->
                 <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px;">
                     <thead style="background: #ffffff; color: #334155; border-bottom: 1px solid #e2e8f0;">
-                        <tr style="font-size: 12px; font-weight: 900; letter-spacing: 0.5px;">
-                            <th style="padding: 10px; width: 26%;">SCHEME</th>
-                            <th style="padding: 10px; width: 20%;">DP</th>
-                            <th style="padding: 10px; width: 22%;">EMI</th>
-                            <th style="padding: 10px; width: 14%;">M</th>
-                            <th style="padding: 10px; width: 18%;">DAILY</th>
+                        <tr style="font-size: 13px; font-weight: 900; letter-spacing: 0.5px;">
+                            <th style="padding: 12px; width: 26%;">SCHEME</th>
+                            <th style="padding: 12px; width: 20%;">DP</th>
+                            <th style="padding: 12px; width: 22%;">EMI</th>
+                            <th style="padding: 12px; width: 14%;">M</th>
+                            <th style="padding: 12px; width: 18%;">DAILY</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1582,18 +1594,18 @@ function doGenerateCustomerImage() {
         if (winDp) {
             html += `
                 <tr style="background: #f0fdf4; border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 12px 10px; text-align: center; border-left: 5px solid #059669;">
-                        <div style="font-size: 15px; font-weight: 900; color: #0f172a;">${winDp.currentTenure}/${winDp.advEmi}</div>
-                        <div style="display: flex; flex-direction: column; gap: 3px; align-items: center; margin-top: 4px;">
-                            <span style="background: #059669; color: white; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 4px;">▼ LOWEST DP</span>
-                            <span style="background: #d97706; color: white; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 4px;">★ TOP CHOICE</span>
-                            <span style="background: #7c3aed; color: white; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 4px;">✦ BEST VALUE</span>
+                    <td style="padding: 14px 10px; text-align: center; border-left: 6px solid #059669;">
+                        <div style="font-size: 16px; font-weight: 900; color: #0f172a;">${winDp.currentTenure}/${winDp.advEmi}</div>
+                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center; margin-top: 6px;">
+                            <span style="background: #059669; color: white; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">▼ LOWEST DP</span>
+                            <span style="background: #d97706; color: white; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">★ TOP CHOICE</span>
+                            <span style="background: #7c3aed; color: white; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">✦ BEST VALUE</span>
                         </div>
                     </td>
-                    <td style="padding: 12px 10px; font-size: 18px; font-weight: 900; color: #059669;">₹${Math.round(winDp.dp).toLocaleString()}</td>
-                    <td style="padding: 12px 10px; font-size: 18px; font-weight: 900; color: #095797;">₹${Math.round(winDp.emi).toLocaleString()}</td>
-                    <td style="padding: 12px 10px; font-size: 15px; font-weight: 900; color: #1e293b;">${winDp.inst}</td>
-                    <td style="padding: 12px 10px; font-size: 17px; font-weight: 900; color: #ea580c;">₹${Math.round(winDp.daily).toLocaleString()}</td>
+                    <td style="padding: 14px 10px; font-size: 20px; font-weight: 900; color: #059669;">₹${Math.round(winDp.dp).toLocaleString()}</td>
+                    <td style="padding: 14px 10px; font-size: 20px; font-weight: 900; color: #095797;">₹${Math.round(winDp.emi).toLocaleString()}</td>
+                    <td style="padding: 14px 10px; font-size: 17px; font-weight: 900; color: #1e293b;">${winDp.inst}</td>
+                    <td style="padding: 14px 10px; font-size: 19px; font-weight: 900; color: #ea580c;">₹${Math.round(winDp.daily).toLocaleString()}</td>
                 </tr>
             `;
         }
@@ -1602,16 +1614,16 @@ function doGenerateCustomerImage() {
         if (winEmi && winEmi.dIdx !== winDp.dIdx) {
             html += `
                 <tr style="background: #eff6ff; border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 12px 10px; text-align: center; border-left: 5px solid #2563eb;">
-                        <div style="font-size: 15px; font-weight: 900; color: #0f172a;">${winEmi.currentTenure}/${winEmi.advEmi}</div>
-                        <div style="display: flex; flex-direction: column; gap: 3px; align-items: center; margin-top: 4px;">
-                            <span style="background: #2563eb; color: white; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 4px;">▼ LOWEST EMI</span>
+                    <td style="padding: 14px 10px; text-align: center; border-left: 6px solid #2563eb;">
+                        <div style="font-size: 16px; font-weight: 900; color: #0f172a;">${winEmi.currentTenure}/${winEmi.advEmi}</div>
+                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center; margin-top: 6px;">
+                            <span style="background: #2563eb; color: white; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 4px; width: 85%;">▼ LOWEST EMI</span>
                         </div>
                     </td>
-                    <td style="padding: 12px 10px; font-size: 18px; font-weight: 900; color: #059669;">₹${Math.round(winEmi.dp).toLocaleString()}</td>
-                    <td style="padding: 12px 10px; font-size: 18px; font-weight: 900; color: #095797;">₹${Math.round(winEmi.emi).toLocaleString()}</td>
-                    <td style="padding: 12px 10px; font-size: 15px; font-weight: 900; color: #1e293b;">${winEmi.inst}</td>
-                    <td style="padding: 12px 10px; font-size: 17px; font-weight: 900; color: #ea580c;">₹${Math.round(winEmi.daily).toLocaleString()}</td>
+                    <td style="padding: 14px 10px; font-size: 20px; font-weight: 900; color: #059669;">₹${Math.round(winEmi.dp).toLocaleString()}</td>
+                    <td style="padding: 14px 10px; font-size: 20px; font-weight: 900; color: #095797;">₹${Math.round(winEmi.emi).toLocaleString()}</td>
+                    <td style="padding: 14px 10px; font-size: 17px; font-weight: 900; color: #1e293b;">${winEmi.inst}</td>
+                    <td style="padding: 14px 10px; font-size: 19px; font-weight: 900; color: #ea580c;">₹${Math.round(winEmi.daily).toLocaleString()}</td>
                 </tr>
             `;
         }
@@ -1620,7 +1632,7 @@ function doGenerateCustomerImage() {
         if (otherSchemes.length > 0) {
             html += `
                 <tr style="background: #f8fafc; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
-                    <td colspan="5" style="padding: 8px; font-size: 12px; font-weight: 900; color: #64748b; letter-spacing: 0.5px;">
+                    <td colspan="5" style="padding: 10px; font-size: 13px; font-weight: 900; color: #64748b; letter-spacing: 0.5px;">
                         👇 OTHER AVAILABLE SCHEMES 👇
                     </td>
                 </tr>
@@ -1629,11 +1641,11 @@ function doGenerateCustomerImage() {
             otherSchemes.forEach((d, i) => {
                 html += `
                     <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#fcfdfe'}; border-bottom: 1px solid #f1f5f9;">
-                        <td style="padding: 10px; font-size: 14px; font-weight: 900; color: #334155;">${d.currentTenure}/${d.advEmi}</td>
-                        <td style="padding: 10px; font-size: 16px; font-weight: 900; color: #059669;">₹${Math.round(d.dp).toLocaleString()}</td>
-                        <td style="padding: 10px; font-size: 16px; font-weight: 900; color: #095797;">₹${Math.round(d.emi).toLocaleString()}</td>
-                        <td style="padding: 10px; font-size: 14px; font-weight: 900; color: #334155;">${d.inst}</td>
-                        <td style="padding: 10px; font-size: 15px; font-weight: 900; color: #ea580c;">₹${Math.round(d.daily).toLocaleString()}</td>
+                        <td style="padding: 12px 10px; font-size: 15px; font-weight: 900; color: #334155;">${d.currentTenure}/${d.advEmi}</td>
+                        <td style="padding: 12px 10px; font-size: 17px; font-weight: 900; color: #059669;">₹${Math.round(d.dp).toLocaleString()}</td>
+                        <td style="padding: 12px 10px; font-size: 17px; font-weight: 900; color: #095797;">₹${Math.round(d.emi).toLocaleString()}</td>
+                        <td style="padding: 12px 10px; font-size: 15px; font-weight: 900; color: #334155;">${d.inst}</td>
+                        <td style="padding: 12px 10px; font-size: 16px; font-weight: 900; color: #ea580c;">₹${Math.round(d.daily).toLocaleString()}</td>
                     </tr>
                 `;
             });
@@ -1653,7 +1665,7 @@ function doGenerateCustomerImage() {
 
     // Clean Footer
     html += `
-            <div style="text-align: center; font-size: 11px; font-weight: 700; color: #94a3b8; padding-top: 10px;">
+            <div style="text-align: center; font-size: 12px; font-weight: 700; color: #94a3b8; padding-top: 12px;">
                 Generated securely via Persistent Portal
             </div>
         </div>
