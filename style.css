@@ -63,19 +63,29 @@ input[id^="mrp_"], input[id^="inv_"], input[id^="surch_"] {
     letter-spacing: -0.5px !important;
 }
 
-/* === INVISIBLE LOAN INPUT FIX (REMOVES BOX ON MOBILE) === */
+/* === INVISIBLE LOAN INPUT FIX (ARROWS & BOX REMOVER FOR LAPTOP + MOBILE) === */
+input[id^="l_"]::-webkit-outer-spin-button,
+input[id^="l_"]::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}
+
 input[id^="l_"] {
+    -moz-appearance: textfield !important;
+    appearance: none !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
     outline: none !important;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
+    width: 65px !important;
     height: auto !important;
     padding: 0 !important;
+    margin: 0 !important;
     border-radius: 0 !important;
     color: var(--primary) !important;
+    font-weight: 900 !important;
+    text-align: left !important;
+    cursor: pointer !important;
 }
 
 /* TABLE WRAPPER - ENABLE HORIZONTAL SCROLL ON MOBILE */
