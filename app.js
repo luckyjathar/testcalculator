@@ -1303,7 +1303,7 @@ function renderRows(pIdx) {
 
         let rowClass = (d.isFixed ? "fixed-row " : "") + (isLtvB || isBoundB ? "ltv-breach " : "") + (d.isExpired && !isInactive ? "expired-row " : "") + (isInactive ? "inactive-row " : "");
         
-        // नवीन Single Dropdown Button (ACT)
+        // Action Button Dropdown
         let actionMenuBtnHtml = `
         <div style="position:relative; display:inline-block;">
             <button onclick="toggleActionMenu(${pIdx}, ${d.dIdx}, event)" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:bold; cursor:pointer; font-size: 11px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); min-width: 65px; letter-spacing:0.5px;">ACT ▼</button>
@@ -1320,7 +1320,15 @@ function renderRows(pIdx) {
         return `<tr id="row_${pIdx}_${d.dIdx}" class="${rowClass}">
             <td class="hidden-col">${d.category}</td><td class="hidden-col">${+parseFloat(d.dbd).toFixed(3)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.dbdAmt||0).toLocaleString()}</span></td><td class="hidden-col">₹${d.pf}</td><td class="hidden-col">${+parseFloat(d.roi).toFixed(2)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.roiAmt||0).toLocaleString()}</span></td><td class="hidden-col">${d.fixedEmi > 0 ? '₹'+d.fixedEmi : 'N/A'}</td><td class="hidden-col" id="ltv_${pIdx}_${d.dIdx}">${Math.round(d.curLTV)}%</td><td class="hidden-col" id="nd_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--bajaj-blue);">₹${Math.round(d.netDisb).toLocaleString()}</td><td class="hidden-col" id="extra_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--danger);">₹${Math.round(d.extra).toLocaleString()}</td>
             ${isNT ? `<td class="bound-col">${d.minLoan > 0 ? '₹' + d.minLoan : '0'}</td><td class="bound-col">${d.maxLoan < 9999999 ? '₹' + d.maxLoan : 'NO'}</td>` : `<td style="color:#777;">₹${Math.floor(d.nbfcMaxL)}</td>`}
-            <td style="font-weight:900; color:var(--primary); font-size:14px;">₹${Math.floor(d.loan)}</td>
+            
+            <!-- हा भाग पूर्णपणे बदलला आहे (Invisible Input) -->
+            <td style="text-align:center; vertical-align:middle;" title="Click to Edit Loan Amount">
+                <div style="display:inline-flex; justify-content:center; align-items:center;">
+                    <span style="color:var(--primary); font-weight:900; font-size:14px;">₹</span>
+                    <input id="l_${pIdx}_${d.dIdx}" type="number" value="${Math.floor(d.loan)}" onchange="manual(${pIdx},${d.dIdx})" onblur="manual(${pIdx},${d.dIdx})" style="width: 55px; padding: 0; margin: 0 0 0 2px; border: none; background: transparent; outline: none; text-align: left; font-weight: 900; font-size: 14px; color: var(--primary); cursor: pointer;">
+                </div>
+            </td>
+
             <td id="ta_${pIdx}_${d.dIdx}" style="font-weight:900;">${d.currentTenure}/${d.advEmi}${expInfo}${expiredWarning}</td>
             <td id="dp_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td><td id="emi_${pIdx}_${d.dIdx}" style="color:var(--primary); font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td><td id="inst_${pIdx}_${d.dIdx}" style="font-weight:900;">${d.inst}</td><td id="day_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950;">₹${Math.round(d.daily).toLocaleString()}</td>
             <td style="padding: 6px; text-align: center;">${actionMenuBtnHtml}</td>
