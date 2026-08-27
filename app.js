@@ -1176,10 +1176,27 @@ function renderMatrix() {
                 <div><label>MARGIN</label><input type="number" value="${prod.inputs.margin}" placeholder="0" oninput="updateVal(${pIdx},'margin',this.value)"></div>
                 <div><label>DEALER</label><input type="number" value="${prod.inputs.dealer}" placeholder="0" oninput="updateVal(${pIdx},'dealer',this.value)"></div>
             </div>
-            <div class="table-wrapper" id="tw_${pIdx}" style="display:${displayStyle};">
-                <table>
+            <div class="table-wrapper" id="tw_${pIdx}" style="display:${displayStyle}; overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
                     <thead>
-                        <tr><th class="hidden-col" onclick="sortM(${pIdx},'category')">CAT ↕</th><th class="hidden-col" onclick="sortM(${pIdx},'dbd')">DBD% ↕</th><th class="hidden-col" onclick="sortM(${pIdx},'pf')">PF ↕</th><th class="hidden-col" onclick="sortM(${pIdx},'roi')">ROI% ↕</th><th class="hidden-col" onclick="sortM(${pIdx},'fixedEmi')">FIXED ↕</th><th class="hidden-col" onclick="sortM(${pIdx},'curLTV')">LTV% ↕</th><th class="hidden-col" onclick="sortM(${pIdx},'netDisb')" style="color:var(--bajaj-blue);">NET DISB ↕</th><th class="hidden-col" onclick="sortM(${pIdx},'extra')">EXTRA ↕</th>${isNT ? `<th onclick="sortM(${pIdx},'minLoan')">MIN ↕</th><th onclick="sortM(${pIdx},'maxLoan')">MAX ↕</th>` : `<th onclick="sortM(${pIdx},'nbfcMaxL')">NBFC LMT ↕</th>`}<th onclick="sortM(${pIdx},'loan')">LOAN ↕</th><th onclick="sortM(${pIdx},'currentTenure')">T/A ↕</th><th onclick="sortM(${pIdx},'dp')">NET DP ↕</th><th onclick="sortM(${pIdx},'emi')">EMI ↕</th><th onclick="sortM(${pIdx},'inst')">M ↕</th><th onclick="sortM(${pIdx},'daily')">DAILY ↕</th><th>ACT</th></tr>
+                        <tr style="font-size: 10px; white-space: nowrap;">
+                            <th class="hidden-col" onclick="sortM(${pIdx},'category')">CAT ↕</th>
+                            <th class="hidden-col" onclick="sortM(${pIdx},'dbd')">DBD% ↕</th>
+                            <th class="hidden-col" onclick="sortM(${pIdx},'pf')">PF ↕</th>
+                            <th class="hidden-col" onclick="sortM(${pIdx},'roi')">ROI% ↕</th>
+                            <th class="hidden-col" onclick="sortM(${pIdx},'fixedEmi')">FIXED ↕</th>
+                            <th class="hidden-col" onclick="sortM(${pIdx},'curLTV')">LTV% ↕</th>
+                            <th class="hidden-col" onclick="sortM(${pIdx},'netDisb')" style="color:var(--bajaj-blue);">NET DISB ↕</th>
+                            <th class="hidden-col" onclick="sortM(${pIdx},'extra')">EXTRA ↕</th>
+                            ${isNT ? `<th style="padding:4px 1px;" onclick="sortM(${pIdx},'minLoan')">MIN ↕</th><th style="padding:4px 1px;" onclick="sortM(${pIdx},'maxLoan')">MAX ↕</th>` : `<th style="padding:4px 1px;" onclick="sortM(${pIdx},'nbfcMaxL')">LMT ↕</th>`}
+                            <th style="padding:4px 1px;" onclick="sortM(${pIdx},'loan')">LOAN ↕</th>
+                            <th style="padding:4px 1px;" onclick="sortM(${pIdx},'currentTenure')">T/A ↕</th>
+                            <th style="padding:4px 1px;" onclick="sortM(${pIdx},'dp')">NET DP ↕</th>
+                            <th style="padding:4px 1px;" onclick="sortM(${pIdx},'emi')">EMI ↕</th>
+                            <th style="padding:4px 1px;" onclick="sortM(${pIdx},'inst')">M ↕</th>
+                            <th style="padding:4px 1px;" onclick="sortM(${pIdx},'daily')">DAILY ↕</th>
+                            <th style="padding:4px 1px;">ACT</th>
+                        </tr>
                     </thead>
                     <tbody id="body_${pIdx}"></tbody>
                 </table>
@@ -1187,7 +1204,6 @@ function renderMatrix() {
         container.appendChild(div); recalcModel(pIdx);
     });
 }
-
 function syncInsurance(pIdx, mrpVal, baseLoanVal, triggerType = 'NONE') {
     let prod = current_products[pIdx]; let isPhoneWebMobile = isMobileDeviceCat(prod.category); let gtl = baseLoanVal > 100000 ? 2398 : (baseLoanVal > 50000 ? 1799 : (baseLoanVal > 30000 ? 1499 : (baseLoanVal > 10000 ? 1199 : (baseLoanVal > 0 ? 699 : 0)))); let rfcSlab = getRfcSlabValue(mrpVal); let inp = prod.inputs;
     if(triggerType === 'MRP' || triggerType === 'INV') { inp.gtl = gtl; if(triggerType === 'MRP') inp.rfc = isPhoneWebMobile ? rfcSlab : 0; } else if (triggerType === 'LOAN') { inp.gtl = gtl; }
@@ -1303,35 +1319,37 @@ function renderRows(pIdx) {
 
         let rowClass = (d.isFixed ? "fixed-row " : "") + (isLtvB || isBoundB ? "ltv-breach " : "") + (d.isExpired && !isInactive ? "expired-row " : "") + (isInactive ? "inactive-row " : "");
         
-        // Action Button Dropdown
+        // Action Button Dropdown (Size reduced for mobile)
         let actionMenuBtnHtml = `
         <div style="position:relative; display:inline-block;">
-            <button onclick="toggleActionMenu(${pIdx}, ${d.dIdx}, event)" style="background:var(--primary); color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:bold; cursor:pointer; font-size: 11px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); min-width: 65px; letter-spacing:0.5px;">ACT ▼</button>
+            <button onclick="toggleActionMenu(${pIdx}, ${d.dIdx}, event)" style="background:var(--primary); color:white; border:none; padding:4px 6px; border-radius:4px; font-weight:bold; cursor:pointer; font-size: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.2); min-width: 40px; letter-spacing:0;">ACT▼</button>
             
-            <div id="actMenu_${pIdx}_${d.dIdx}" class="act-menu-dropdown" style="display:none; position:absolute; right:0; top:100%; background:white; border:1px solid #e2e8f0; box-shadow:0 10px 25px rgba(0,0,0,0.15); border-radius:8px; z-index:9999; min-width:130px; flex-direction:column; overflow:hidden; margin-top:5px;">
-                <button onclick="copySchemeText(${pIdx}, ${d.dIdx}, this); document.getElementById('actMenu_${pIdx}_${d.dIdx}').style.display='none';" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'" style="background:#fff; border:none; padding:12px 15px; text-align:left; cursor:pointer; width:100%; border-bottom:1px solid #f1f5f9; font-size:12px; font-weight:bold; color:var(--dark); transition:0.2s;">📋 COPY</button>
-                <button onclick="openEditSchemeModal(${pIdx}, ${d.dIdx}); document.getElementById('actMenu_${pIdx}_${d.dIdx}').style.display='none';" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'" style="background:#fff; border:none; padding:12px 15px; text-align:left; cursor:pointer; width:100%; border-bottom:1px solid #f1f5f9; font-size:12px; font-weight:bold; color:#d97706; transition:0.2s;">✏️ EDIT</button>
-                <button onclick="toggleInactive(${pIdx}, ${d.dIdx}); document.getElementById('actMenu_${pIdx}_${d.dIdx}').style.display='none';" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'" style="background:#fff; border:none; padding:12px 15px; text-align:left; cursor:pointer; width:100%; font-size:12px; font-weight:bold; color:${isInactive ? '#059669' : '#dc2626'}; transition:0.2s;">${isInactive ? '✅ ADD' : '🚫 DISABLE'}</button>
+            <div id="actMenu_${pIdx}_${d.dIdx}" class="act-menu-dropdown" style="display:none; position:absolute; right:0; top:100%; background:white; border:1px solid #e2e8f0; box-shadow:0 10px 25px rgba(0,0,0,0.15); border-radius:8px; z-index:9999; min-width:120px; flex-direction:column; overflow:hidden; margin-top:5px;">
+                <button onclick="copySchemeText(${pIdx}, ${d.dIdx}, this); document.getElementById('actMenu_${pIdx}_${d.dIdx}').style.display='none';" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'" style="background:#fff; border:none; padding:10px 12px; text-align:left; cursor:pointer; width:100%; border-bottom:1px solid #f1f5f9; font-size:11px; font-weight:bold; color:var(--dark); transition:0.2s;">📋 COPY</button>
+                <button onclick="openEditSchemeModal(${pIdx}, ${d.dIdx}); document.getElementById('actMenu_${pIdx}_${d.dIdx}').style.display='none';" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'" style="background:#fff; border:none; padding:10px 12px; text-align:left; cursor:pointer; width:100%; border-bottom:1px solid #f1f5f9; font-size:11px; font-weight:bold; color:#d97706; transition:0.2s;">✏️ EDIT</button>
+                <button onclick="toggleInactive(${pIdx}, ${d.dIdx}); document.getElementById('actMenu_${pIdx}_${d.dIdx}').style.display='none';" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'" style="background:#fff; border:none; padding:10px 12px; text-align:left; cursor:pointer; width:100%; font-size:11px; font-weight:bold; color:${isInactive ? '#059669' : '#dc2626'}; transition:0.2s;">${isInactive ? '✅ ADD' : '🚫 DISABLE'}</button>
             </div>
         </div>`;
         
-        let expInfo = d.expiryDateStr ? `<div style="font-size:10px; color:#555; margin-top:2px; font-weight:bold;">Exp: ${d.expiryDateStr}</div>` : ''; let expiredWarning = d.isExpired ? `<div style="color:#d35400; font-size:9px; font-weight:900; margin-top:3px; line-height:1.2; background:#ffeaa7; padding:2px; border-radius:3px;">⚠️ EXPIRED<br>Check Live</div>` : '';
+        let expInfo = d.expiryDateStr ? `<div style="font-size:9px; color:#555; margin-top:2px; font-weight:bold;">Exp: ${d.expiryDateStr}</div>` : ''; let expiredWarning = d.isExpired ? `<div style="color:#d35400; font-size:8px; font-weight:900; margin-top:3px; line-height:1.2; background:#ffeaa7; padding:2px; border-radius:3px;">⚠️ EXPIRED</div>` : '';
         
         return `<tr id="row_${pIdx}_${d.dIdx}" class="${rowClass}">
             <td class="hidden-col">${d.category}</td><td class="hidden-col">${+parseFloat(d.dbd).toFixed(3)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.dbdAmt||0).toLocaleString()}</span></td><td class="hidden-col">₹${d.pf}</td><td class="hidden-col">${+parseFloat(d.roi).toFixed(2)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.roiAmt||0).toLocaleString()}</span></td><td class="hidden-col">${d.fixedEmi > 0 ? '₹'+d.fixedEmi : 'N/A'}</td><td class="hidden-col" id="ltv_${pIdx}_${d.dIdx}">${Math.round(d.curLTV)}%</td><td class="hidden-col" id="nd_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--bajaj-blue);">₹${Math.round(d.netDisb).toLocaleString()}</td><td class="hidden-col" id="extra_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--danger);">₹${Math.round(d.extra).toLocaleString()}</td>
-            ${isNT ? `<td class="bound-col">${d.minLoan > 0 ? '₹' + d.minLoan : '0'}</td><td class="bound-col">${d.maxLoan < 9999999 ? '₹' + d.maxLoan : 'NO'}</td>` : `<td style="color:#777;">₹${Math.floor(d.nbfcMaxL)}</td>`}
+            ${isNT ? `<td class="bound-col" style="padding:4px 1px; font-size:11px; white-space:nowrap;">${d.minLoan > 0 ? '₹' + d.minLoan : '0'}</td><td class="bound-col" style="padding:4px 1px; font-size:11px; white-space:nowrap;">${d.maxLoan < 9999999 ? '₹' + d.maxLoan : 'NO'}</td>` : `<td style="padding:4px 1px; color:#777; font-size:11px; white-space:nowrap;">₹${Math.floor(d.nbfcMaxL)}</td>`}
             
-            <!-- हा भाग पूर्णपणे बदलला आहे (Invisible Input) -->
-            <td style="text-align:center; vertical-align:middle;" title="Click to Edit Loan Amount">
+            <td style="padding:4px 1px; text-align:center; vertical-align:middle; white-space:nowrap;" title="Click to Edit Loan Amount">
                 <div style="display:inline-flex; justify-content:center; align-items:center;">
-                    <span style="color:var(--primary); font-weight:900; font-size:14px;">₹</span>
-                    <input id="l_${pIdx}_${d.dIdx}" type="number" value="${Math.floor(d.loan)}" onchange="manual(${pIdx},${d.dIdx})" onblur="manual(${pIdx},${d.dIdx})" style="width: 55px; padding: 0; margin: 0 0 0 2px; border: none; background: transparent; outline: none; text-align: left; font-weight: 900; font-size: 14px; color: var(--primary); cursor: pointer;">
+                    <span style="color:var(--primary); font-weight:900; font-size:11px;">₹</span>
+                    <input id="l_${pIdx}_${d.dIdx}" type="number" value="${Math.floor(d.loan)}" onchange="manual(${pIdx},${d.dIdx})" onblur="manual(${pIdx},${d.dIdx})" style="width: 45px; padding: 0; margin: 0 0 0 1px; border: none; background: transparent; outline: none; box-shadow: none; -webkit-appearance: none; -moz-appearance: none; appearance: none; text-align: left; font-weight: 900; font-size: 11px; color: var(--primary); cursor: pointer;">
                 </div>
             </td>
 
-            <td id="ta_${pIdx}_${d.dIdx}" style="font-weight:900;">${d.currentTenure}/${d.advEmi}${expInfo}${expiredWarning}</td>
-            <td id="dp_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950;">₹${Math.round(d.dp).toLocaleString()}</td><td id="emi_${pIdx}_${d.dIdx}" style="color:var(--primary); font-weight:950;">₹${Math.round(d.emi).toLocaleString()}</td><td id="inst_${pIdx}_${d.dIdx}" style="font-weight:900;">${d.inst}</td><td id="day_${pIdx}_${d.dIdx}" style="color:var(--success); font-weight:950;">₹${Math.round(d.daily).toLocaleString()}</td>
-            <td style="padding: 6px; text-align: center;">${actionMenuBtnHtml}</td>
+            <td id="ta_${pIdx}_${d.dIdx}" style="padding:4px 1px; font-weight:900; font-size:11px; white-space:nowrap;">${d.currentTenure}/${d.advEmi}${expInfo}${expiredWarning}</td>
+            <td id="dp_${pIdx}_${d.dIdx}" style="padding:4px 1px; color:var(--success); font-weight:950; font-size:11px; white-space:nowrap;">₹${Math.round(d.dp).toLocaleString()}</td>
+            <td id="emi_${pIdx}_${d.dIdx}" style="padding:4px 1px; color:var(--primary); font-weight:950; font-size:11px; white-space:nowrap;">₹${Math.round(d.emi).toLocaleString()}</td>
+            <td id="inst_${pIdx}_${d.dIdx}" style="padding:4px 1px; font-weight:900; font-size:11px; white-space:nowrap;">${d.inst}</td>
+            <td id="day_${pIdx}_${d.dIdx}" style="padding:4px 1px; color:var(--success); font-weight:950; font-size:11px; white-space:nowrap;">₹${Math.round(d.daily).toLocaleString()}</td>
+            <td style="padding:4px 1px; text-align: center; white-space:nowrap;">${actionMenuBtnHtml}</td>
         </tr>`;
     }).join('');
 }
