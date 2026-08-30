@@ -24,12 +24,13 @@
 
 <style>
 /* =========================================
-   COMPACT SIDE-BY-SIDE DESIGN FOR ZATPAT CALC 
+   MINIMAL SPACING & BORDERLESS ZATPAT CALC 
    ========================================= */
-.compact-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
-.compact-label { margin-bottom: 0; width: 45%; font-size: 10.5px; font-weight: 900; color: #555; text-transform: uppercase; line-height: 1.1; }
-.compact-input { width: 55%; padding: 4px 8px; height: 28px !important; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; font-size: 12px; box-sizing: border-box; }
-.compact-input:disabled { background: #e9ecef; cursor: not-allowed; border: 1px solid #ddd; }
+.compact-row { display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 3px; }
+.compact-label { margin-bottom: 0; width: 48%; font-size: 10px; font-weight: 900; color: #444; text-transform: uppercase; line-height: 1; }
+.compact-input { width: 52%; padding: 2px 6px; height: 24px !important; border: none; border-bottom: 1.5px solid #bbb; background: transparent; border-radius: 0; font-weight: bold; font-size: 11.5px; box-sizing: border-box; }
+.compact-input:focus { border-bottom-color: var(--primary); outline: none; }
+.compact-input:disabled { background: transparent; cursor: not-allowed; border-bottom: 1px dashed #ccc; }
 
 /* Custom Inputs for Pop-ups */
 .popup-input-label { font-size: 11px; font-weight: 900; color: #555; display: block; margin-bottom: 4px; text-transform: uppercase; }
@@ -109,14 +110,12 @@
 </header>
 
 <main>
-    <!-- ========================================== -->
-    <!-- TOP 2 ACTION BUTTONS (Zatpat Calc & Smart Scheme Dictionary) -->
-    <!-- ========================================== -->
-    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 15px;">
-        <button onclick="document.getElementById('zatpatModal').style.display='flex'" style="background: var(--bajaj-blue); color: white; padding: 12px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
+    <!-- TOP 2 ACTION BUTTONS -->
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;">
+        <button onclick="document.getElementById('zatpatModal').style.display='flex'" style="background: var(--bajaj-blue); color: white; padding: 10px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
             <span id="icon_fc" style="font-size:14px;">🧮</span> ZATPAT CALC
         </button>
-        <button onclick="openDictionaryModal()" style="background: var(--indigo); color: white; padding: 12px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
+        <button onclick="openDictionaryModal()" style="background: var(--indigo); color: white; padding: 10px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
             <span style="font-size:14px;">🔍</span> SMART SCHEME DICTIONARY
         </button>
     </div>
@@ -149,39 +148,48 @@
     <!-- ========================================== -->
     <div id="finalEligibleArea" style="display: none; flex-direction: column;">
         
-        <!-- HIDDEN TOP NAV (Required for app.js to work) -->
-        <div class="top-nav-box" style="display: flex; gap: 5px; margin-bottom: 10px; align-items: center; justify-content: flex-end;">
-            <button id="genQuoteBtn" onclick="openQuoteSelectionModal()" style="background:var(--bajaj-blue); color:white; padding:8px 12px; border-radius:4px; font-weight:bold; font-size:11px; border:none; cursor:pointer;">GEN QUOTE</button>
-            <select id="finalCustomerSwitcher" onchange="switchCustomerFinal(this.value)" style="padding:6px; border-radius:4px; font-weight:bold; font-size:12px; border:1px solid #ccc; max-width: 150px;"></select>
-            <button onclick="goHome()" style="background:var(--danger); color:white; padding:8px 12px; border-radius:4px; font-weight:bold; font-size:11px; border:none; cursor:pointer;">✖ CLOSE</button>
+        <!-- HIDDEN TOP NAV -->
+        <div class="top-nav-box" style="display: flex; gap: 5px; margin-bottom: 8px; align-items: center; justify-content: flex-end;">
+            <button id="genQuoteBtn" onclick="openQuoteSelectionModal()" style="background:var(--bajaj-blue); color:white; padding:6px 10px; border-radius:4px; font-weight:bold; font-size:11px; border:none; cursor:pointer;">GEN QUOTE</button>
+            <select id="finalCustomerSwitcher" onchange="switchCustomerFinal(this.value)" style="padding:4px; border-radius:4px; font-weight:bold; font-size:11px; border:1px solid #ccc; max-width: 140px;"></select>
+            <button onclick="goHome()" style="background:var(--danger); color:white; padding:6px 10px; border-radius:4px; font-weight:bold; font-size:11px; border:none; cursor:pointer;">✖ CLOSE</button>
         </div>
 
-        <!-- COMPACT ACTIVE CUSTOMER INFO CARD -->
-        <div style="background: #253241; border-radius: 8px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); margin-bottom: 12px; border: 1px solid #3b4b5e;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 38px; height: 38px; background: rgba(0,0,0,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px;">👤</div>
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span id="infoName" style="font-size: 15px; font-weight: 900; text-transform: uppercase;">-</span>
-                        <span style="font-size: 11px; color: #94a3b8; font-weight: bold;">📞 <span id="infoMobile">0000000000</span></span>
-                    </div>
-                    <div style="display: flex; gap: 6px; font-size: 10px; font-weight: 900;">
-                        <span id="infoType" style="background: #f39c12; padding: 2px 6px; border-radius: 4px; color: #fff;">NEW</span>
-                        <span style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">LTV: <span id="infoLtv">100%</span></span>
-                        <span style="border: 1px dashed rgba(255,255,255,0.3); padding: 2px 6px; border-radius: 4px;">CAP: <span id="infoCap">NONE</span></span>
-                    </div>
+        <!-- ================================================================= -->
+        <!-- CUSTOMER DETAILS IN A SINGLE HORIZONTAL LINE (Type, Limit, LTV, Cap) -->
+        <!-- ================================================================= -->
+        <div style="background: #253241; border-radius: 8px; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); margin-bottom: 10px; border: 1px solid #3b4b5e;">
+            
+            <!-- Top Row: Name, Phone & Action Icons -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 15px;">👤</span>
+                    <span id="infoName" style="font-size: 14px; font-weight: 900; text-transform: uppercase;">-</span>
+                    <span style="font-size: 11px; color: #94a3b8; font-weight: bold;">📞 <span id="infoMobile">0000000000</span></span>
+                </div>
+                <div style="display: flex; gap: 6px;">
+                    <button onclick="let mob=document.getElementById('infoMobile').innerText; if(mob && mob!=='-') window.open('tel:+91'+mob)" style="width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; cursor: pointer; font-size: 12px; padding:0;">📞</button>
+                    <button onclick="let mob=document.getElementById('infoMobile').innerText; if(mob && mob!=='-') window.open('https://wa.me/91'+mob)" style="width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; cursor: pointer; font-size: 12px; padding:0;">💬</button>
                 </div>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="text-align: right; background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 6px; border-right: 3px solid #2ecc71;">
-                    <div style="font-size: 9px; color: #94a3b8; font-weight: 900; letter-spacing: 0.5px;">APPROVED LIMIT</div>
-                    <div id="infoLimit" style="font-size: 18px; font-weight: 900; color: #2ecc71; text-shadow: 0 0 5px rgba(46,204,113,0.3);">₹0</div>
+            <!-- Bottom Row: Single Horizontal Line for Type, Limit, LTV & Cap -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: nowrap; font-size: 11px; font-weight: 900;">
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <span style="color:#94a3b8; font-size:9px;">TYPE:</span>
+                    <span id="infoType" style="background: #f39c12; padding: 2px 6px; border-radius: 4px; color: #fff;">NEW</span>
                 </div>
-                
-                <div style="display: flex; gap: 6px;">
-                    <button onclick="let mob=document.getElementById('infoMobile').innerText; if(mob && mob!=='-') window.open('tel:+91'+mob)" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; cursor: pointer; font-size: 14px;">📞</button>
-                    <button onclick="let mob=document.getElementById('infoMobile').innerText; if(mob && mob!=='-') window.open('https://wa.me/91'+mob)" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; cursor: pointer; font-size: 14px;">💬</button>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <span style="color:#94a3b8; font-size:9px;">LIMIT:</span>
+                    <span id="infoLimit" style="color: #2ecc71; font-size: 13px;">₹0</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <span style="color:#94a3b8; font-size:9px;">LTV:</span>
+                    <span style="background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 4px;"><span id="infoLtv">100%</span></span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <span style="color:#94a3b8; font-size:9px;">CAP:</span>
+                    <span style="border: 1px dashed rgba(255,255,255,0.3); padding: 2px 5px; border-radius: 4px;"><span id="infoCap">NONE</span></span>
                 </div>
             </div>
         </div>
@@ -195,7 +203,7 @@
 <!-- ALL MODALS (POP-UPS) -->
 <!-- ============================================================== -->
 
-<!-- 1. ZATPAT CALC MODAL -->
+<!-- 1. ZATPAT CALC MODAL (CLEAN & BORDERLESS INPUTS) -->
 <div id="zatpatModal" class="modal" style="align-items:center; justify-content:center;">
     <div class="modal-content" id="fastCalcContainer" style="max-width: 380px; padding: 15px 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 12px;">
@@ -208,7 +216,8 @@
             </div>
         </div>
         
-        <div style="display:flex; flex-direction:column; gap:5px; margin-bottom:12px;">
+        <!-- BORDERLESS COMPACT SIDE-BY-SIDE COMPONENTS -->
+        <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:12px;">
             <div class="compact-row">
                 <label class="compact-label">INVOICE / MRP (₹)</label>
                 <input type="number" id="fcInv" placeholder="Enter Amount" oninput="fcInvChanged();" class="compact-input">
@@ -466,7 +475,7 @@
     </div>
 </div>
 
-<!-- NEW SMART DICTIONARY MODAL -->
+<!-- NEW SMART SCHEME DICTIONARY MODAL -->
 <div id="dictionarySearchModal" class="modal" style="align-items:center; justify-content:center;">
     <div class="modal-content" style="max-width: 950px; padding: 20px; max-height: 90vh; overflow-y: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--indigo); padding-bottom: 8px; margin-bottom: 15px;">
@@ -477,6 +486,7 @@
         <div style="background: #f0f7ff; border: 1.5px solid var(--primary); padding: 15px; border-radius: 6px; margin-bottom: 15px;">
             <h4 style="margin-top:0; color:var(--primary); font-size: 14px; margin-bottom: 12px;">⚡ 1. Eligibility & Invoice</h4>
             
+            <!-- CUSTOMER TYPE, LIMIT, LTV INSIDE DICTIONARY ALSO ARRANGED CLEANLY -->
             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
                 <div style="flex: 1; min-width: 140px;">
                     <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:3px;">1. CUSTOMER TYPE</label>
