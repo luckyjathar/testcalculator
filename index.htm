@@ -65,7 +65,7 @@
 .wa-btn { color: #25D366; text-shadow: 0 0 5px rgba(37, 211, 102, 0.5); }
 .call-btn { color: #3498db; }
 
-/* Custom Inputs for Pop-ups matching image_bdc9fc */
+/* Custom Inputs for Pop-ups */
 .popup-input-label {
     font-size: 11px; font-weight: 900; color: #555; display: block; margin-bottom: 4px; text-transform: uppercase;
 }
@@ -75,6 +75,37 @@
 .popup-input:disabled {
     background: #e9ecef; cursor: not-allowed;
 }
+
+/* =========================================
+   NEW CSS FOR PERFECT CENTER ALIGNED MODALS 
+   ========================================= */
+.modal {
+    display: none; 
+    position: fixed;
+    z-index: 100000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(2px);
+    /* Flexbox for perfect centering when shown */
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background-color: #fff;
+    margin: 0 auto; /* Overrides old margins */
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-height: 85vh; /* Prevents going out of screen */
+    overflow-y: auto; /* Adds scroll if content is long */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+/* Scrollbar styling for smooth scrolling inside pop-ups */
+.modal-content::-webkit-scrollbar { width: 6px; }
+.modal-content::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 </style>
 
 </head>
@@ -87,7 +118,7 @@
 <div id="toastNotification" class="toast-notification"></div>
 
 <!-- CUSTOM CONFIRM MODAL -->
-<div id="customConfirmModal" class="modal" style="z-index: 99998;">
+<div id="customConfirmModal" class="modal" style="z-index: 99998; align-items:center; justify-content:center;">
     <div class="modal-content" style="max-width: 320px; text-align: center;">
         <h3 style="margin-top:0; color:var(--bajaj-blue);" id="confirmTitle">⚠️ Confirm</h3>
         <p id="confirmMessage" style="font-size:14px; margin-bottom:20px; color:#444; font-weight:bold;"></p>
@@ -99,7 +130,7 @@
 </div>
 
 <!-- CUSTOM ALERT MODAL -->
-<div id="customAlertModal" class="modal" style="z-index: 99998;">
+<div id="customAlertModal" class="modal" style="z-index: 99998; align-items:center; justify-content:center;">
     <div class="modal-content" style="max-width: 320px; text-align: center;">
         <h3 style="margin-top:0; color:var(--danger);" id="alertTitle">⚠️ Notice</h3>
         <p id="alertMessage" style="font-size:14px; margin-bottom:10px; color:#444; font-weight:bold;"></p>
@@ -139,15 +170,15 @@
 <main>
     <div id="unifiedHome">
         
-        <!-- NEW ACTION BUTTONS (Replaced Tabs) -->
+        <!-- MAIN ACTION BUTTONS (Clicking sets display to 'flex' so modals perfectly center) -->
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px;">
-            <button onclick="document.getElementById('zatpatModal').style.display='block'" style="background: var(--bajaj-blue); color: white; padding: 12px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
+            <button onclick="document.getElementById('zatpatModal').style.display='flex'" style="background: var(--bajaj-blue); color: white; padding: 12px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
                 <span style="font-size:14px;">🧮</span> ZATPAT CALC
             </button>
-            <button onclick="document.getElementById('addCustomerModal').style.display='block'" style="background: var(--primary); color: white; padding: 12px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
+            <button onclick="document.getElementById('addCustomerModal').style.display='flex'" style="background: var(--primary); color: white; padding: 12px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
                 <span style="font-size:14px;">📝</span> ADD CUSTOMER
             </button>
-            <button onclick="document.getElementById('savedQueueModal').style.display='block'" style="background: #6c757d; color: white; padding: 12px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
+            <button onclick="document.getElementById('savedQueueModal').style.display='flex'" style="background: #6c757d; color: white; padding: 12px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
                 <span style="font-size:14px;">👥</span> SAVED QUEUE (<span id="queueCount">0</span>)
             </button>
         </div>
@@ -195,23 +226,25 @@
 
 
     <!-- ============================================== -->
-    <!-- NEW: POP-UP MODALS FOR PRIMARY ACTIONS         -->
+    <!-- CENTERED POP-UP MODALS FOR PRIMARY ACTIONS     -->
     <!-- ============================================== -->
 
-    <!-- 1. ZATPAT CALC MODAL -->
+    <!-- 1. ZATPAT CALC MODAL (Single Column & Required Compact Width) -->
     <div id="zatpatModal" class="modal">
-        <div class="modal-content" style="max-width: 650px; padding: 20px;">
+        <!-- max-width 350px restricts width so elements take exactly the needed space without stretching across the screen -->
+        <div class="modal-content" style="max-width: 350px; padding: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">
-                <h3 style="margin:0; color:var(--bajaj-blue); font-size: 18px !important; display: flex; align-items: center; gap: 6px;">
-                    <span style="font-size:20px;">⚙️</span> PRO ZATPAT CALCULATOR
+                <h3 style="margin:0; color:var(--bajaj-blue); font-size: 16px !important; display: flex; align-items: center; gap: 6px;">
+                    <span style="font-size:18px;">🧮</span> PRO ZATPAT CALC
                 </h3>
                 <div style="display:flex; gap:10px; align-items: center;">
-                    <button onclick="resetFastCalc()" style="background:var(--warning); color:#000; padding:6px 12px; border-radius:4px; font-weight:bold; font-size:11px !important; border:none; cursor:pointer;">🔄 RESET</button>
-                    <button onclick="document.getElementById('zatpatModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:20px; padding:0;">✖</button>
+                    <button onclick="resetFastCalc()" style="background:var(--warning); color:#000; padding:4px 8px; border-radius:4px; font-weight:bold; font-size:11px !important; border:none; cursor:pointer;">🔄 RESET</button>
+                    <button onclick="document.getElementById('zatpatModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px; padding:0;">✖</button>
                 </div>
             </div>
             
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px;">
+            <!-- 1 Column Layout (flex-direction: column) -->
+            <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:15px;">
                 <div><label class="popup-input-label">INVOICE AMOUNT / MRP (₹)</label><input type="number" id="fcInv" placeholder="Enter Amount" oninput="fcInvChanged();" class="popup-input"></div>
                 <div><label class="popup-input-label">LOAN AMOUNT (₹)</label><input type="number" id="fcLoanInput" placeholder="Default 100%" oninput="calculateFastData();" onchange="validateFastLoanMin();" onblur="validateFastLoanMin();" class="popup-input"></div>
                 <div><label class="popup-input-label">TENURE (Max)</label><input type="number" id="fcTenure" placeholder="0" oninput="calculateFastData();" class="popup-input"></div>
@@ -258,19 +291,19 @@
             </div>
             
             <div style="display:flex; gap:10px; margin-top:15px;">
-                <button onclick="document.getElementById('zatpatModal').style.display='none'" style="flex:1; background:#dc3545; color:white; padding:12px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">CANCEL</button>
+                <button onclick="document.getElementById('zatpatModal').style.display='none'" style="width:100%; background:#dc3545; color:white; padding:12px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">CANCEL</button>
             </div>
         </div>
     </div>
 
-    <!-- 2. ADD CUSTOMER MODAL -->
+    <!-- 2. ADD CUSTOMER MODAL (Compact 350px Width) -->
     <div id="addCustomerModal" class="modal">
-        <div class="modal-content" style="max-width: 400px; padding: 20px;">
+        <div class="modal-content" style="max-width: 350px; padding: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">
-                <h3 style="margin:0; color:var(--primary); font-size: 18px !important; display: flex; align-items: center; gap: 6px;">
-                    <span style="font-size:20px;">📝</span> ADD NEW CUSTOMER
+                <h3 style="margin:0; color:var(--primary); font-size: 16px !important; display: flex; align-items: center; gap: 6px;">
+                    <span style="font-size:18px;">📝</span> ADD NEW CUSTOMER
                 </h3>
-                <button onclick="document.getElementById('addCustomerModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:20px; padding:0;">✖</button>
+                <button onclick="document.getElementById('addCustomerModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px; padding:0;">✖</button>
             </div>
             
             <div style="display:none;">
@@ -278,20 +311,18 @@
                 <input type="text" id="cqMobile" placeholder="10 Digits" maxlength="10" oninput="checkDuplicateMobile(this.value)" class="popup-input">
                 <div id="mobileDupWarning" style="color: var(--danger); font-size: 11px !important; font-weight: 900; display: none; margin-top: 3px; background: #ffebee; padding: 4px 6px; border-radius: 4px; border-left: 3px solid var(--danger);"></div>
             </div>
-            <div style="margin-bottom:10px;"><label class="popup-input-label">CUSTOMER NAME</label><input type="text" id="cqName" placeholder="Enter Name" class="popup-input"></div>
-            <div style="margin-bottom:10px;"><label class="popup-input-label">CUSTOMER TYPE</label>
+            <div style="margin-bottom:12px;"><label class="popup-input-label">CUSTOMER NAME</label><input type="text" id="cqName" placeholder="Enter Name" class="popup-input"></div>
+            <div style="margin-bottom:12px;"><label class="popup-input-label">CUSTOMER TYPE</label>
                 <select id="cqType" class="popup-input">
                     <option value="NEW">NEW</option><option value="EMI CARD">EMI CARD</option><option value="VIRTUAL">VIRTUAL</option><option value="W/O CARD">W/O CARD</option>
                 </select>
             </div>
-            <div style="margin-bottom:10px;"><label class="popup-input-label">NBFC LIMIT (₹)</label><input type="number" id="cqLimit" placeholder="₹ Amount" class="popup-input"></div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-                <div><label class="popup-input-label">MAX LTV %</label><input type="number" id="cqLtv" value="100" max="100" oninput="if(this.value>100)this.value=100;" class="popup-input"></div>
-                <div><label class="popup-input-label">EMI CAPPING</label><input type="number" id="cqCap" placeholder="₹ Cap" class="popup-input"></div>
-            </div>
+            <div style="margin-bottom:12px;"><label class="popup-input-label">NBFC LIMIT (₹)</label><input type="number" id="cqLimit" placeholder="₹ Amount" class="popup-input"></div>
+            <div style="margin-bottom:12px;"><label class="popup-input-label">MAX LTV %</label><input type="number" id="cqLtv" value="100" max="100" oninput="if(this.value>100)this.value=100;" class="popup-input"></div>
+            <div style="margin-bottom:15px;"><label class="popup-input-label">EMI CAPPING</label><input type="number" id="cqCap" placeholder="₹ Cap" class="popup-input"></div>
             
             <div style="display:flex; gap:10px;">
-                <button id="addToQueueBtn" onclick="addCustomerToQueue(); document.getElementById('addCustomerModal').style.display='none';" style="flex:2; background:#28a745; color:white; padding:12px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">CONTINUE (ADD)</button>
+                <button id="addToQueueBtn" onclick="addCustomerToQueue(); document.getElementById('addCustomerModal').style.display='none';" style="flex:2; background:#28a745; color:white; padding:12px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">ADD TO QUEUE</button>
                 <button onclick="document.getElementById('addCustomerModal').style.display='none'" style="flex:1; background:#dc3545; color:white; padding:12px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">CANCEL</button>
             </div>
         </div>
@@ -299,14 +330,14 @@
 
     <!-- 3. SAVED QUEUE MODAL -->
     <div id="savedQueueModal" class="modal">
-        <div class="modal-content" style="max-width: 500px; padding: 20px;">
+        <div class="modal-content" style="max-width: 400px; padding: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">
-                <h3 style="margin:0; color:#6c757d; font-size: 18px !important; display: flex; align-items: center; gap: 6px;">
-                    <span style="font-size:20px;">👥</span> SAVED QUEUE (<span id="queueCount">0</span>)
+                <h3 style="margin:0; color:#6c757d; font-size: 16px !important; display: flex; align-items: center; gap: 6px;">
+                    <span style="font-size:18px;">👥</span> SAVED QUEUE (<span id="queueCount">0</span>)
                 </h3>
                 <div style="display:flex; gap:10px; align-items: center;">
                     <button onclick="openRecycleBin()" style="background:#fff; border:1px solid #ccc; border-radius:4px; padding: 4px 8px; font-weight:bold; font-size:12px; cursor:pointer;" title="Recycle Bin">🗑️ Bin</button>
-                    <button onclick="document.getElementById('savedQueueModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:20px; padding:0;">✖</button>
+                    <button onclick="document.getElementById('savedQueueModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px; padding:0;">✖</button>
                 </div>
             </div>
             
@@ -329,7 +360,7 @@
     <!-- ============================================== -->
 
     <!-- MAIN SEND EMI DETAILS MODAL -->
-    <div id="customerMessageGenModal" class="modal">
+    <div id="customerMessageGenModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width: 850px; padding: 20px;">
             <div style="display: flex; align-items: center; border-bottom: 2px solid var(--bajaj-blue); padding-bottom: 8px; margin-bottom: 10px; position: relative;">
                 <button onclick="openDraftsModal()" style="background:var(--warning); color:#000; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:6px; z-index: 10;">
@@ -373,7 +404,7 @@
     </div>
 
     <!-- SEPARATE DRAFTS MODAL -->
-    <div id="draftsModal" class="modal">
+    <div id="draftsModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width: 500px; padding: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--warning); padding-bottom: 8px; margin-bottom: 15px;">
                 <h3 style="margin:0; color:var(--warning); text-shadow: 0 1px 1px rgba(0,0,0,0.1);">📥 Saved Drafts</h3>
@@ -383,7 +414,7 @@
         </div>
     </div>
 
-    <div id="flyerGenModal" class="modal">
+    <div id="flyerGenModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width:440px; padding: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bajaj-blue); padding-bottom: 8px; margin-bottom: 15px;">
                 <h3 style="margin:0; color:var(--bajaj-blue);">🔗 Generate Flyer Link</h3>
@@ -417,7 +448,7 @@
         </div>
     </div>
 
-    <div id="inviteModal" class="modal">
+    <div id="inviteModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width: 320px;">
             <h3 style="margin-top:0; color:#25D366; border-bottom: 2px solid #ddd; padding-bottom: 6px;">💬 Send Invitation</h3>
             <p style="font-size:12px; color:#555; margin-bottom:12px;">Customer ko WhatsApp se kharidari ke liye invite karein.</p>
@@ -431,7 +462,7 @@
     </div>
 
     <!-- NEW SMART DICTIONARY MODAL -->
-    <div id="dictionarySearchModal" class="modal">
+    <div id="dictionarySearchModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width: 950px; padding: 20px; max-height: 90vh; overflow-y: auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--indigo); padding-bottom: 8px; margin-bottom: 15px;">
                 <h3 style="margin:0; color:var(--indigo); font-size: 16px !important;">🔍 SMART SCHEMES DICTIONARY</h3>
@@ -509,27 +540,27 @@
         </div>
     </div>
 
-    <div id="editCustomerModal" class="modal">
+    <div id="editCustomerModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width:300px;">
             <h3 style="margin-top:0; color:var(--indigo); border-bottom: 2px solid #ddd; padding-bottom: 6px;">✏️ Edit Customer Details</h3>
-            <div style="margin-bottom:6px;"><label>CUSTOMER NAME</label><input type="text" id="ecName"></div>
+            <div style="margin-bottom:6px;"><label>CUSTOMER NAME</label><input type="text" id="ecName" class="popup-input"></div>
             <div style="display:none;"><label>MOBILE NO.</label><input type="text" id="ecMobile" maxlength="10"></div>
-            <div style="margin-bottom:6px;"><label>NBFC LIMIT</label><input type="number" id="ecLimit"></div>
+            <div style="margin-bottom:6px;"><label>NBFC LIMIT</label><input type="number" id="ecLimit" class="popup-input"></div>
             <div style="margin-bottom:6px;"><label>CUSTOMER TYPE</label>
-                <select id="ecType"><option value="NEW">NEW</option><option value="EMI CARD">EMI CARD</option><option value="VIRTUAL">VIRTUAL</option><option value="W/O CARD">W/O CARD</option></select>
+                <select id="ecType" class="popup-input"><option value="NEW">NEW</option><option value="EMI CARD">EMI CARD</option><option value="VIRTUAL">VIRTUAL</option><option value="W/O CARD">W/O CARD</option></select>
             </div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:12px;">
-                <div><label>MAX LTV %</label><input type="number" id="ecLtv" max="100" oninput="if(this.value>100)this.value=100;"></div>
-                <div><label>EMI CAPPING</label><input type="number" id="ecCap"></div>
+                <div><label>MAX LTV %</label><input type="number" id="ecLtv" max="100" oninput="if(this.value>100)this.value=100;" class="popup-input"></div>
+                <div><label>EMI CAPPING</label><input type="number" id="ecCap" class="popup-input"></div>
             </div>
             <div style="display:flex; gap:8px;">
-                <button onclick="saveCustomerEdit()" style="flex:2; background:var(--success); color:white;">SAVE CHANGES</button>
-                <button onclick="closeCustomerEdit()" style="flex:1; background:var(--danger); color:white;">CANCEL</button>
+                <button onclick="saveCustomerEdit()" style="flex:2; background:var(--success); color:white; border:none; padding:8px; border-radius:4px; font-weight:bold;">SAVE CHANGES</button>
+                <button onclick="closeCustomerEdit()" style="flex:1; background:var(--danger); color:white; border:none; padding:8px; border-radius:4px; font-weight:bold;">CANCEL</button>
             </div>
         </div>
     </div>
 
-    <div id="recycleBinModal" class="modal">
+    <div id="recycleBinModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width:350px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 6px; margin-bottom: 8px;">
                 <h3 style="margin:0; color:var(--danger);">🗑️ Recycle Bin</h3>
@@ -540,7 +571,7 @@
         </div>
     </div>
 
-    <div id="addProductModal" class="modal">
+    <div id="addProductModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width: 350px;">
             <h3 style="margin-top:0; color:var(--bajaj-blue); border-bottom: 2px solid #ddd; padding-bottom: 6px;">🔍 ADD NEW PRODUCT</h3>
             <div style="position:relative; margin-bottom: 12px;">
@@ -556,7 +587,7 @@
         </div>
     </div>
 
-    <div id="quoteSelectionModal" class="modal">
+    <div id="quoteSelectionModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width:350px;">
             <h3 style="margin-top:0; color:var(--bajaj-blue);">🖼️ Select Models for Quotation</h3>
             <div id="quoteModelCheckboxes" style="display:flex; flex-direction:column; gap:6px; max-height:220px; overflow-y:auto; margin-bottom:15px; padding-right:5px;" class="custom-scroll"></div>
@@ -567,7 +598,7 @@
         </div>
     </div>
 
-    <div id="componentsModal" class="modal">
+    <div id="componentsModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width: 350px;">
             <h3 style="margin-top:0; color:var(--indigo); border-bottom: 2px solid #ddd; padding-bottom: 6px;">⚙️ Fill Components</h3>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:12px;">
@@ -588,7 +619,7 @@
         </div>
     </div>
 
-    <div id="custInfoPromptModal" class="modal">
+    <div id="custInfoPromptModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width:320px;">
             <h3 style="margin-top:0; color:var(--bajaj-blue); text-align: center;">👤 Verify Details Before Export</h3>
             <div style="margin-bottom:8px;">
@@ -607,7 +638,7 @@
         </div>
     </div>
 
-    <div id="catSelectionModal" class="modal">
+    <div id="catSelectionModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width: 350px; max-height: 80vh; overflow-y: auto;">
             <h3 style="margin-top:0; color:var(--indigo);">⚡ SELECT NON-TIEUP CATEGORY</h3>
             <div id="categoryGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:6px;"></div>
@@ -615,7 +646,7 @@
         </div>
     </div>
 
-    <div id="multiStackModal" class="modal">
+    <div id="multiStackModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content">
             <h3 style="margin-top:0; color:var(--dark);">Add Manual Product (Up to 10 Schemes)</h3>
             <div style="margin-bottom: 12px; background: #f8f9fa; padding: 8px; border-radius: 6px; border: 1.5px solid #ccc;">
@@ -630,7 +661,7 @@
         </div>
     </div>
 
-    <div id="editSchemeModal" class="modal">
+    <div id="editSchemeModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width: 280px;">
             <h3 style="margin-top:0; color:var(--indigo);">Modify Scheme Components</h3>
             <input type="hidden" id="editPIdx"><input type="hidden" id="editDIdx">
@@ -646,14 +677,14 @@
         </div>
     </div>
 
-    <div id="imageViewerModal" class="modal">
+    <div id="imageViewerModal" class="modal" style="align-items:center; justify-content:center;">
         <button class="close-img-btn" onclick="closeImageViewer()">X</button>
         <div id="clipboardStatusAlert" style="color:#25D366; font-size:14px !important; font-weight:bold; text-align:center; width:100%; display:none;">✅ COPIED TO CLIPBOARD!</div>
         <div style="color:#f39c12; font-size:14px !important; font-weight:bold; text-align:center; margin-top:5px; width:100%;">⚠️ Long press or Right-click image to Save directly 👇</div>
         <img id="generatedImage" src="" alt="Quotation">
     </div>
 
-    <div id="manualModal" class="modal">
+    <div id="manualModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width:300px;">
             <h3 id="modalTitle" style="margin-top:0;">Add Custom Scheme</h3>
             <div id="modelNameInputArea" style="display:none;"><label>Model Name</label><input type="text" id="manName" value="MANUAL MODEL"></div>
@@ -668,16 +699,8 @@
         </div>
     </div>
 
-    <div id="finalEligibleArea">
-        <div class="top-nav-box" style="margin-top: 4px; border-top: 2px dashed #ccc; padding-top: 8px;">
-            <button id="genQuoteBtn" onclick="openQuoteSelectionModal()" style="flex:1; background:var(--bajaj-blue); color:white;">GEN QUOTE</button>
-            <select id="finalCustomerSwitcher" onchange="switchCustomerFinal(this.value)" style="flex:1.5; font-weight:bold; color:var(--indigo); padding:2px;"></select>
-            <button onclick="goHome()" style="flex:0.8; background:var(--danger); color:white;">✖ BACK</button>
-        </div>
-    </div>
-    
     <!-- DEALER SEARCH MODAL -->
-    <div id="dealerSearchModal" class="modal">
+    <div id="dealerSearchModal" class="modal" style="align-items:center; justify-content:center;">
         <div class="modal-content" style="max-width: 500px; padding: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bajaj-blue); padding-bottom: 8px; margin-bottom: 15px;">
                 <h3 style="margin:0; color:var(--bajaj-blue);">🔗 Dealer Links Search</h3>
