@@ -21,72 +21,6 @@
     
     <!-- Link to our separate CSS file -->
     <link rel="stylesheet" href="style.css?v=6.5">
-
-<style>
-/* काचेसारखा इफेक्ट (Glassmorphism) */
-.premium-customer-card::before {
-    content: '';
-    position: absolute;
-    top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-    transform: rotate(30deg);
-    pointer-events: none;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 15px;
-    margin-bottom: 15px;
-    position: relative;
-    z-index: 2;
-}
-
-.profile-info { display: flex; align-items: center; gap: 15px; }
-.avatar { font-size: 35px; background: rgba(255,255,255,0.2); border-radius: 50%; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-.cust-name { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
-
-.cust-badges { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-.premium-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; letter-spacing: 0.5px; }
-.type-badge { background: #e67e22; color: white; box-shadow: 0 2px 5px rgba(230, 126, 34, 0.4); }
-.ltv-badge { background: rgba(255,255,255,0.2); }
-.cap-badge { border: 1px dashed rgba(255,255,255,0.5); }
-
-.card-body { position: relative; z-index: 2; text-align: center; }
-.limit-label { font-size: 12px; color: #a8c0ff; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
-.limit-amount { font-size: 42px; font-weight: 900; color: #00ff87; text-shadow: 0 0 20px rgba(0, 255, 135, 0.4); margin-top: 5px; line-height: 1; }
-
-.quick-actions { display: flex; gap: 10px; }
-.icon-btn { background: rgba(255,255,255,0.1); border: none; font-size: 18px; padding: 10px; border-radius: 50%; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
-.icon-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
-.wa-btn { color: #25D366; text-shadow: 0 0 5px rgba(37, 211, 102, 0.5); }
-.call-btn { color: #3498db; }
-
-/* Custom Inputs for Pop-ups */
-.popup-input-label { font-size: 11px; font-weight: 900; color: #555; display: block; margin-bottom: 4px; text-transform: uppercase; }
-.popup-input { width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; font-size: 13px; box-sizing: border-box; height: auto !important; }
-.popup-input:disabled { background: #e9ecef; cursor: not-allowed; }
-
-/* =========================================
-   COMPACT SIDE-BY-SIDE DESIGN FOR ZATPAT CALC 
-   ========================================= */
-.compact-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
-.compact-label { margin-bottom: 0; width: 45%; font-size: 10.5px; font-weight: 900; color: #555; text-transform: uppercase; line-height: 1.1; }
-.compact-input { width: 55%; padding: 4px 8px; height: 28px !important; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; font-size: 12px; box-sizing: border-box; }
-.compact-input:disabled { background: #e9ecef; cursor: not-allowed; border: 1px solid #ddd; }
-
-/* =========================================
-   PERFECT CENTER ALIGNED MODALS 
-   ========================================= */
-.modal { display: none; position: fixed; z-index: 100000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px); align-items: center; justify-content: center; }
-.modal-content { background-color: #fff; margin: 0 auto; padding: 20px; border-radius: 8px; width: 90%; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-.modal-content::-webkit-scrollbar { width: 6px; }
-.modal-content::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
-</style>
-
 </head>
 <body>
 <!-- Global Data Loader -->
@@ -193,8 +127,8 @@
             <button onclick="goHome()">✖ BACK</button>
         </div>
 
-        <!-- COMPACT ACTIVE CUSTOMER INFO CARD -->
-        <div style="background: #253241; border-radius: 8px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); margin-bottom: 12px; border: 1px solid #3b4b5e;">
+        <!-- COMPACT ACTIVE CUSTOMER INFO CARD (Given an ID to hide/show) -->
+        <div id="activeCustomerCard" style="display: none; background: #253241; border-radius: 8px; padding: 10px 15px; justify-content: space-between; align-items: center; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); margin-bottom: 12px; border: 1px solid #3b4b5e;">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="width: 38px; height: 38px; background: rgba(0,0,0,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px;">👤</div>
                 <div style="display: flex; flex-direction: column; gap: 4px;">
@@ -223,8 +157,10 @@
             </div>
         </div>
 
-        <button onclick="openAddProductModal()" style="width: 100%; background:var(--warning); color:#000; padding:10px; border-radius:6px; font-weight:900; margin-bottom:8px; border: 1.5px solid #d35400; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor:pointer;">➕ ADD NEW PRODUCT (SEARCH / NON-TIEUP / MANUAL)</button>
-        <div id="multiModelContainer"></div>
+        <div id="calculationWorkspace" style="display: none;">
+            <button onclick="openAddProductModal()" style="width: 100%; background:var(--warning); color:#000; padding:10px; border-radius:6px; font-weight:900; margin-bottom:8px; border: 1.5px solid #d35400; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor:pointer;">➕ ADD NEW PRODUCT (SEARCH / NON-TIEUP / MANUAL)</button>
+            <div id="multiModelContainer"></div>
+        </div>
     </div>
 </main>
 
@@ -381,7 +317,7 @@
                 <span style="font-size:18px;">👥</span> SAVED QUEUE (<span id="queueCount">0</span>)
             </h3>
             <div style="display:flex; gap:10px; align-items: center;">
-                <button onclick="openRecycleBin()" style="background:#fff; border:1px solid #ccc; border-radius:4px; padding: 4px 8px; font-weight:bold; font-size:12px; cursor:pointer;" title="Recycle Bin">🗑️ Bin</button>
+                <button onclick="emptyRecycleBin(); document.getElementById('infoName').innerText='-';" style="background:#fff; border:1px solid #ccc; border-radius:4px; padding: 4px 8px; font-weight:bold; font-size:12px; cursor:pointer;" title="Recycle Bin">🗑️ Bin</button>
                 <button onclick="document.getElementById('savedQueueModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px; padding:0;">✖</button>
             </div>
         </div>
@@ -393,7 +329,10 @@
             <button id="uniCopyBtn" onclick="uniCopy()" style="flex:1; background:var(--warning); color:#000; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">📋 COPY</button>
             <button id="uniSelectBtn" onclick="uniSelect(); document.getElementById('savedQueueModal').style.display='none';" style="flex:1.2; background:var(--primary); color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">▶ SELECT</button>
             <button id="uniEditBtn" onclick="uniEdit()" style="flex:1; background:var(--indigo); color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">✏️ EDIT</button>
-            <button id="uniDeleteBtn" onclick="uniDelete()" style="flex:1; background:var(--danger); color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">✖ DEL</button>
+            
+            <!-- DELETE BUTTON UPDATED TO RESET UI IMMEDIATELY -->
+            <button id="uniDeleteBtn" onclick="uniDelete(); document.getElementById('infoName').innerText='-';" style="flex:1; background:var(--danger); color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">✖ DEL</button>
+            
             <button id="uniInviteBtn" onclick="uniInvite()" style="flex:1.2; background:#25D366; color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">💬 INVITE</button>
         </div>
         
@@ -772,42 +711,30 @@
 <!-- Link to our separate JS file -->
 <script src="app.js"></script>
 
-<!-- Script for Error Handling & UI Flow Correction -->
+<!-- Script for Customer Selection Toggle -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const infoNameEl = document.getElementById('infoName');
+        const activeCustomerCard = document.getElementById('activeCustomerCard');
         const noCustomerState = document.getElementById('noCustomerState');
-        const unifiedHome = document.getElementById('unifiedHome');
-        const toastEl = document.getElementById('toastNotification');
 
-        // Customer select kelyavar Final Screen UI display karnyasathi
-        function checkCustomerState() {
+        function toggleCustomerDisplay() {
             const name = infoNameEl.innerText.trim();
             if (name === '-' || name === '') {
+                activeCustomerCard.style.display = 'none';
                 noCustomerState.style.display = 'block';
             } else {
+                activeCustomerCard.style.display = 'flex';
                 noCustomerState.style.display = 'none';
             }
         }
 
-        checkCustomerState();
-        const observer = new MutationObserver(checkCustomerState);
-        observer.observe(infoNameEl, { childList: true, characterData: true, subtree: true });
+        // Run on load
+        toggleCustomerDisplay();
 
-        // Queue error aalyavar reset karnyachi system
-        const toastObserver = new MutationObserver(() => {
-            if (toastEl.classList.contains('show')) {
-                const msg = toastEl.innerText.toLowerCase();
-                if (msg.includes('queue') && msg.includes('customer')) {
-                    unifiedHome.style.display = 'block';
-                    noCustomerState.style.display = 'block';
-                }
-            }
-        });
-        
-        if (toastEl) {
-            toastObserver.observe(toastEl, { attributes: true, attributeFilter: ['class'] });
-        }
+        // Watch for changes in Customer Name
+        const observer = new MutationObserver(toggleCustomerDisplay);
+        observer.observe(infoNameEl, { childList: true, characterData: true, subtree: true });
     });
 </script>
 
