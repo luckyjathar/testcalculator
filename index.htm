@@ -131,8 +131,8 @@
             <div class="form-container" style="flex: 1; min-width: 250px; background: #e3f2fd; border: 2px solid var(--primary); margin-bottom:0; display: flex; flex-direction: column;">
                 <label style="color:var(--primary); font-size:13px !important; border-bottom:2px solid var(--primary); padding-bottom:4px; margin-bottom:8px; display:block;"><span id="icon_add">📝</span> ADD NEW CUSTOMER</label>
                 <div style="flex: 1;">
-                    <!-- ON-THE-SPOT DUPLICATE CHECK INPUT & WARNING -->
-                    <div style="margin-bottom:6px;">
+                    <!-- ON-THE-SPOT DUPLICATE CHECK INPUT & WARNING (HIDDEN) -->
+                    <div style="display:none;">
                         <label>MOBILE NO.</label>
                         <input type="text" id="cqMobile" placeholder="10 Digits" maxlength="10" oninput="checkDuplicateMobile(this.value)">
                         <div id="mobileDupWarning" style="color: var(--danger); font-size: 11px !important; font-weight: 900; display: none; margin-top: 3px; background: #ffebee; padding: 4px 6px; border-radius: 4px; border-left: 3px solid var(--danger);"></div>
@@ -159,7 +159,7 @@
                     <span id="icon_queue">👥</span> SAVED CUSTOMERS QUEUE (<span id="queueCount">0</span>)
                     <span onclick="openRecycleBin()" style="cursor:pointer; float:right; font-size:16px !important; background: #fff; border:1px solid #ccc; border-radius:4px; padding: 0 4px;" title="Recycle Bin">🗑️</span>
                 </label>
-                <input type="text" id="queueSearch" placeholder="🔍 Search saved customer by name, number, limit..." oninput="renderCustomerQueue()" style="margin-bottom: 6px; border-color:var(--bajaj-blue);">
+                <input type="text" id="queueSearch" placeholder="🔍 Search saved customer by name, limit..." oninput="renderCustomerQueue()" style="margin-bottom: 6px; border-color:var(--bajaj-blue);">
                 <div id="customerQueueList" class="custom-scroll" style="display:flex; flex-direction:column; gap:6px; overflow-y:auto; flex:1; max-height: 250px; padding-right:4px;"></div>
                 <div style="display:flex; gap:4px; margin-top:8px; border-top:1px solid #ccc; padding-top:8px; flex-wrap:wrap;">
                     <button id="uniCopyBtn" onclick="uniCopy()" style="flex:1; background:var(--warning); color:#000; opacity:0.5; pointer-events:none; padding:6px; font-size:11px !important;">📋 COPY</button>
@@ -246,7 +246,8 @@
                 <div class="msg-form-group"><label>Dealer / Shop Name:</label><input type="text" id="msgShopName" value="" placeholder="Enter Dealer / Shop Name" oninput="generateMessage()"></div>
                 <div class="msg-form-group"><label>Asset Category:</label><input type="text" id="msgAssetCategory" value="" placeholder="Enter Category (e.g. PHONE)" oninput="generateMessage()"></div>
                 <div class="msg-form-group"><label>Customer Name:</label><input type="text" id="msgCustName" value="" placeholder="Enter Customer Name" oninput="generateMessage()"></div>
-                <div class="msg-form-group"><label>Mobile Number:</label><input type="text" id="msgCustMobile" value="" placeholder="10 Digits" maxlength="10" oninput="generateMessage()"></div>
+                <!-- MOBILE NUMBER INPUT REMOVED (HIDDEN) FROM HERE -->
+                <div class="msg-form-group" style="display:none;"><label>Mobile Number:</label><input type="text" id="msgCustMobile" value="" placeholder="10 Digits" maxlength="10" oninput="generateMessage()"></div>
                 <div class="msg-form-group"><label>Monthly EMI Amount (₹):</label><input type="number" id="msgCustEMI" value="" placeholder="0" oninput="generateMessage()"></div>
                 <div class="msg-form-group"><label>Total Tenure (Months):</label><input type="number" id="msgCustTenure" value="" placeholder="0" oninput="generateMessage()"></div>
                 <div class="msg-form-group"><label>Loan Approval Date:</label><input type="date" id="msgLoanDate" value="" onchange="calculateDates()"></div>
@@ -286,7 +287,8 @@
                 <button onclick="document.getElementById('flyerGenModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:16px;">✖</button>
             </div>
             <div style="margin-bottom:10px;"><label>Salesman Name (Required)</label><input type="text" id="fgSalesName" placeholder="Lakshya"></div>
-            <div style="margin-bottom:10px;"><label>WhatsApp Number (Required)</label><input type="text" id="fgSalesMobile" placeholder="10 Digit Mobile Number" maxlength="10"></div>
+            <!-- MOBILE NUMBER INPUT REMOVED (HIDDEN) FROM HERE -->
+            <div style="display:none;"><label>WhatsApp Number (Required)</label><input type="text" id="fgSalesMobile" placeholder="10 Digit Mobile Number" maxlength="10"></div>
             <div style="margin-bottom:10px; background: #f8f9fa; padding: 10px; border: 1.5px solid var(--bajaj-blue); border-radius: 6px;">
                 <label style="color:var(--bajaj-blue);">🏪 Select Dealer Shop (Compulsory)</label>
                 <input type="text" id="fgDealerSearch" placeholder="Search Dealer Name, City or Code..." oninput="searchFgDealer()">
@@ -318,7 +320,8 @@
             <h3 style="margin-top:0; color:#25D366; border-bottom: 2px solid #ddd; padding-bottom: 6px;">💬 Send Invitation</h3>
             <p style="font-size:12px; color:#555; margin-bottom:12px;">Customer ko WhatsApp se kharidari ke liye invite karein.</p>
             <div style="margin-bottom:6px;"><label>YOUR NAME (SALESPERSON)</label><input type="text" id="invSenderName" placeholder="E.g. Lakshya"></div>
-            <div style="margin-bottom:15px;"><label>YOUR MOBILE NO.</label><input type="text" id="invSenderMobile" placeholder="10 Digits" maxlength="10"></div>
+            <!-- MOBILE NUMBER INPUT REMOVED (HIDDEN) FROM HERE -->
+            <div style="display:none;"><label>YOUR MOBILE NO.</label><input type="text" id="invSenderMobile" placeholder="10 Digits" maxlength="10"></div>
             <div style="display:flex; gap:8px;">
                 <button onclick="sendWhatsAppInvite()" style="flex:2; background:#25D366; color:white;">SEND ON WHATSAPP ↗</button>
                 <button onclick="document.getElementById('inviteModal').style.display='none'" style="flex:1; background:var(--danger); color:white;">CANCEL</button>
@@ -409,7 +412,8 @@
         <div class="modal-content" style="max-width:300px;">
             <h3 style="margin-top:0; color:var(--indigo); border-bottom: 2px solid #ddd; padding-bottom: 6px;">✏️ Edit Customer Details</h3>
             <div style="margin-bottom:6px;"><label>CUSTOMER NAME</label><input type="text" id="ecName"></div>
-            <div style="margin-bottom:6px;"><label>MOBILE NO.</label><input type="text" id="ecMobile" maxlength="10"></div>
+            <!-- MOBILE NUMBER INPUT REMOVED (HIDDEN) FROM HERE -->
+            <div style="display:none;"><label>MOBILE NO.</label><input type="text" id="ecMobile" maxlength="10"></div>
             <div style="margin-bottom:6px;"><label>NBFC LIMIT</label><input type="number" id="ecLimit"></div>
             <div style="margin-bottom:6px;"><label>CUSTOMER TYPE</label>
                 <select id="ecType"><option value="NEW">NEW</option><option value="EMI CARD">EMI CARD</option><option value="VIRTUAL">VIRTUAL</option><option value="W/O CARD">W/O CARD</option></select>
@@ -491,7 +495,8 @@
                 <label style="color:var(--indigo);">CUSTOMER NAME</label>
                 <input type="text" id="promptCustName" readonly style="background:#f0f0f0; cursor:not-allowed;">
             </div>
-            <div style="margin-bottom:12px;">
+            <!-- MOBILE NUMBER INPUT REMOVED (HIDDEN) FROM HERE -->
+            <div style="display:none;">
                 <label style="color:var(--indigo);">MOBILE NUMBER</label>
                 <input type="text" id="promptCustMobile" readonly style="background:#f0f0f0; cursor:not-allowed;">
             </div>
