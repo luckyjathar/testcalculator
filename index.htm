@@ -21,6 +21,72 @@
     
     <!-- Link to our separate CSS file -->
     <link rel="stylesheet" href="style.css?v=6.5">
+
+<style>
+/* काचेसारखा इफेक्ट (Glassmorphism) */
+.premium-customer-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    transform: rotate(30deg);
+    pointer-events: none;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 2;
+}
+
+.profile-info { display: flex; align-items: center; gap: 15px; }
+.avatar { font-size: 35px; background: rgba(255,255,255,0.2); border-radius: 50%; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+.cust-name { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+
+.cust-badges { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.premium-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; letter-spacing: 0.5px; }
+.type-badge { background: #e67e22; color: white; box-shadow: 0 2px 5px rgba(230, 126, 34, 0.4); }
+.ltv-badge { background: rgba(255,255,255,0.2); }
+.cap-badge { border: 1px dashed rgba(255,255,255,0.5); }
+
+.card-body { position: relative; z-index: 2; text-align: center; }
+.limit-label { font-size: 12px; color: #a8c0ff; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
+.limit-amount { font-size: 42px; font-weight: 900; color: #00ff87; text-shadow: 0 0 20px rgba(0, 255, 135, 0.4); margin-top: 5px; line-height: 1; }
+
+.quick-actions { display: flex; gap: 10px; }
+.icon-btn { background: rgba(255,255,255,0.1); border: none; font-size: 18px; padding: 10px; border-radius: 50%; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
+.icon-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
+.wa-btn { color: #25D366; text-shadow: 0 0 5px rgba(37, 211, 102, 0.5); }
+.call-btn { color: #3498db; }
+
+/* Custom Inputs for Pop-ups */
+.popup-input-label { font-size: 11px; font-weight: 900; color: #555; display: block; margin-bottom: 4px; text-transform: uppercase; }
+.popup-input { width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; font-size: 13px; box-sizing: border-box; height: auto !important; }
+.popup-input:disabled { background: #e9ecef; cursor: not-allowed; }
+
+/* =========================================
+   COMPACT SIDE-BY-SIDE DESIGN FOR ZATPAT CALC 
+   ========================================= */
+.compact-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.compact-label { margin-bottom: 0; width: 45%; font-size: 10.5px; font-weight: 900; color: #555; text-transform: uppercase; line-height: 1.1; }
+.compact-input { width: 55%; padding: 4px 8px; height: 28px !important; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; font-size: 12px; box-sizing: border-box; }
+.compact-input:disabled { background: #e9ecef; cursor: not-allowed; border: 1px solid #ddd; }
+
+/* =========================================
+   PERFECT CENTER ALIGNED MODALS 
+   ========================================= */
+.modal { display: none; position: fixed; z-index: 100000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px); align-items: center; justify-content: center; }
+.modal-content { background-color: #fff; margin: 0 auto; padding: 20px; border-radius: 8px; width: 90%; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+.modal-content::-webkit-scrollbar { width: 6px; }
+.modal-content::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+</style>
+
 </head>
 <body>
 <!-- Global Data Loader -->
@@ -74,13 +140,13 @@
 </aside>
 
 <!-- HEADER -->
-<header>
-    <div class="logo-area">
-        <button class="menu-toggle-btn" onclick="toggleSidebar()">☰ MENU</button>
-        <h1>🚀 Persistent Portal Master</h1>
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 10px 15px; border-bottom: 3px solid var(--primary); margin-bottom: 6px; background: #fff; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow: hidden;">
+    <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+        <button class="menu-toggle-btn" onclick="toggleSidebar()" style="margin: 0; background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 16px !important; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: bold;">☰ MENU</button>
+        <h1 style="margin: 0; font-size: 18px; color: var(--primary); font-weight: 900; letter-spacing: 0.5px; white-space: nowrap;">🚀 Persistent Portal Master</h1>
     </div>
-    <div class="header-disclaimer" title="DISCLAIMER: GitHub smart stream activated. System will only download files if updates are detected. Original application ke saath verify zaroor karein.">
-        <b>DISCLAIMER:</b> GitHub smart stream activated. System will only download files if updates are detected. Original application ke saath verify zaroor karein.
+    <div title="DISCLAIMER: GitHub smart stream activated. System will only download files if updates are detected. Original application ke saath verify zaroor karein." style="background-color: #e3f2fd; border: 1px solid #90caf9; color: #1565c0; padding: 6px 12px; border-radius: 6px; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; text-align: left; max-width: 600px; font-weight: 600;">
+        <b style="color: #0d47a1; font-weight: 900; text-transform: uppercase;">DISCLAIMER:</b> GitHub smart stream activated. System will only download files if updates are detected. Original application ke saath verify zaroor karein.
     </div>
 </header>
 
@@ -101,7 +167,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- UNIFIED HOME (Shown when NO Customer is Selected) -->
+    <!-- SCREEN 1: UNIFIED HOME (No Customer Selected) -->
     <!-- ========================================== -->
     <div id="unifiedHome">
         <div id="noCustomerState" style="text-align: center; padding: 40px 20px; background: transparent; border: 2px dashed #ced4da; border-radius: 8px; margin-bottom: 12px;">
@@ -116,7 +182,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- FINAL ELIGIBLE AREA (Shown when Customer IS Selected) -->
+    <!-- SCREEN 2: FINAL ELIGIBLE AREA (Customer Selected) -->
     <!-- ========================================== -->
     <div id="finalEligibleArea" style="display: none; flex-direction: column;">
         
@@ -166,9 +232,9 @@
 <!-- ALL MODALS (POP-UPS) -->
 <!-- ============================================================== -->
 
-<!-- 1. ZATPAT CALC MODAL -->
+<!-- 1. ZATPAT CALC MODAL (MINIMAL SPACING & NO CONTAINER BOX) -->
 <div id="zatpatModal" class="modal" style="align-items:center; justify-content:center;">
-    <div class="modal-content" style="max-width: 400px; padding: 15px 20px;">
+    <div class="modal-content" style="max-width: 380px; padding: 15px 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 12px;">
             <h3 style="margin:0; color:var(--bajaj-blue); font-size: 16px !important; display: flex; align-items: center; gap: 6px;">
                 <span style="font-size:18px;">🧮</span> PRO ZATPAT CALC
@@ -179,98 +245,98 @@
             </div>
         </div>
         
-        <!-- SIDE BY SIDE COMPONENTS -->
-        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">INVOICE / MRP (₹)</label>
-                <input type="number" id="fcInv" placeholder="Enter Amount" oninput="fcInvChanged();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+        <!-- COMPACT SIDE-BY-SIDE COMPONENTS (No background box around inputs) -->
+        <div style="display:flex; flex-direction:column; gap:5px; margin-bottom:12px;">
+            <div class="compact-row">
+                <label class="compact-label">INVOICE / MRP (₹)</label>
+                <input type="number" id="fcInv" placeholder="Enter Amount" oninput="fcInvChanged();" class="compact-input">
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">LOAN AMOUNT (₹)</label>
-                <input type="number" id="fcLoanInput" placeholder="Default 100%" oninput="calculateFastData();" onchange="validateFastLoanMin();" onblur="validateFastLoanMin();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">LOAN AMOUNT (₹)</label>
+                <input type="number" id="fcLoanInput" placeholder="Default 100%" oninput="calculateFastData();" onchange="validateFastLoanMin();" onblur="validateFastLoanMin();" class="compact-input">
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">TENURE (Max)</label>
-                <input type="number" id="fcTenure" placeholder="0" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">TENURE (Max)</label>
+                <input type="number" id="fcTenure" placeholder="0" oninput="calculateFastData();" class="compact-input">
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">ADVANCE EMI</label>
-                <input type="number" id="fcAdv" placeholder="0" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">ADVANCE EMI</label>
+                <input type="number" id="fcAdv" placeholder="0" oninput="calculateFastData();" class="compact-input">
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">DBD (%)</label>
-                <input type="number" id="fcDbd" placeholder="0" step="0.01" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">DBD (%)</label>
+                <input type="number" id="fcDbd" placeholder="0" step="0.01" oninput="calculateFastData();" class="compact-input">
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">PF (₹)</label>
-                <input type="number" id="fcPf" placeholder="0" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">PF (₹)</label>
+                <input type="number" id="fcPf" placeholder="0" oninput="calculateFastData();" class="compact-input">
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">ROI (%)</label>
-                <input type="number" id="fcRoi" placeholder="0" step="0.01" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">ROI (%)</label>
+                <input type="number" id="fcRoi" placeholder="0" step="0.01" oninput="calculateFastData();" class="compact-input">
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">CUSTOMER TYPE</label>
-                <select id="fcCustType" onchange="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">CUSTOMER TYPE</label>
+                <select id="fcCustType" onchange="calculateFastData();" class="compact-input">
                     <option value="NEW">NEW</option><option value="EMI CARD">EMI CARD</option><option value="VIRTUAL">VIRTUAL</option><option value="W/O CARD">W/O CARD</option>
                 </select>
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">FIXED EMI (₹)</label>
-                <input type="number" id="fcFixed" placeholder="Optional" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">FIXED EMI (₹)</label>
+                <input type="number" id="fcFixed" placeholder="Optional" oninput="calculateFastData();" class="compact-input">
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">EMI CAPPING (₹)</label>
-                <input type="number" id="fcCap" placeholder="MAX" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">EMI CAPPING (₹)</label>
+                <input type="number" id="fcCap" placeholder="MAX" oninput="calculateFastData();" class="compact-input">
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">TARGET DP (₹)</label>
-                <input type="number" id="fcTarget" placeholder="Reverse Calc" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">TARGET DP (₹)</label>
+                <input type="number" id="fcTarget" placeholder="Reverse Calc" oninput="calculateFastData();" class="compact-input">
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">CATEGORY</label>
-                <select id="fcCat" onchange="fcCatChanged();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">CATEGORY</label>
+                <select id="fcCat" onchange="fcCatChanged();" class="compact-input">
                     <option value="OTHER">OTHER</option><option value="PHONE(WEB-MOBILE)">PHONE, TABLET</option>
                 </select>
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">GTL (₹)</label>
-                <select id="fcGtl" onchange="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">GTL (₹)</label>
+                <select id="fcGtl" onchange="calculateFastData();" class="compact-input">
                     <option value="0">0</option><option value="699">699</option><option value="1099">1099</option><option value="1199">1199</option><option value="1499">1499</option><option value="1799">1799</option><option value="2398">2398</option>
                 </select>
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">RFC (₹)</label>
-                <select id="fcRfc" onchange="calculateFastData();" disabled class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">RFC (₹)</label>
+                <select id="fcRfc" onchange="calculateFastData();" disabled class="compact-input">
                     <option value="0">0</option><option id="fcRfcOpt" value="0">0</option>
                 </select>
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">EXW (₹)</label>
-                <input type="number" id="fcExw" placeholder="0" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">EXW (₹)</label>
+                <input type="number" id="fcExw" placeholder="0" oninput="calculateFastData();" class="compact-input">
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">MARGIN (₹)</label>
-                <input type="number" id="fcMargin" placeholder="0" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">MARGIN (₹)</label>
+                <input type="number" id="fcMargin" placeholder="0" oninput="calculateFastData();" class="compact-input">
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">DEALER CONTRI (₹)</label>
-                <input type="number" id="fcDealer" placeholder="0" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            <div class="compact-row">
+                <label class="compact-label">DEALER CONTRI (₹)</label>
+                <input type="number" id="fcDealer" placeholder="0" oninput="calculateFastData();" class="compact-input">
             </div>
         </div>
 
-        <!-- REMOVED BOX (Seamless Result) -->
-        <div id="fcResult" style="display:none; padding-top:10px; border-top:1px dashed #ccc;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-weight:900; color:#555;">LOAN AMOUNT:</span> <span id="fcResLoan" style="color:var(--dark); font-weight:900; font-size:16px;">₹0</span></div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-weight:900; color:#555;">NET DP:</span> <span id="fcResDp" style="color:var(--success); font-weight:900; font-size:16px;">₹0</span></div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-weight:900; color:var(--primary);">MONTHLY EMI:</span> <span id="fcResEmi" style="color:var(--primary); font-weight:900; font-size:16px;">₹0</span></div>
+        <!-- BOLD RESULT BOX PRESERVED -->
+        <div id="fcResult" style="display:none; margin-top:12px; background:#fff; border:2px solid var(--primary); padding:15px; border-radius:6px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:6px;"><span style="font-weight:900; color:#555;">LOAN AMOUNT:</span> <span id="fcResLoan" style="color:var(--dark); font-weight:900; font-size:16px;">₹0</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:6px;"><span style="font-weight:900; color:#555;">NET DP:</span> <span id="fcResDp" style="color:var(--success); font-weight:900; font-size:16px;">₹0</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:6px;"><span style="font-weight:900; color:var(--primary);">MONTHLY EMI:</span> <span id="fcResEmi" style="color:var(--primary); font-weight:900; font-size:16px;">₹0</span></div>
             <div style="display:flex; justify-content:space-between;"><span style="font-weight:900; color:#555;">DAILY EMI:</span> <span id="fcResDaily" style="color:#d35400; font-weight:900; font-size:16px;">₹0</span></div>
-            <div id="fcResTa" style="text-align:center; font-weight:bold; color:var(--indigo); margin-top:8px;">T/A: 0/0 | M: 0</div>
-            <button onclick="copyFastCalcResult(this)" style="width:100%; margin-top:10px; background:var(--primary); color:white; padding:10px; border-radius:4px; font-weight:bold; box-shadow: 0 2px 4px rgba(9, 132, 227, 0.3); border:none; cursor:pointer;">📋 COPY CALCULATION</button>
+            <div id="fcResTa" style="text-align:center; font-weight:bold; color:var(--indigo); margin-top:10px;">T/A: 0/0 | M: 0</div>
+            <button onclick="copyFastCalcResult(this)" style="width:100%; margin-top:12px; background:var(--primary); color:white; padding:10px; border-radius:4px; font-weight:bold; box-shadow: 0 2px 4px rgba(9, 132, 227, 0.3); border:none; cursor:pointer;">📋 COPY CALCULATION</button>
         </div>
         
-        <div style="display:flex; gap:10px; margin-top:10px;">
-            <button onclick="document.getElementById('zatpatModal').style.display='none'" style="width:100%; background:#dc3545; color:white; padding:12px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">CLOSE</button>
+        <div style="display:flex; gap:10px; margin-top:12px;">
+            <button onclick="document.getElementById('zatpatModal').style.display='none'" style="width:100%; background:#dc3545; color:white; padding:10px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">CLOSE</button>
         </div>
     </div>
 </div>
@@ -680,7 +746,7 @@
 <!-- DEALER SEARCH MODAL -->
 <div id="dealerSearchModal" class="modal" style="align-items:center; justify-content:center;">
     <div class="modal-content" style="max-width: 500px; padding: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px var(--bajaj-blue); padding-bottom: 8px; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bajaj-blue); padding-bottom: 8px; margin-bottom: 15px;">
             <h3 style="margin:0; color:var(--bajaj-blue);">🔗 Dealer Links Search</h3>
             <button onclick="closeDealerSearchModal()" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px;">✖</button>
         </div>
@@ -709,21 +775,32 @@
 <!-- Script for Error Handling & UI Flow Correction -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        const infoNameEl = document.getElementById('infoName');
         const noCustomerState = document.getElementById('noCustomerState');
         const unifiedHome = document.getElementById('unifiedHome');
-        const finalEligibleArea = document.getElementById('finalEligibleArea');
         const toastEl = document.getElementById('toastNotification');
 
-        // Watch for Toast Error "Kripya pehle queue mein ek customer add karein..."
+        // Customer select kelyavar Final Screen UI display karnyasathi
+        function checkCustomerState() {
+            const name = infoNameEl.innerText.trim();
+            if (name === '-' || name === '') {
+                noCustomerState.style.display = 'block';
+            } else {
+                noCustomerState.style.display = 'none';
+            }
+        }
+
+        checkCustomerState();
+        const observer = new MutationObserver(checkCustomerState);
+        observer.observe(infoNameEl, { childList: true, characterData: true, subtree: true });
+
+        // Queue error aalyavar reset karnyachi system
         const toastObserver = new MutationObserver(() => {
             if (toastEl.classList.contains('show')) {
                 const msg = toastEl.innerText.toLowerCase();
-                // Check if the error is related to missing customer
                 if (msg.includes('queue') && msg.includes('customer')) {
-                    // Reset UI to No Customer State immediately
                     unifiedHome.style.display = 'block';
                     noCustomerState.style.display = 'block';
-                    finalEligibleArea.style.display = 'none';
                 }
             }
         });
