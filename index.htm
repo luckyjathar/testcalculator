@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <!-- App-like Viewport (झूम बंद करण्यासाठी) -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<!-- Android Chrome Theme Color (स्टेटस बारचा रंग) -->
-<meta name="theme-color" content="#1976D2">
+    <!-- Android Chrome Theme Color (स्टेटस बारचा रंग) -->
+    <meta name="theme-color" content="#1976D2">
 
-<!-- iOS Safari App Mode -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Persistent Portal">
+    <!-- iOS Safari App Mode -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Persistent Portal">
     <title>Persistent Portal V76.18 - Ultimate Filter Edition</title>
     <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -64,6 +64,57 @@
 .icon-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
 .wa-btn { color: #25D366; text-shadow: 0 0 5px rgba(37, 211, 102, 0.5); }
 .call-btn { color: #3498db; }
+
+/* NEW MODERN TABS CSS (ADDED FOR UI UPGRADE) */
+.modern-tabs-container {
+    margin-bottom: 12px;
+}
+.modern-tabs { 
+    display: flex; 
+    border-bottom: 1px solid #ccc; 
+    background: #f8f9fa; 
+    border-radius: 8px 8px 0 0; 
+    overflow: hidden; 
+}
+.modern-tab-btn { 
+    flex: 1; 
+    padding: 12px; 
+    font-size: 13px !important; 
+    font-weight: 900; 
+    border: none; 
+    background: transparent; 
+    cursor: pointer; 
+    transition: all 0.3s; 
+    color: #6c757d; 
+    text-transform: uppercase; 
+}
+.modern-tab-btn.active { 
+    background: var(--primary); 
+    color: white; 
+    box-shadow: 0 -3px 0 var(--bajaj-blue) inset; 
+}
+.modern-tab-btn:hover:not(.active) { 
+    background: #e9ecef; 
+}
+.modern-tab-content { 
+    background: white; 
+    border: 1px solid var(--primary); 
+    border-top: none; 
+    padding: 15px; 
+    border-radius: 0 0 8px 8px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+}
+.modern-section { 
+    display: none; 
+    animation: fadeIn 0.3s ease; 
+}
+.modern-section.active { 
+    display: block; 
+}
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(5px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
 </style>
 
 </head>
@@ -127,11 +178,21 @@
 
 <main>
     <div id="unifiedHome">
-        <div class="forms-row">
-            <div class="form-container" style="flex: 1; min-width: 250px; background: #e3f2fd; border: 2px solid var(--primary); margin-bottom:0; display: flex; flex-direction: column;">
-                <label style="color:var(--primary); font-size:13px !important; border-bottom:2px solid var(--primary); padding-bottom:4px; margin-bottom:8px; display:block;"><span id="icon_add">📝</span> ADD NEW CUSTOMER</label>
-                <div style="flex: 1;">
-                    <!-- ON-THE-SPOT DUPLICATE CHECK INPUT & WARNING (HIDDEN) -->
+        
+        <!-- NEW TABBED SECTION REPLACING OLD FORMS-ROW -->
+        <div class="modern-tabs-container">
+            <div class="modern-tabs">
+                <button id="tabBtn-add" class="modern-tab-btn active" onclick="switchCustomerTab('add')">
+                    <span id="icon_add">📝</span> ADD NEW CUSTOMER
+                </button>
+                <button id="tabBtn-queue" class="modern-tab-btn" onclick="switchCustomerTab('queue')">
+                    <span id="icon_queue">👥</span> SAVED QUEUE (<span id="queueCount">0</span>)
+                </button>
+            </div>
+            
+            <div class="modern-tab-content">
+                <!-- SECTION 1: ADD CUSTOMER -->
+                <div id="tab-add" class="modern-section active">
                     <div style="display:none;">
                         <label>MOBILE NO.</label>
                         <input type="text" id="cqMobile" placeholder="10 Digits" maxlength="10" oninput="checkDuplicateMobile(this.value)">
@@ -151,22 +212,24 @@
                         <div><label>MAX LTV %</label><input type="number" id="cqLtv" value="100" max="100" oninput="if(this.value>100)this.value=100;"></div>
                         <div><label>EMI CAPPING</label><input type="number" id="cqCap" placeholder="₹ Cap"></div>
                     </div>
+                    <button id="addToQueueBtn" onclick="addCustomerToQueue()" style="width:100%; background:var(--success); color:white; padding:10px; border-radius:4px; box-shadow: 0 2px 4px rgba(39, 174, 96, 0.3); margin-top: 8px;"><span id="icon_btn_add">➕</span> ADD TO QUEUE</button>
                 </div>
-                <button id="addToQueueBtn" onclick="addCustomerToQueue()" style="width:100%; background:var(--success); color:white; padding:10px; border-radius:4px; box-shadow: 0 2px 4px rgba(39, 174, 96, 0.3); margin-top: 8px;"><span id="icon_btn_add">➕</span> ADD TO QUEUE</button>
-            </div>
-            <div class="form-container" style="flex: 1.5; min-width: 280px; margin-bottom:0; border: 2px solid var(--bajaj-blue); box-sizing: border-box; display: flex; flex-direction: column;">
-                <label style="color:var(--bajaj-blue); font-size:13px !important; border-bottom:2px solid #ccc; padding-bottom:4px; margin-bottom:6px; display:block; text-align:center;">
-                    <span id="icon_queue">👥</span> SAVED CUSTOMERS QUEUE (<span id="queueCount">0</span>)
-                    <span onclick="openRecycleBin()" style="cursor:pointer; float:right; font-size:16px !important; background: #fff; border:1px solid #ccc; border-radius:4px; padding: 0 4px;" title="Recycle Bin">🗑️</span>
-                </label>
-                <input type="text" id="queueSearch" placeholder="🔍 Search saved customer by name, limit..." oninput="renderCustomerQueue()" style="margin-bottom: 6px; border-color:var(--bajaj-blue);">
-                <div id="customerQueueList" class="custom-scroll" style="display:flex; flex-direction:column; gap:6px; overflow-y:auto; flex:1; max-height: 250px; padding-right:4px;"></div>
-                <div style="display:flex; gap:4px; margin-top:8px; border-top:1px solid #ccc; padding-top:8px; flex-wrap:wrap;">
-                    <button id="uniCopyBtn" onclick="uniCopy()" style="flex:1; background:var(--warning); color:#000; opacity:0.5; pointer-events:none; padding:6px; font-size:11px !important;">📋 COPY</button>
-                    <button id="uniSelectBtn" onclick="uniSelect()" style="flex:1.2; background:var(--primary); color:white; opacity:0.5; pointer-events:none; padding:6px; font-size:11px !important;">▶ SELECT</button>
-                    <button id="uniEditBtn" onclick="uniEdit()" style="flex:1; background:var(--indigo); color:white; opacity:0.5; pointer-events:none; padding:6px; font-size:11px !important;">✏️ EDIT</button>
-                    <button id="uniDeleteBtn" onclick="uniDelete()" style="flex:1; background:var(--danger); color:white; opacity:0.5; pointer-events:none; padding:6px; font-size:11px !important;">✖ DEL</button>
-                    <button id="uniInviteBtn" onclick="uniInvite()" style="flex:1.2; background:#25D366; color:white; opacity:0.5; pointer-events:none; padding:6px; font-size:11px !important;">💬 INVITE</button>
+
+                <!-- SECTION 2: SAVED CUSTOMERS QUEUE -->
+                <div id="tab-queue" class="modern-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size:12px; font-weight:bold; color:var(--bajaj-blue);">Manage Saved Customers</span>
+                        <span onclick="openRecycleBin()" style="cursor:pointer; font-size:16px !important; background: #fff; border:1px solid #ccc; border-radius:4px; padding: 0 4px;" title="Recycle Bin">🗑️ Bin</span>
+                    </div>
+                    <input type="text" id="queueSearch" placeholder="🔍 Search saved customer by name, limit..." oninput="renderCustomerQueue()" style="margin-bottom: 6px; border-color:var(--bajaj-blue); width: 100%;">
+                    <div id="customerQueueList" class="custom-scroll" style="display:flex; flex-direction:column; gap:6px; overflow-y:auto; max-height: 250px; padding-right:4px;"></div>
+                    <div style="display:flex; gap:4px; margin-top:8px; border-top:1px solid #ccc; padding-top:8px; flex-wrap:wrap;">
+                        <button id="uniCopyBtn" onclick="uniCopy()" style="flex:1; background:var(--warning); color:#000; opacity:0.5; pointer-events:none; padding:6px; font-size:11px !important;">📋 COPY</button>
+                        <button id="uniSelectBtn" onclick="uniSelect()" style="flex:1.2; background:var(--primary); color:white; opacity:0.5; pointer-events:none; padding:6px; font-size:11px !important;">▶ SELECT</button>
+                        <button id="uniEditBtn" onclick="uniEdit()" style="flex:1; background:var(--indigo); color:white; opacity:0.5; pointer-events:none; padding:6px; font-size:11px !important;">✏️ EDIT</button>
+                        <button id="uniDeleteBtn" onclick="uniDelete()" style="flex:1; background:var(--danger); color:white; opacity:0.5; pointer-events:none; padding:6px; font-size:11px !important;">✖ DEL</button>
+                        <button id="uniInviteBtn" onclick="uniInvite()" style="flex:1.2; background:#25D366; color:white; opacity:0.5; pointer-events:none; padding:6px; font-size:11px !important;">💬 INVITE</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -246,7 +309,6 @@
                 <div class="msg-form-group"><label>Dealer / Shop Name:</label><input type="text" id="msgShopName" value="" placeholder="Enter Dealer / Shop Name" oninput="generateMessage()"></div>
                 <div class="msg-form-group"><label>Asset Category:</label><input type="text" id="msgAssetCategory" value="" placeholder="Enter Category (e.g. PHONE)" oninput="generateMessage()"></div>
                 <div class="msg-form-group"><label>Customer Name:</label><input type="text" id="msgCustName" value="" placeholder="Enter Customer Name" oninput="generateMessage()"></div>
-                <!-- MOBILE NUMBER INPUT REMOVED (HIDDEN) FROM HERE -->
                 <div class="msg-form-group" style="display:none;"><label>Mobile Number:</label><input type="text" id="msgCustMobile" value="" placeholder="10 Digits" maxlength="10" oninput="generateMessage()"></div>
                 <div class="msg-form-group"><label>Monthly EMI Amount (₹):</label><input type="number" id="msgCustEMI" value="" placeholder="0" oninput="generateMessage()"></div>
                 <div class="msg-form-group"><label>Total Tenure (Months):</label><input type="number" id="msgCustTenure" value="" placeholder="0" oninput="generateMessage()"></div>
@@ -287,7 +349,6 @@
                 <button onclick="document.getElementById('flyerGenModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:16px;">✖</button>
             </div>
             <div style="margin-bottom:10px;"><label>Salesman Name (Required)</label><input type="text" id="fgSalesName" placeholder="Lakshya"></div>
-            <!-- MOBILE NUMBER INPUT REMOVED (HIDDEN) FROM HERE -->
             <div style="display:none;"><label>WhatsApp Number (Required)</label><input type="text" id="fgSalesMobile" placeholder="10 Digit Mobile Number" maxlength="10"></div>
             <div style="margin-bottom:10px; background: #f8f9fa; padding: 10px; border: 1.5px solid var(--bajaj-blue); border-radius: 6px;">
                 <label style="color:var(--bajaj-blue);">🏪 Select Dealer Shop (Compulsory)</label>
@@ -320,7 +381,6 @@
             <h3 style="margin-top:0; color:#25D366; border-bottom: 2px solid #ddd; padding-bottom: 6px;">💬 Send Invitation</h3>
             <p style="font-size:12px; color:#555; margin-bottom:12px;">Customer ko WhatsApp se kharidari ke liye invite karein.</p>
             <div style="margin-bottom:6px;"><label>YOUR NAME (SALESPERSON)</label><input type="text" id="invSenderName" placeholder="E.g. Lakshya"></div>
-            <!-- MOBILE NUMBER INPUT REMOVED (HIDDEN) FROM HERE -->
             <div style="display:none;"><label>YOUR MOBILE NO.</label><input type="text" id="invSenderMobile" placeholder="10 Digits" maxlength="10"></div>
             <div style="display:flex; gap:8px;">
                 <button onclick="sendWhatsAppInvite()" style="flex:2; background:#25D366; color:white;">SEND ON WHATSAPP ↗</button>
@@ -412,7 +472,6 @@
         <div class="modal-content" style="max-width:300px;">
             <h3 style="margin-top:0; color:var(--indigo); border-bottom: 2px solid #ddd; padding-bottom: 6px;">✏️ Edit Customer Details</h3>
             <div style="margin-bottom:6px;"><label>CUSTOMER NAME</label><input type="text" id="ecName"></div>
-            <!-- MOBILE NUMBER INPUT REMOVED (HIDDEN) FROM HERE -->
             <div style="display:none;"><label>MOBILE NO.</label><input type="text" id="ecMobile" maxlength="10"></div>
             <div style="margin-bottom:6px;"><label>NBFC LIMIT</label><input type="number" id="ecLimit"></div>
             <div style="margin-bottom:6px;"><label>CUSTOMER TYPE</label>
@@ -495,7 +554,6 @@
                 <label style="color:var(--indigo);">CUSTOMER NAME</label>
                 <input type="text" id="promptCustName" readonly style="background:#f0f0f0; cursor:not-allowed;">
             </div>
-            <!-- MOBILE NUMBER INPUT REMOVED (HIDDEN) FROM HERE -->
             <div style="display:none;">
                 <label style="color:var(--indigo);">MOBILE NUMBER</label>
                 <input type="text" id="promptCustMobile" readonly style="background:#f0f0f0; cursor:not-allowed;">
@@ -632,6 +690,28 @@
             </div>
         </div>
     </div>
+
+    <!-- Script for Tab Switching Logic -->
+    <script>
+        function switchCustomerTab(tab) {
+            const addBtn = document.getElementById('tabBtn-add');
+            const queueBtn = document.getElementById('tabBtn-queue');
+            const addSection = document.getElementById('tab-add');
+            const queueSection = document.getElementById('tab-queue');
+            
+            if(tab === 'add') {
+                addBtn.classList.add('active');
+                queueBtn.classList.remove('active');
+                addSection.classList.add('active');
+                queueSection.classList.remove('active');
+            } else {
+                queueBtn.classList.add('active');
+                addBtn.classList.remove('active');
+                queueSection.classList.add('active');
+                addSection.classList.remove('active');
+            }
+        }
+    </script>
 </main>
 
 <footer>
