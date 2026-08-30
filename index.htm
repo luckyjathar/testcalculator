@@ -2,13 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- App-like Viewport (झूम बंद करण्यासाठी) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-    <!-- Android Chrome Theme Color (स्टेटस बारचा रंग) -->
     <meta name="theme-color" content="#1976D2">
-
-    <!-- iOS Safari App Mode -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Persistent Portal">
@@ -21,91 +16,6 @@
     
     <!-- Link to our separate CSS file -->
     <link rel="stylesheet" href="style.css?v=6.5">
-
-<style>
-/* काचेसारखा इफेक्ट (Glassmorphism) */
-.premium-customer-card::before {
-    content: '';
-    position: absolute;
-    top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-    transform: rotate(30deg);
-    pointer-events: none;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 15px;
-    margin-bottom: 15px;
-    position: relative;
-    z-index: 2;
-}
-
-.profile-info { display: flex; align-items: center; gap: 15px; }
-.avatar { font-size: 35px; background: rgba(255,255,255,0.2); border-radius: 50%; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-.cust-name { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
-
-.cust-badges { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-.premium-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; letter-spacing: 0.5px; }
-.type-badge { background: #e67e22; color: white; box-shadow: 0 2px 5px rgba(230, 126, 34, 0.4); }
-.ltv-badge { background: rgba(255,255,255,0.2); }
-.cap-badge { border: 1px dashed rgba(255,255,255,0.5); }
-
-.card-body { position: relative; z-index: 2; text-align: center; }
-.limit-label { font-size: 12px; color: #a8c0ff; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
-.limit-amount { font-size: 42px; font-weight: 900; color: #00ff87; text-shadow: 0 0 20px rgba(0, 255, 135, 0.4); margin-top: 5px; line-height: 1; }
-
-.quick-actions { display: flex; gap: 10px; }
-.icon-btn { background: rgba(255,255,255,0.1); border: none; font-size: 18px; padding: 10px; border-radius: 50%; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
-.icon-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
-.wa-btn { color: #25D366; text-shadow: 0 0 5px rgba(37, 211, 102, 0.5); }
-.call-btn { color: #3498db; }
-
-/* Custom Inputs for Pop-ups */
-.popup-input-label {
-    font-size: 11px; font-weight: 900; color: #555; display: block; margin-bottom: 4px; text-transform: uppercase;
-}
-.popup-input {
-    width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; font-size: 13px; box-sizing: border-box;
-}
-.popup-input:disabled {
-    background: #e9ecef; cursor: not-allowed;
-}
-
-/* =========================================
-   CSS FOR PERFECT CENTER ALIGNED MODALS 
-   ========================================= */
-.modal {
-    display: none; 
-    position: fixed;
-    z-index: 100000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.6);
-    backdrop-filter: blur(2px);
-    align-items: center;
-    justify-content: center;
-}
-.modal-content {
-    background-color: #fff;
-    margin: 0 auto; 
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%;
-    max-height: 85vh; 
-    overflow-y: auto; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-.modal-content::-webkit-scrollbar { width: 6px; }
-.modal-content::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
-</style>
-
 </head>
 <body>
 <!-- Global Data Loader -->
@@ -116,7 +26,7 @@
 <div id="toastNotification" class="toast-notification"></div>
 
 <!-- CUSTOM CONFIRM MODAL -->
-<div id="customConfirmModal" class="modal" style="z-index: 99998; align-items:center; justify-content:center;">
+<div id="customConfirmModal" class="modal">
     <div class="modal-content" style="max-width: 320px; text-align: center;">
         <h3 style="margin-top:0; color:var(--bajaj-blue);" id="confirmTitle">⚠️ Confirm</h3>
         <p id="confirmMessage" style="font-size:14px; margin-bottom:20px; color:#444; font-weight:bold;"></p>
@@ -128,7 +38,7 @@
 </div>
 
 <!-- CUSTOM ALERT MODAL -->
-<div id="customAlertModal" class="modal" style="z-index: 99998; align-items:center; justify-content:center;">
+<div id="customAlertModal" class="modal">
     <div class="modal-content" style="max-width: 320px; text-align: center;">
         <h3 style="margin-top:0; color:var(--danger);" id="alertTitle">⚠️ Notice</h3>
         <p id="alertMessage" style="font-size:14px; margin-bottom:10px; color:#444; font-weight:bold;"></p>
@@ -151,23 +61,21 @@
         <div id="g_id_onload" data-client_id="777001839486-tqii6kb1hjig7qnreme74vjbm9utavvd.apps.googleusercontent.com" data-callback="handleGoogleLogin" data-auto_select="false" data-auto_prompt="false"></div>
         <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left" style="margin-bottom: 10px; width: 100%;"></div>
         <button onclick="forceCloudSync()" class="sidebar-btn" id="syncBtn" style="background: #3498db; color: white; display: none;"><span>🔄</span> FORCE CLOUD SYNC</button>
-        <button onclick="toggleSidebar(); openFlyerGenModal()" class="sidebar-btn" style="background: var(--warning); color: #000;"><span>📱</span> CREATE Flyer LINK</button>
+        <button onclick="toggleSidebar(); openFlyerGenModal()" class="sidebar-btn" style="background: var(--warning); color: #000;"><span>📱</span> CREATE FLYER LINK</button>
         <button onclick="toggleSidebar(); openCustomerMessageModal()" class="sidebar-btn" style="background: #27ae60; color: white;"><span>💬</span> SEND EMI DETAILS</button>
         <button onclick="toggleSidebar(); openDealerSearchModal()" class="sidebar-btn" style="background: var(--bajaj-blue); color: white;"><span>🔗</span> DEALER LINKS</button>
         <button onclick="toggleSidebar(); openDictionaryModal()" class="sidebar-btn" style="background: var(--indigo); color: white;"><span>🔍</span> SMART SCHEME DICTIONARY</button>
     </div>
 </aside>
 
-<!-- NEW HEADER LAYOUT (Auto height, no extra spacing) -->
-<header style="display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 10px 15px;">
-    <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
-        <button class="menu-toggle-btn" onclick="toggleSidebar()" style="margin: 0;">☰ MENU</button>
-        <h1 style="margin: 0; font-size: 18px; white-space: nowrap;">🚀 Persistent Portal Master</h1>
+<!-- HEADER -->
+<header>
+    <div class="logo-area">
+        <button class="menu-toggle-btn" onclick="toggleSidebar()">☰ MENU</button>
+        <h1>🚀 Persistent Portal Master</h1>
     </div>
-    
-    <!-- COMPACT DISCLAIMER IN THE HEADER RIGHT SIDE -->
-    <div title="DISCLAIMER: GitHub smart stream activated. System will only download files if updates are detected. Original application ke saath verify zaroor karein." style="background-color: #e3f2fd; border: 1px solid #90caf9; color: #1565c0; padding: 6px 12px; border-radius: 6px; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; text-align: left; max-width: 600px;">
-        <strong style="color: #0d47a1; font-weight: 900;">DISCLAIMER:</strong> GitHub smart stream activated. System will only download files if updates are detected. Original application ke saath verify zaroor karein.
+    <div class="header-disclaimer" title="DISCLAIMER: GitHub smart stream activated. System will only download files if updates are detected. Original application ke saath verify zaroor karein.">
+        <b>DISCLAIMER:</b> GitHub smart stream activated. System will only download files if updates are detected. Original application ke saath verify zaroor karein.
     </div>
 </header>
 
@@ -187,9 +95,8 @@
             </button>
         </div>
         
-        <!-- COMPACT ACTIVE CUSTOMER INFO CARD (For Web UI) -->
+        <!-- COMPACT ACTIVE CUSTOMER INFO CARD -->
         <div style="background: #253241; border-radius: 8px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); margin-bottom: 12px; border: 1px solid #3b4b5e;">
-            
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="width: 38px; height: 38px; background: rgba(0,0,0,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px;">👤</div>
                 <div style="display: flex; flex-direction: column; gap: 4px;">
@@ -217,19 +124,28 @@
                 </div>
             </div>
         </div>
-        
-        <button onclick="openAddProductModal()" style="width: 100%; background:var(--warning); color:#000; padding:10px; border-radius:6px; font-weight:900; margin-bottom:8px; border: 1.5px solid #d35400; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor:pointer;">➕ ADD NEW PRODUCT (SEARCH / NON-TIEUP / MANUAL)</button>
-        <div id="multiModelContainer"></div>
+
+        <!-- NO CUSTOMER SELECTED STATE -->
+        <div id="noCustomerState" style="text-align: center; padding: 40px 20px; background: #f8f9fa; border: 2px dashed #ced4da; border-radius: 8px; margin-bottom: 12px;">
+            <div style="font-size: 40px; margin-bottom: 10px;">👤</div>
+            <h3 style="color: var(--bajaj-blue); margin: 0 0 5px 0; font-size: 16px;">No Customer Selected</h3>
+            <p style="color: #6c757d; font-size: 13px; font-weight: bold; margin-bottom: 15px;">Please add a new customer or select one from the queue to start calculation.</p>
+            <div style="display:flex; justify-content:center; gap:10px;">
+                <button onclick="document.getElementById('addCustomerModal').style.display='flex'" style="background: var(--primary); color: white; padding: 10px 16px; border: none; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">➕ ADD CUSTOMER</button>
+                <button onclick="document.getElementById('savedQueueModal').style.display='flex'" style="background: #6c757d; color: white; padding: 10px 16px; border: none; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🔍 OPEN QUEUE</button>
+            </div>
+        </div>
+
+        <!-- CALCULATION WORKSPACE (Hidden initially) -->
+        <div id="calculationWorkspace" style="display: none;">
+            <button onclick="openAddProductModal()" style="width: 100%; background:var(--warning); color:#000; padding:10px; border-radius:6px; font-weight:900; margin-bottom:8px; border: 1.5px solid #d35400; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor:pointer;">➕ ADD NEW PRODUCT (SEARCH / NON-TIEUP / MANUAL)</button>
+            <div id="multiModelContainer"></div>
+        </div>
+
     </div>
 
-
-    <!-- ============================================== -->
-    <!-- CENTERED POP-UP MODALS FOR PRIMARY ACTIONS     -->
-    <!-- ============================================== -->
-
-    <!-- 1. ZATPAT CALC MODAL (Single Column & Required Compact Width) -->
+    <!-- 1. ZATPAT CALC MODAL -->
     <div id="zatpatModal" class="modal">
-        <!-- max-width 350px restricts width so elements take exactly the needed space without stretching across the screen -->
         <div class="modal-content" style="max-width: 350px; padding: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">
                 <h3 style="margin:0; color:var(--bajaj-blue); font-size: 16px !important; display: flex; align-items: center; gap: 6px;">
@@ -241,7 +157,6 @@
                 </div>
             </div>
             
-            <!-- 1 Column Layout (flex-direction: column) -->
             <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:15px;">
                 <div><label class="popup-input-label">INVOICE AMOUNT / MRP (₹)</label><input type="number" id="fcInv" placeholder="Enter Amount" oninput="fcInvChanged();" class="popup-input"></div>
                 <div><label class="popup-input-label">LOAN AMOUNT (₹)</label><input type="number" id="fcLoanInput" placeholder="Default 100%" oninput="calculateFastData();" onchange="validateFastLoanMin();" onblur="validateFastLoanMin();" class="popup-input"></div>
@@ -278,7 +193,6 @@
                 <div><label class="popup-input-label">DEALER CONTRI (₹)</label><input type="number" id="fcDealer" placeholder="0" oninput="calculateFastData();" class="popup-input"></div>
             </div>
 
-            <!-- Fast Calc Result Box -->
             <div id="fcResult" style="display:none; margin-top:12px; background:#fff; border:2px solid var(--primary); padding:15px; border-radius:6px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:6px;"><span style="font-weight:900; color:#555;">LOAN AMOUNT:</span> <span id="fcResLoan" style="color:var(--dark); font-weight:900; font-size:16px;">₹0</span></div>
                 <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:6px;"><span style="font-weight:900; color:#555;">NET DP:</span> <span id="fcResDp" style="color:var(--success); font-weight:900; font-size:16px;">₹0</span></div>
@@ -294,7 +208,7 @@
         </div>
     </div>
 
-    <!-- 2. ADD CUSTOMER MODAL (Compact 350px Width) -->
+    <!-- 2. ADD CUSTOMER MODAL -->
     <div id="addCustomerModal" class="modal">
         <div class="modal-content" style="max-width: 350px; padding: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">
@@ -355,10 +269,9 @@
             </div>
         </div>
     </div>
-    <!-- ============================================== -->
 
     <!-- MAIN SEND EMI DETAILS MODAL -->
-    <div id="customerMessageGenModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="customerMessageGenModal" class="modal">
         <div class="modal-content" style="max-width: 850px; padding: 20px;">
             <div style="display: flex; align-items: center; border-bottom: 2px solid var(--bajaj-blue); padding-bottom: 8px; margin-bottom: 10px; position: relative;">
                 <button onclick="openDraftsModal()" style="background:var(--warning); color:#000; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:6px; z-index: 10;">
@@ -402,7 +315,7 @@
     </div>
 
     <!-- SEPARATE DRAFTS MODAL -->
-    <div id="draftsModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="draftsModal" class="modal">
         <div class="modal-content" style="max-width: 500px; padding: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--warning); padding-bottom: 8px; margin-bottom: 15px;">
                 <h3 style="margin:0; color:var(--warning); text-shadow: 0 1px 1px rgba(0,0,0,0.1);">📥 Saved Drafts</h3>
@@ -412,7 +325,7 @@
         </div>
     </div>
 
-    <div id="flyerGenModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="flyerGenModal" class="modal">
         <div class="modal-content" style="max-width:440px; padding: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bajaj-blue); padding-bottom: 8px; margin-bottom: 15px;">
                 <h3 style="margin:0; color:var(--bajaj-blue);">🔗 Generate Flyer Link</h3>
@@ -446,7 +359,7 @@
         </div>
     </div>
 
-    <div id="inviteModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="inviteModal" class="modal">
         <div class="modal-content" style="max-width: 320px;">
             <h3 style="margin-top:0; color:#25D366; border-bottom: 2px solid #ddd; padding-bottom: 6px;">💬 Send Invitation</h3>
             <p style="font-size:12px; color:#555; margin-bottom:12px;">Customer ko WhatsApp se kharidari ke liye invite karein.</p>
@@ -460,7 +373,7 @@
     </div>
 
     <!-- NEW SMART DICTIONARY MODAL -->
-    <div id="dictionarySearchModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="dictionarySearchModal" class="modal">
         <div class="modal-content" style="max-width: 950px; padding: 20px; max-height: 90vh; overflow-y: auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--indigo); padding-bottom: 8px; margin-bottom: 15px;">
                 <h3 style="margin:0; color:var(--indigo); font-size: 16px !important;">🔍 SMART SCHEMES DICTIONARY</h3>
@@ -538,7 +451,7 @@
         </div>
     </div>
 
-    <div id="editCustomerModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="editCustomerModal" class="modal">
         <div class="modal-content" style="max-width:300px;">
             <h3 style="margin-top:0; color:var(--indigo); border-bottom: 2px solid #ddd; padding-bottom: 6px;">✏️ Edit Customer Details</h3>
             <div style="margin-bottom:6px;"><label>CUSTOMER NAME</label><input type="text" id="ecName" class="popup-input"></div>
@@ -558,7 +471,7 @@
         </div>
     </div>
 
-    <div id="recycleBinModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="recycleBinModal" class="modal">
         <div class="modal-content" style="max-width:350px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 6px; margin-bottom: 8px;">
                 <h3 style="margin:0; color:var(--danger);">🗑️ Recycle Bin</h3>
@@ -569,7 +482,7 @@
         </div>
     </div>
 
-    <div id="addProductModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="addProductModal" class="modal">
         <div class="modal-content" style="max-width: 350px;">
             <h3 style="margin-top:0; color:var(--bajaj-blue); border-bottom: 2px solid #ddd; padding-bottom: 6px;">🔍 ADD NEW PRODUCT</h3>
             <div style="position:relative; margin-bottom: 12px;">
@@ -585,7 +498,7 @@
         </div>
     </div>
 
-    <div id="quoteSelectionModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="quoteSelectionModal" class="modal">
         <div class="modal-content" style="max-width:350px;">
             <h3 style="margin-top:0; color:var(--bajaj-blue);">🖼️ Select Models for Quotation</h3>
             <div id="quoteModelCheckboxes" style="display:flex; flex-direction:column; gap:6px; max-height:220px; overflow-y:auto; margin-bottom:15px; padding-right:5px;" class="custom-scroll"></div>
@@ -596,7 +509,7 @@
         </div>
     </div>
 
-    <div id="componentsModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="componentsModal" class="modal">
         <div class="modal-content" style="max-width: 350px;">
             <h3 style="margin-top:0; color:var(--indigo); border-bottom: 2px solid #ddd; padding-bottom: 6px;">⚙️ Fill Components</h3>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:12px;">
@@ -617,7 +530,7 @@
         </div>
     </div>
 
-    <div id="custInfoPromptModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="custInfoPromptModal" class="modal">
         <div class="modal-content" style="max-width:320px;">
             <h3 style="margin-top:0; color:var(--bajaj-blue); text-align: center;">👤 Verify Details Before Export</h3>
             <div style="margin-bottom:8px;">
@@ -636,7 +549,7 @@
         </div>
     </div>
 
-    <div id="catSelectionModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="catSelectionModal" class="modal">
         <div class="modal-content" style="max-width: 350px; max-height: 80vh; overflow-y: auto;">
             <h3 style="margin-top:0; color:var(--indigo);">⚡ SELECT NON-TIEUP CATEGORY</h3>
             <div id="categoryGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:6px;"></div>
@@ -644,7 +557,7 @@
         </div>
     </div>
 
-    <div id="multiStackModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="multiStackModal" class="modal">
         <div class="modal-content">
             <h3 style="margin-top:0; color:var(--dark);">Add Manual Product (Up to 10 Schemes)</h3>
             <div style="margin-bottom: 12px; background: #f8f9fa; padding: 8px; border-radius: 6px; border: 1.5px solid #ccc;">
@@ -659,7 +572,7 @@
         </div>
     </div>
 
-    <div id="editSchemeModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="editSchemeModal" class="modal">
         <div class="modal-content" style="max-width: 280px;">
             <h3 style="margin-top:0; color:var(--indigo);">Modify Scheme Components</h3>
             <input type="hidden" id="editPIdx"><input type="hidden" id="editDIdx">
@@ -675,14 +588,14 @@
         </div>
     </div>
 
-    <div id="imageViewerModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="imageViewerModal" class="modal">
         <button class="close-img-btn" onclick="closeImageViewer()">X</button>
         <div id="clipboardStatusAlert" style="color:#25D366; font-size:14px !important; font-weight:bold; text-align:center; width:100%; display:none;">✅ COPIED TO CLIPBOARD!</div>
         <div style="color:#f39c12; font-size:14px !important; font-weight:bold; text-align:center; margin-top:5px; width:100%;">⚠️ Long press or Right-click image to Save directly 👇</div>
         <img id="generatedImage" src="" alt="Quotation">
     </div>
 
-    <div id="manualModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="manualModal" class="modal">
         <div class="modal-content" style="max-width:300px;">
             <h3 id="modalTitle" style="margin-top:0;">Add Custom Scheme</h3>
             <div id="modelNameInputArea" style="display:none;"><label>Model Name</label><input type="text" id="manName" value="MANUAL MODEL"></div>
@@ -698,7 +611,7 @@
     </div>
 
     <!-- DEALER SEARCH MODAL -->
-    <div id="dealerSearchModal" class="modal" style="align-items:center; justify-content:center;">
+    <div id="dealerSearchModal" class="modal">
         <div class="modal-content" style="max-width: 500px; padding: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bajaj-blue); padding-bottom: 8px; margin-bottom: 15px;">
                 <h3 style="margin:0; color:var(--bajaj-blue);">🔗 Dealer Links Search</h3>
@@ -724,7 +637,37 @@
         <p class="footer-support">Kisi bhi help, support ya suggestions ke liye bejhijhak connect karein:<br><a href="https://wa.me/918087313624" target="_blank" class="wa-link">💬 WhatsApp : 8087313624</a></p>
     </div>
 </footer>
+
 <!-- Link to our separate JS file -->
 <script src="app.js"></script>
+
+<!-- Script for Customer Selection Toggle -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const infoNameEl = document.getElementById('infoName');
+        const noCustomerState = document.getElementById('noCustomerState');
+        const calcWorkspace = document.getElementById('calculationWorkspace');
+
+        function checkCustomerState() {
+            const name = infoNameEl.innerText.trim();
+            // If the name is blank or "-" it means no customer is selected
+            if (name === '-' || name === '') {
+                noCustomerState.style.display = 'block';
+                calcWorkspace.style.display = 'none';
+            } else {
+                noCustomerState.style.display = 'none';
+                calcWorkspace.style.display = 'block';
+            }
+        }
+
+        // Initial setup check on page load
+        checkCustomerState();
+
+        // Automatically toggle views whenever app.js updates the customer name
+        const observer = new MutationObserver(checkCustomerState);
+        observer.observe(infoNameEl, { childList: true, characterData: true, subtree: true });
+    });
+</script>
+
 </body>
 </html>
