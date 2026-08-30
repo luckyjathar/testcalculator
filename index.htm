@@ -2,13 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- App-like Viewport (झूम बंद करण्यासाठी) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-    <!-- Android Chrome Theme Color (स्टेटस बारचा रंग) -->
     <meta name="theme-color" content="#1976D2">
-
-    <!-- iOS Safari App Mode -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Persistent Portal">
@@ -165,10 +160,10 @@
 <!-- ALL MODALS (POP-UPS) -->
 <!-- ============================================================== -->
 
-<!-- 1. ZATPAT CALC MODAL -->
+<!-- 1. ZATPAT CALC MODAL (SIDE-BY-SIDE DESIGN) -->
 <div id="zatpatModal" class="modal">
-    <div class="modal-content" style="max-width: 350px; padding: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">
+    <div class="modal-content" style="max-width: 400px; padding: 15px 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 12px;">
             <h3 style="margin:0; color:var(--bajaj-blue); font-size: 16px !important; display: flex; align-items: center; gap: 6px;">
                 <span style="font-size:18px;">🧮</span> PRO ZATPAT CALC
             </h3>
@@ -178,40 +173,84 @@
             </div>
         </div>
         
-        <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:15px;">
-            <div><label class="popup-input-label">INVOICE AMOUNT / MRP (₹)</label><input type="number" id="fcInv" placeholder="Enter Amount" oninput="fcInvChanged();" class="popup-input"></div>
-            <div><label class="popup-input-label">LOAN AMOUNT (₹)</label><input type="number" id="fcLoanInput" placeholder="Default 100%" oninput="calculateFastData();" onchange="validateFastLoanMin();" onblur="validateFastLoanMin();" class="popup-input"></div>
-            <div><label class="popup-input-label">TENURE (Max)</label><input type="number" id="fcTenure" placeholder="0" oninput="calculateFastData();" class="popup-input"></div>
-            <div><label class="popup-input-label">ADVANCE EMI</label><input type="number" id="fcAdv" placeholder="0" oninput="calculateFastData();" class="popup-input"></div>
-            <div><label class="popup-input-label">DBD (%)</label><input type="number" id="fcDbd" placeholder="0" step="0.01" oninput="calculateFastData();" class="popup-input"></div>
-            <div><label class="popup-input-label">PF (₹)</label><input type="number" id="fcPf" placeholder="0" oninput="calculateFastData();" class="popup-input"></div>
-            <div><label class="popup-input-label">ROI (%)</label><input type="number" id="fcRoi" placeholder="0" step="0.01" oninput="calculateFastData();" class="popup-input"></div>
-            <div><label class="popup-input-label">CUSTOMER TYPE</label>
-                <select id="fcCustType" onchange="calculateFastData();" class="popup-input">
+        <!-- SIDE BY SIDE COMPONENTS (Label on Left, Input on Right) -->
+        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:15px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">INVOICE / MRP (₹)</label>
+                <input type="number" id="fcInv" placeholder="Enter Amount" oninput="fcInvChanged();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">LOAN AMOUNT (₹)</label>
+                <input type="number" id="fcLoanInput" placeholder="Default 100%" oninput="calculateFastData();" onchange="validateFastLoanMin();" onblur="validateFastLoanMin();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">TENURE (Max)</label>
+                <input type="number" id="fcTenure" placeholder="0" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">ADVANCE EMI</label>
+                <input type="number" id="fcAdv" placeholder="0" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">DBD (%)</label>
+                <input type="number" id="fcDbd" placeholder="0" step="0.01" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">PF (₹)</label>
+                <input type="number" id="fcPf" placeholder="0" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">ROI (%)</label>
+                <input type="number" id="fcRoi" placeholder="0" step="0.01" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">CUSTOMER TYPE</label>
+                <select id="fcCustType" onchange="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
                     <option value="NEW">NEW</option><option value="EMI CARD">EMI CARD</option><option value="VIRTUAL">VIRTUAL</option><option value="W/O CARD">W/O CARD</option>
                 </select>
             </div>
-            <div><label class="popup-input-label">FIXED EMI (₹)</label><input type="number" id="fcFixed" placeholder="Optional" oninput="calculateFastData();" class="popup-input"></div>
-            <div><label class="popup-input-label">EMI CAPPING (₹)</label><input type="number" id="fcCap" placeholder="MAX" oninput="calculateFastData();" class="popup-input"></div>
-            <div><label class="popup-input-label">TARGET DP (₹)</label><input type="number" id="fcTarget" placeholder="Reverse Calc" oninput="calculateFastData();" class="popup-input"></div>
-            <div><label class="popup-input-label">CATEGORY</label>
-                <select id="fcCat" onchange="fcCatChanged();" class="popup-input">
-                    <option value="OTHER">OTHER</option><option value="PHONE(WEB-MOBILE)">PHONE, TABLET, SMART WATCH</option>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">FIXED EMI (₹)</label>
+                <input type="number" id="fcFixed" placeholder="Optional" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">EMI CAPPING (₹)</label>
+                <input type="number" id="fcCap" placeholder="MAX" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">TARGET DP (₹)</label>
+                <input type="number" id="fcTarget" placeholder="Reverse Calc" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">CATEGORY</label>
+                <select id="fcCat" onchange="fcCatChanged();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+                    <option value="OTHER">OTHER</option><option value="PHONE(WEB-MOBILE)">PHONE, TABLET</option>
                 </select>
             </div>
-            <div><label class="popup-input-label">GTL (₹)</label>
-                <select id="fcGtl" onchange="calculateFastData();" class="popup-input">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">GTL (₹)</label>
+                <select id="fcGtl" onchange="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
                     <option value="0">0</option><option value="699">699</option><option value="1099">1099</option><option value="1199">1199</option><option value="1499">1499</option><option value="1799">1799</option><option value="2398">2398</option>
                 </select>
             </div>
-            <div><label class="popup-input-label">RFC (₹)</label>
-                <select id="fcRfc" onchange="calculateFastData();" disabled class="popup-input">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">RFC (₹)</label>
+                <select id="fcRfc" onchange="calculateFastData();" disabled class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
                     <option value="0">0</option><option id="fcRfcOpt" value="0">0</option>
                 </select>
             </div>
-            <div><label class="popup-input-label">EXW (₹)</label><input type="number" id="fcExw" placeholder="0" oninput="calculateFastData();" class="popup-input"></div>
-            <div><label class="popup-input-label">MARGIN (₹)</label><input type="number" id="fcMargin" placeholder="0" oninput="calculateFastData();" class="popup-input"></div>
-            <div><label class="popup-input-label">DEALER CONTRI (₹)</label><input type="number" id="fcDealer" placeholder="0" oninput="calculateFastData();" class="popup-input"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">EXW (₹)</label>
+                <input type="number" id="fcExw" placeholder="0" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">MARGIN (₹)</label>
+                <input type="number" id="fcMargin" placeholder="0" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">DEALER CONTRI (₹)</label>
+                <input type="number" id="fcDealer" placeholder="0" oninput="calculateFastData();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
+            </div>
         </div>
 
         <div id="fcResult" style="display:none; margin-top:12px; background:#fff; border:2px solid var(--primary); padding:15px; border-radius:6px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
@@ -224,7 +263,7 @@
         </div>
         
         <div style="display:flex; gap:10px; margin-top:15px;">
-            <button onclick="document.getElementById('zatpatModal').style.display='none'" style="width:100%; background:#dc3545; color:white; padding:12px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">CANCEL</button>
+            <button onclick="document.getElementById('zatpatModal').style.display='none'" style="width:100%; background:#dc3545; color:white; padding:12px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">CLOSE</button>
         </div>
     </div>
 </div>
@@ -659,6 +698,34 @@
 
 <!-- Link to our separate JS file -->
 <script src="app.js"></script>
+
+<!-- Script for Customer Selection Toggle -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const infoNameEl = document.getElementById('infoName');
+        const noCustomerState = document.getElementById('noCustomerState');
+        const calcWorkspace = document.getElementById('calculationWorkspace');
+
+        function checkCustomerState() {
+            const name = infoNameEl.innerText.trim();
+            // If the name is blank or "-" it means no customer is selected
+            if (name === '-' || name === '') {
+                noCustomerState.style.display = 'block';
+                calcWorkspace.style.display = 'none';
+            } else {
+                noCustomerState.style.display = 'none';
+                calcWorkspace.style.display = 'block';
+            }
+        }
+
+        // Initial setup check on page load
+        checkCustomerState();
+
+        // Automatically toggle views whenever app.js updates the customer name
+        const observer = new MutationObserver(checkCustomerState);
+        observer.observe(infoNameEl, { childList: true, characterData: true, subtree: true });
+    });
+</script>
 
 </body>
 </html>
