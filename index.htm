@@ -101,10 +101,32 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- UNIFIED HOME (No Customer State Included here) -->
+    <!-- UNIFIED HOME (Shown when NO Customer is Selected) -->
     <!-- ========================================== -->
     <div id="unifiedHome">
+        <div id="noCustomerState" style="text-align: center; padding: 40px 20px; background: transparent; border: 2px dashed #ced4da; border-radius: 8px; margin-bottom: 12px;">
+            <div style="font-size: 40px; margin-bottom: 10px;">👤</div>
+            <h3 style="color: var(--bajaj-blue); margin: 0 0 5px 0; font-size: 16px;">No Customer Selected</h3>
+            <p style="color: #6c757d; font-size: 13px; font-weight: bold; margin-bottom: 15px;">Please add a new customer or select one from the queue to start calculation.</p>
+            <div style="display:flex; justify-content:center; gap:10px;">
+                <button onclick="document.getElementById('addCustomerModal').style.display='flex'" style="background: var(--primary); color: white; padding: 10px 16px; border: none; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">➕ ADD CUSTOMER</button>
+                <button onclick="document.getElementById('savedQueueModal').style.display='flex'" style="background: #6c757d; color: white; padding: 10px 16px; border: none; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🔍 OPEN QUEUE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FINAL ELIGIBLE AREA (Shown when Customer IS Selected) -->
+    <!-- ========================================== -->
+    <div id="finalEligibleArea" style="display: none; flex-direction: column;">
         
+        <!-- HIDDEN TOP NAV (Required for app.js to work) -->
+        <div class="top-nav-box" style="display: none !important;">
+            <button id="genQuoteBtn" onclick="openQuoteSelectionModal()">GEN QUOTE</button>
+            <select id="finalCustomerSwitcher" onchange="switchCustomerFinal(this.value)"></select>
+            <button onclick="goHome()">✖ BACK</button>
+        </div>
+
         <!-- COMPACT ACTIVE CUSTOMER INFO CARD -->
         <div style="background: #253241; border-radius: 8px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); margin-bottom: 12px; border: 1px solid #3b4b5e;">
             <div style="display: flex; align-items: center; gap: 12px;">
@@ -135,30 +157,8 @@
             </div>
         </div>
 
-        <!-- NO CUSTOMER SELECTED STATE -->
-        <div id="noCustomerState" style="text-align: center; padding: 40px 20px; background: #f8f9fa; border: 2px dashed #ced4da; border-radius: 8px; margin-bottom: 12px;">
-            <div style="font-size: 40px; margin-bottom: 10px;">👤</div>
-            <h3 style="color: var(--bajaj-blue); margin: 0 0 5px 0; font-size: 16px;">No Customer Selected</h3>
-            <p style="color: #6c757d; font-size: 13px; font-weight: bold; margin-bottom: 15px;">Please add a new customer or select one from the queue to start calculation.</p>
-            <div style="display:flex; justify-content:center; gap:10px;">
-                <button onclick="document.getElementById('addCustomerModal').style.display='flex'" style="background: var(--primary); color: white; padding: 10px 16px; border: none; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">➕ ADD CUSTOMER</button>
-                <button onclick="document.getElementById('savedQueueModal').style.display='flex'" style="background: #6c757d; color: white; padding: 10px 16px; border: none; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🔍 OPEN QUEUE</button>
-            </div>
-        </div>
-
-        <!-- CALCULATION WORKSPACE -->
-        <div id="calculationWorkspace" style="display: none;">
-            <!-- HIDDEN: Required for app.js to work properly without crashing -->
-            <div id="finalEligibleArea" style="display: none;">
-                <button id="genQuoteBtn" onclick="openQuoteSelectionModal()">GEN QUOTE</button>
-                <select id="finalCustomerSwitcher" onchange="switchCustomerFinal(this.value)"></select>
-                <button onclick="goHome()">✖ BACK</button>
-            </div>
-
-            <button onclick="openAddProductModal()" style="width: 100%; background:var(--warning); color:#000; padding:10px; border-radius:6px; font-weight:900; margin-bottom:8px; border: 1.5px solid #d35400; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor:pointer;">➕ ADD NEW PRODUCT (SEARCH / NON-TIEUP / MANUAL)</button>
-            <div id="multiModelContainer"></div>
-        </div>
-
+        <button onclick="openAddProductModal()" style="width: 100%; background:var(--warning); color:#000; padding:10px; border-radius:6px; font-weight:900; margin-bottom:8px; border: 1.5px solid #d35400; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor:pointer;">➕ ADD NEW PRODUCT (SEARCH / NON-TIEUP / MANUAL)</button>
+        <div id="multiModelContainer"></div>
     </div>
 </main>
 
@@ -166,8 +166,8 @@
 <!-- ALL MODALS (POP-UPS) -->
 <!-- ============================================================== -->
 
-<!-- 1. ZATPAT CALC MODAL (SIDE-BY-SIDE DESIGN) -->
-<div id="zatpatModal" class="modal">
+<!-- 1. ZATPAT CALC MODAL -->
+<div id="zatpatModal" class="modal" style="align-items:center; justify-content:center;">
     <div class="modal-content" style="max-width: 400px; padding: 15px 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 12px;">
             <h3 style="margin:0; color:var(--bajaj-blue); font-size: 16px !important; display: flex; align-items: center; gap: 6px;">
@@ -179,7 +179,8 @@
             </div>
         </div>
         
-        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:15px;">
+        <!-- SIDE BY SIDE COMPONENTS -->
+        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
                 <label class="popup-input-label" style="margin-bottom: 0; width: 45%; line-height: 1.2;">INVOICE / MRP (₹)</label>
                 <input type="number" id="fcInv" placeholder="Enter Amount" oninput="fcInvChanged();" class="popup-input" style="width: 55%; padding: 6px 10px; height: 34px !important;">
@@ -258,16 +259,17 @@
             </div>
         </div>
 
-        <div id="fcResult" style="display:none; margin-top:12px; background:#fff; border:2px solid var(--primary); padding:15px; border-radius:6px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:6px;"><span style="font-weight:900; color:#555;">LOAN AMOUNT:</span> <span id="fcResLoan" style="color:var(--dark); font-weight:900; font-size:16px;">₹0</span></div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:6px;"><span style="font-weight:900; color:#555;">NET DP:</span> <span id="fcResDp" style="color:var(--success); font-weight:900; font-size:16px;">₹0</span></div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:6px;"><span style="font-weight:900; color:var(--primary);">MONTHLY EMI:</span> <span id="fcResEmi" style="color:var(--primary); font-weight:900; font-size:16px;">₹0</span></div>
+        <!-- REMOVED BOX (Seamless Result) -->
+        <div id="fcResult" style="display:none; padding-top:10px; border-top:1px dashed #ccc;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-weight:900; color:#555;">LOAN AMOUNT:</span> <span id="fcResLoan" style="color:var(--dark); font-weight:900; font-size:16px;">₹0</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-weight:900; color:#555;">NET DP:</span> <span id="fcResDp" style="color:var(--success); font-weight:900; font-size:16px;">₹0</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-weight:900; color:var(--primary);">MONTHLY EMI:</span> <span id="fcResEmi" style="color:var(--primary); font-weight:900; font-size:16px;">₹0</span></div>
             <div style="display:flex; justify-content:space-between;"><span style="font-weight:900; color:#555;">DAILY EMI:</span> <span id="fcResDaily" style="color:#d35400; font-weight:900; font-size:16px;">₹0</span></div>
-            <div id="fcResTa" style="text-align:center; font-weight:bold; color:var(--indigo); margin-top:10px;">T/A: 0/0 | M: 0</div>
-            <button onclick="copyFastCalcResult(this)" style="width:100%; margin-top:12px; background:var(--primary); color:white; padding:10px; border-radius:4px; font-weight:bold; box-shadow: 0 2px 4px rgba(9, 132, 227, 0.3); border:none; cursor:pointer;">📋 COPY CALCULATION</button>
+            <div id="fcResTa" style="text-align:center; font-weight:bold; color:var(--indigo); margin-top:8px;">T/A: 0/0 | M: 0</div>
+            <button onclick="copyFastCalcResult(this)" style="width:100%; margin-top:10px; background:var(--primary); color:white; padding:10px; border-radius:4px; font-weight:bold; box-shadow: 0 2px 4px rgba(9, 132, 227, 0.3); border:none; cursor:pointer;">📋 COPY CALCULATION</button>
         </div>
         
-        <div style="display:flex; gap:10px; margin-top:15px;">
+        <div style="display:flex; gap:10px; margin-top:10px;">
             <button onclick="document.getElementById('zatpatModal').style.display='none'" style="width:100%; background:#dc3545; color:white; padding:12px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">CLOSE</button>
         </div>
     </div>
@@ -678,7 +680,7 @@
 <!-- DEALER SEARCH MODAL -->
 <div id="dealerSearchModal" class="modal" style="align-items:center; justify-content:center;">
     <div class="modal-content" style="max-width: 500px; padding: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bajaj-blue); padding-bottom: 8px; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px var(--bajaj-blue); padding-bottom: 8px; margin-bottom: 15px;">
             <h3 style="margin:0; color:var(--bajaj-blue);">🔗 Dealer Links Search</h3>
             <button onclick="closeDealerSearchModal()" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px;">✖</button>
         </div>
@@ -704,46 +706,31 @@
 <!-- Link to our separate JS file -->
 <script src="app.js"></script>
 
-<!-- Script for Customer Selection Toggle & Error Handling -->
+<!-- Script for Error Handling & UI Flow Correction -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const infoNameEl = document.getElementById('infoName');
         const noCustomerState = document.getElementById('noCustomerState');
-        const calcWorkspace = document.getElementById('calculationWorkspace');
-
-        // Function 1: Check Customer State on Load or Change
-        function checkCustomerState() {
-            const name = infoNameEl.innerText.trim();
-            if (name === '-' || name === '') {
-                noCustomerState.style.display = 'block';
-                calcWorkspace.style.display = 'none';
-            } else {
-                noCustomerState.style.display = 'none';
-                calcWorkspace.style.display = 'block';
-            }
-        }
-
-        // Initial setup check
-        checkCustomerState();
-
-        // Observe Name Changes
-        const observer = new MutationObserver(checkCustomerState);
-        observer.observe(infoNameEl, { childList: true, characterData: true, subtree: true });
-
-        // Function 2: Observe Toast Errors
-        // If app.js triggers "Kripya pehle queue mein ek customer add karein..." it will show the No Customer State UI.
+        const unifiedHome = document.getElementById('unifiedHome');
+        const finalEligibleArea = document.getElementById('finalEligibleArea');
         const toastEl = document.getElementById('toastNotification');
+
+        // Watch for Toast Error "Kripya pehle queue mein ek customer add karein..."
         const toastObserver = new MutationObserver(() => {
             if (toastEl.classList.contains('show')) {
                 const msg = toastEl.innerText.toLowerCase();
+                // Check if the error is related to missing customer
                 if (msg.includes('queue') && msg.includes('customer')) {
-                    // Show "Add Customer" & "Open Queue" buttons
+                    // Reset UI to No Customer State immediately
+                    unifiedHome.style.display = 'block';
                     noCustomerState.style.display = 'block';
+                    finalEligibleArea.style.display = 'none';
                 }
             }
         });
         
-        toastObserver.observe(toastEl, { attributes: true, attributeFilter: ['class'] });
+        if (toastEl) {
+            toastObserver.observe(toastEl, { attributes: true, attributeFilter: ['class'] });
+        }
     });
 </script>
 
