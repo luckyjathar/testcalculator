@@ -2,29 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- App-like Viewport -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- Android Chrome Theme Color -->
     <meta name="theme-color" content="#1976D2">
+
+    <!-- iOS Safari App Mode -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Persistent Portal">
     <title>Persistent Portal V76.18 - Ultimate Filter Edition</title>
-    
+    <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
+    <!-- Link to our separate CSS file -->
     <link rel="stylesheet" href="style.css?v=6.5">
 
 <style>
+/* =========================================
+   MINIMAL SPACING & BORDERLESS ZATPAT CALC 
+   ========================================= */
 .compact-row { display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 3px; }
 .compact-label { margin-bottom: 0; width: 48%; font-size: 10px; font-weight: 900; color: #444; text-transform: uppercase; line-height: 1; }
 .compact-input { width: 52%; padding: 2px 6px; height: 24px !important; border: none; border-bottom: 1.5px solid #bbb; background: transparent; border-radius: 0; font-weight: bold; font-size: 11.5px; box-sizing: border-box; }
 .compact-input:focus { border-bottom-color: var(--primary); outline: none; }
 .compact-input:disabled { background: transparent; cursor: not-allowed; border-bottom: 1px dashed #ccc; }
+
+/* Custom Inputs for Pop-ups */
 .popup-input-label { font-size: 11px; font-weight: 900; color: #555; display: block; margin-bottom: 4px; text-transform: uppercase; }
 .popup-input { width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; font-size: 13px; box-sizing: border-box; height: auto !important; }
 .popup-input:disabled { background: #e9ecef; cursor: not-allowed; }
+
+/* =========================================
+   PERFECT CENTER ALIGNED MODALS 
+   ========================================= */
 .modal { display: none; position: fixed; z-index: 100000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px); align-items: center; justify-content: center; }
 .modal-content { background-color: #fff; margin: 0 auto; padding: 20px; border-radius: 8px; width: 90%; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
 .modal-content::-webkit-scrollbar { width: 6px; }
@@ -79,7 +94,7 @@
         <button onclick="toggleSidebar(); openFlyerGenModal()" class="sidebar-btn" style="background: var(--warning); color: #000;"><span>📱</span> CREATE FLYER LINK</button>
         <button onclick="toggleSidebar(); openCustomerMessageModal()" class="sidebar-btn" style="background: #27ae60; color: white;"><span>💬</span> SEND EMI DETAILS</button>
         <button onclick="toggleSidebar(); openDealerSearchModal()" class="sidebar-btn" style="background: var(--bajaj-blue); color: white;"><span>🔗</span> DEALER LINKS</button>
-        <button onclick="toggleSidebar(); openEligibility('DICT')" class="sidebar-btn" style="background: var(--indigo); color: white;"><span>🔍</span> SMART SCHEME DICTIONARY</button>
+        <!-- SMART SCHEME DICTIONARY REMOVED FROM SIDEBAR -->
     </div>
 </aside>
 
@@ -95,16 +110,6 @@
 </header>
 
 <main>
-    <!-- TOP 2 ACTION BUTTONS -->
-    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;">
-        <button onclick="openEligibility('ZATPAT')" style="background: var(--bajaj-blue); color: white; padding: 10px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
-            <span id="icon_fc" style="font-size:14px;">🧮</span> ZATPAT CALC
-        </button>
-        <button onclick="openEligibility('DICT')" style="background: var(--indigo); color: white; padding: 10px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
-            <span style="font-size:14px;">🔍</span> SMART SCHEME DICTIONARY
-        </button>
-    </div>
-
     <!-- DUMMY HIDDEN SPANS FOR APP.JS COMPATIBILITY -->
     <div style="display: none !important;">
         <span id="icon_add"></span>
@@ -114,19 +119,36 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- SCREEN 1: UNIFIED HOME (No Customer Selected) -->
+    <!-- SCREEN 1: UNIFIED HOME (DASHBOARD MENU) -->
     <!-- ========================================== -->
-    <div id="unifiedHome">
-        <div id="noCustomerState" style="text-align: center; padding: 40px 20px; background: transparent; border: 2px dashed #ced4da; border-radius: 8px; margin-bottom: 12px;">
-            <div style="font-size: 40px; margin-bottom: 10px;">👤</div>
-            <h3 style="color: var(--bajaj-blue); margin: 0 0 5px 0; font-size: 16px;">No Customer Selected</h3>
-            <p style="color: #6c757d; font-size: 13px; font-weight: bold; margin-bottom: 15px;">Please add a new customer or select one from the queue to start calculation.</p>
-            <div style="display:flex; justify-content:center; gap:10px;">
-                <button onclick="document.getElementById('addCustomerModal').style.display='flex'" style="background: var(--primary); color: white; padding: 12px 20px; border: none; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); width: 100%; max-width: 350px;">
-                    ➕ ADD CUSTOMER & OPEN QUEUE
-                </button>
-            </div>
+    <div id="unifiedHome" style="display: flex; flex-direction: column; gap: 10px; padding: 5px; margin-bottom: 20px;">
+        <div style="text-align: center; margin-bottom: 8px; margin-top: 5px;">
+            <h3 style="color: var(--indigo); margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 900;">⚙️ Dashboard Tools</h3>
         </div>
+
+        <button onclick="openEligibility('ZATPAT')" style="background: var(--bajaj-blue); color: white; padding: 14px 10px; border-radius: 8px; font-weight: 900; border: none; font-size: 14px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+            <span style="font-size:18px;">🧮</span> ZATPAT CALC
+        </button>
+
+        <button onclick="openEligibility('DICT')" style="background: var(--indigo); color: white; padding: 14px 10px; border-radius: 8px; font-weight: 900; border: none; font-size: 14px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+            <span style="font-size:18px;">🔍</span> SMART SCHEME DICTIONARY
+        </button>
+
+        <button onclick="document.getElementById('addCustomerModal').style.display='flex'" style="background: var(--primary); color: white; padding: 14px 10px; border-radius: 8px; font-weight: 900; border: none; font-size: 14px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+            <span style="font-size:18px;">➕</span> ADD CUSTOMER & OPEN QUEUE
+        </button>
+
+        <button onclick="openFlyerGenModal()" style="background: var(--warning); color: #000; padding: 14px 10px; border-radius: 8px; font-weight: 900; border: none; font-size: 14px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+            <span style="font-size:18px;">📱</span> CREATE FLYER LINK
+        </button>
+
+        <button onclick="openCustomerMessageModal()" style="background: #27ae60; color: white; padding: 14px 10px; border-radius: 8px; font-weight: 900; border: none; font-size: 14px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+            <span style="font-size:18px;">💬</span> SEND EMI DETAILS
+        </button>
+
+        <button onclick="openDealerSearchModal()" style="background: #3498db; color: white; padding: 14px 10px; border-radius: 8px; font-weight: 900; border: none; font-size: 14px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+            <span style="font-size:18px;">🔗</span> DEALER LINKS
+        </button>
     </div>
 
     <!-- ========================================== -->
