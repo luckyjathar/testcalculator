@@ -112,7 +112,9 @@
 <main>
     <!-- TOP 2 ACTION BUTTONS -->
     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;">
-        <button onclick="document.getElementById('zatpatModal').style.display='flex'" style="background: var(--bajaj-blue); color: white; padding: 10px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
+        <button onclick="openZatpatEligibility()" style="background: var(--bajaj-blue); color: white; padding: 10px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
+    <span id="icon_fc" style="font-size:14px;">🧮</span> ZATPAT CALC
+</button>
             <span id="icon_fc" style="font-size:14px;">🧮</span> ZATPAT CALC
         </button>
         <button onclick="openDictionaryModal()" style="background: var(--indigo); color: white; padding: 10px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
@@ -203,10 +205,58 @@
 <!-- ============================================================== -->
 <!-- ALL MODALS (POP-UPS) -->
 <!-- ============================================================== -->
+    <!-- ZATPAT ELIGIBILITY MODAL -->
+<div id="zatpatEligibilityModal" class="modal" style="align-items:center; justify-content:center;">
+    <div class="modal-content" style="max-width: 320px; padding: 20px;">
+        <h3 style="margin:0 0 15px 0; color:var(--bajaj-blue); display:flex; align-items:center; gap:6px;">
+            <span style="font-size:18px;">🎯</span> SET ELIGIBILITY
+        </h3>
+        <p style="font-size:11px; color:#666; margin-top:0; font-weight:bold;">Zatpat Calc साठी कस्टमरची एलिजिबिलिटी सेट करा किंवा Skip करा.</p>
+        
+        <div style="margin-bottom:10px;">
+            <label class="popup-input-label">CUSTOMER TYPE</label>
+            <select id="zeType" class="popup-input">
+                <option value="NEW">NEW</option>
+                <option value="EMI CARD">EMI CARD</option>
+                <option value="VIRTUAL">VIRTUAL</option>
+                <option value="W/O CARD">W/O CARD</option>
+            </select>
+        </div>
+        <div style="margin-bottom:10px;">
+            <label class="popup-input-label">NBFC LIMIT (₹)</label>
+            <input type="number" id="zeLimit" placeholder="E.g. 50000" class="popup-input">
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:15px;">
+            <div>
+                <label class="popup-input-label">MAX LTV %</label>
+                <input type="number" id="zeLtv" value="100" max="100" class="popup-input">
+            </div>
+            <div>
+                <label class="popup-input-label">EMI CAPPING</label>
+                <input type="number" id="zeCap" placeholder="₹ Cap" class="popup-input">
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button onclick="applyZatpatEligibility()" style="flex:2; background:var(--success); color:white; padding:10px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">APPLY</button>
+            <button onclick="skipZatpatEligibility()" style="flex:1; background:#6c757d; color:white; padding:10px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">SKIP</button>
+        </div>
+    </div>
+</div>
 
 <!-- 1. ZATPAT CALC MODAL (CLEAN & BORDERLESS INPUTS) -->
 <div id="zatpatModal" class="modal" style="align-items:center; justify-content:center;">
     <div class="modal-content" id="fastCalcContainer" style="max-width: 380px; padding: 15px 20px;">
+        <!-- BORDERLESS COMPACT SIDE-BY-SIDE COMPONENTS च्या वर हा बॅनर टाका -->
+<div id="zeBanner" style="display:none; background:#e8f4f8; border:1px solid var(--bajaj-blue); border-radius:6px; padding:10px; margin-bottom:12px; font-size:11px; font-weight:900; color:var(--indigo);">
+    <div style="display:flex; justify-content:space-between; margin-bottom:4px; border-bottom:1px dashed #ccc; padding-bottom:4px;">
+        <span>TYPE: <span id="zeDispType" style="color:var(--danger);">NEW</span></span>
+        <span>LIMIT: <span id="zeDispLimit" style="color:var(--success);">₹0</span></span>
+    </div>
+    <div style="display:flex; justify-content:space-between;">
+        <span>LTV: <span id="zeDispLtv" style="color:var(--primary);">100%</span></span>
+        <span>CAP: <span id="zeDispCap" style="color:var(--primary);">NONE</span></span>
+    </div>
+</div>
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 12px;">
             <h3 style="margin:0; color:var(--bajaj-blue); font-size: 16px !important; display: flex; align-items: center; gap: 6px;">
                 <span style="font-size:18px;">🧮</span> PRO ZATPAT CALC
