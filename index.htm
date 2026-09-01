@@ -94,7 +94,7 @@
         <button onclick="toggleSidebar(); openFlyerGenModal()" class="sidebar-btn" style="background: var(--warning); color: #000;"><span>📱</span> CREATE FLYER LINK</button>
         <button onclick="toggleSidebar(); openCustomerMessageModal()" class="sidebar-btn" style="background: #27ae60; color: white;"><span>💬</span> SEND EMI DETAILS</button>
         <button onclick="toggleSidebar(); openDealerSearchModal()" class="sidebar-btn" style="background: var(--bajaj-blue); color: white;"><span>🔗</span> DEALER LINKS</button>
-        <button onclick="toggleSidebar(); openDictionaryModal()" class="sidebar-btn" style="background: var(--indigo); color: white;"><span>🔍</span> SMART SCHEME DICTIONARY</button>
+        <button onclick="toggleSidebar(); openEligibility('DICT')" class="sidebar-btn" style="background: var(--indigo); color: white;"><span>🔍</span> SMART SCHEME DICTIONARY</button>
     </div>
 </aside>
 
@@ -112,10 +112,10 @@
 <main>
     <!-- TOP 2 ACTION BUTTONS -->
     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;">
-        <button onclick="openZatpatEligibility()" style="background: var(--bajaj-blue); color: white; padding: 10px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
+        <button onclick="openEligibility('ZATPAT')" style="background: var(--bajaj-blue); color: white; padding: 10px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
             <span id="icon_fc" style="font-size:14px;">🧮</span> ZATPAT CALC
         </button>
-        <button onclick="openDictionaryModal()" style="background: var(--indigo); color: white; padding: 10px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
+        <button onclick="openEligibility('DICT')" style="background: var(--indigo); color: white; padding: 10px 5px; border-radius: 6px; font-weight: 900; border: none; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px;">
             <span style="font-size:14px;">🔍</span> SMART SCHEME DICTIONARY
         </button>
     </div>
@@ -203,13 +203,14 @@
 <!-- ============================================================== -->
 <!-- ALL MODALS (POP-UPS) -->
 <!-- ============================================================== -->
-    <!-- ZATPAT ELIGIBILITY MODAL -->
-<div id="zatpatEligibilityModal" class="modal" style="align-items:center; justify-content:center;">
+
+<!-- GLOBAL ELIGIBILITY MODAL -->
+<div id="eligibilityModal" class="modal" style="align-items:center; justify-content:center; z-index: 100005;">
     <div class="modal-content" style="max-width: 320px; padding: 20px;">
         <h3 style="margin:0 0 15px 0; color:var(--bajaj-blue); display:flex; align-items:center; gap:6px;">
             <span style="font-size:18px;">🎯</span> SET ELIGIBILITY
         </h3>
-        <p style="font-size:11px; color:#666; margin-top:0; font-weight:bold;">Zatpat Calc साठी कस्टमरची एलिजिबिलिटी सेट करा किंवा Skip करा.</p>
+        <p style="font-size:11px; color:#666; margin-top:0; font-weight:bold;">कस्टमरची लिमिट आणि प्रकार सेट करा किंवा Skip करा.</p>
         
         <div style="margin-bottom:10px;">
             <label class="popup-input-label">CUSTOMER TYPE</label>
@@ -235,8 +236,8 @@
             </div>
         </div>
         <div style="display:flex; gap:10px;">
-            <button onclick="applyZatpatEligibility()" style="flex:2; background:var(--success); color:white; padding:10px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">APPLY</button>
-            <button onclick="skipZatpatEligibility()" style="flex:1; background:#6c757d; color:white; padding:10px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">SKIP</button>
+            <button onclick="applyEligibility()" style="flex:2; background:var(--success); color:white; padding:10px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">APPLY</button>
+            <button onclick="skipEligibility()" style="flex:1; background:#6c757d; color:white; padding:10px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">SKIP</button>
         </div>
     </div>
 </div>
@@ -244,22 +245,27 @@
 <!-- 1. ZATPAT CALC MODAL (CLEAN & BORDERLESS INPUTS) -->
 <div id="zatpatModal" class="modal" style="align-items:center; justify-content:center;">
     <div class="modal-content" id="fastCalcContainer" style="max-width: 380px; padding: 15px 20px;">
-        <!-- BORDERLESS COMPACT SIDE-BY-SIDE COMPONENTS च्या वर हा बॅनर टाका -->
-<div id="zeBanner" style="display:none; background:#e8f4f8; border:1px solid var(--bajaj-blue); border-radius:6px; padding:10px; margin-bottom:12px; font-size:11px; font-weight:900; color:var(--indigo);">
-    <div style="display:flex; justify-content:space-between; margin-bottom:4px; border-bottom:1px dashed #ccc; padding-bottom:4px;">
-        <span>TYPE: <span id="zeDispType" style="color:var(--danger);">NEW</span></span>
-        <span>LIMIT: <span id="zeDispLimit" style="color:var(--success);">₹0</span></span>
-    </div>
-    <div style="display:flex; justify-content:space-between;">
-        <span>LTV: <span id="zeDispLtv" style="color:var(--primary);">100%</span></span>
-        <span>CAP: <span id="zeDispCap" style="color:var(--primary);">NONE</span></span>
-    </div>
-</div>
+        
+        <!-- ZATPAT ELIGIBILITY BANNER (EDIT BUTTION ADDED) -->
+        <div id="zeBanner" style="display:none; background:#e8f4f8; border:1px solid var(--bajaj-blue); border-radius:6px; padding:10px; margin-bottom:12px; font-size:11px; font-weight:900; color:var(--indigo);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px; border-bottom:1px dashed #ccc; padding-bottom:4px;">
+                <span>TYPE: <span id="zeDispType" style="color:var(--danger);">NEW</span></span>
+                <span>LIMIT: <span id="zeDispLimit" style="color:var(--success);">₹0</span></span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <span>LTV: <span id="zeDispLtv" style="color:var(--primary);">100%</span></span>
+                <span>CAP: <span id="zeDispCap" style="color:var(--primary);">NONE</span></span>
+            </div>
+            <button onclick="openEligibility('ZATPAT')" style="width:100%; margin-top:8px; padding:6px; background:var(--warning); color:#000; font-weight:bold; border:none; border-radius:4px; cursor:pointer; font-size:11px;">✏️ EDIT ELIGIBILITY</button>
+        </div>
+
+        <!-- ZATPAT CALC MODAL HEADER -->
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 12px;">
             <h3 style="margin:0; color:var(--bajaj-blue); font-size: 16px !important; display: flex; align-items: center; gap: 6px;">
                 <span style="font-size:18px;">🧮</span> PRO ZATPAT CALC
             </h3>
             <div style="display:flex; gap:10px; align-items: center;">
+                <button onclick="openEligibility('ZATPAT')" style="background:#e8f4f8; color:var(--bajaj-blue); padding:4px 8px; border-radius:4px; font-weight:bold; font-size:11px !important; border:1px solid var(--bajaj-blue); cursor:pointer;">⚙️ ELIG</button>
                 <button onclick="resetFastCalc()" style="background:var(--warning); color:#000; padding:4px 8px; border-radius:4px; font-weight:bold; font-size:11px !important; border:none; cursor:pointer;">🔄 RESET</button>
                 <button onclick="document.getElementById('zatpatModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px; padding:0;">✖</button>
             </div>
@@ -528,57 +534,47 @@
     <div class="modal-content" style="max-width: 950px; padding: 20px; max-height: 90vh; overflow-y: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--indigo); padding-bottom: 8px; margin-bottom: 15px;">
             <h3 style="margin:0; color:var(--indigo); font-size: 16px !important;">🔍 SMART SCHEMES DICTIONARY</h3>
-            <button onclick="closeDictionaryModal()" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px; padding:0;">✖</button>
+            <div style="display:flex; gap:10px; align-items: center;">
+                <button onclick="openEligibility('DICT')" style="background:#e8f4f8; color:var(--bajaj-blue); padding:4px 8px; border-radius:4px; font-weight:bold; font-size:11px !important; border:1px solid var(--bajaj-blue); cursor:pointer;">⚙️ ELIG</button>
+                <button onclick="closeDictionaryModal()" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px; padding:0;">✖</button>
+            </div>
+        </div>
+        
+        <!-- DICTIONARY ELIGIBILITY BANNER -->
+        <div id="dictBanner" style="display:none; background:#e8f4f8; border:1px solid var(--bajaj-blue); border-radius:6px; padding:10px; margin-bottom:12px; font-size:11px; font-weight:900; color:var(--indigo);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px; border-bottom:1px dashed #ccc; padding-bottom:4px;">
+                <span>TYPE: <span id="dictDispType" style="color:var(--danger);">NEW</span></span>
+                <span>LIMIT: <span id="dictDispLimit" style="color:var(--success);">₹0</span></span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <span>LTV: <span id="dictDispLtv" style="color:var(--primary);">100%</span></span>
+                <span>CAP: <span id="dictDispCap" style="color:var(--primary);">NONE</span></span>
+            </div>
+            <button onclick="openEligibility('DICT')" style="width:100%; margin-top:8px; padding:6px; background:var(--warning); color:#000; font-weight:bold; border:none; border-radius:4px; cursor:pointer; font-size:11px;">✏️ EDIT ELIGIBILITY</button>
         </div>
         
         <div style="background: #f0f7ff; border: 1.5px solid var(--primary); padding: 15px; border-radius: 6px; margin-bottom: 15px;">
-            <h4 style="margin-top:0; color:var(--primary); font-size: 14px; margin-bottom: 12px;">⚡ 1. Eligibility & Invoice</h4>
-            
-            <!-- CUSTOMER TYPE, LIMIT, LTV INSIDE DICTIONARY ALSO ARRANGED CLEANLY -->
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
-                <div style="flex: 1; min-width: 140px;">
-                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:3px;">1. CUSTOMER TYPE</label>
-                    <select id="calcCustType" onchange="recalcCurrentModel()" style="width:100%; padding:8px; font-size:13px; border:1px solid #ccc; border-radius:4px; font-weight:bold;">
-                        <option value="NEW">NEW</option>
-                        <option value="EMI CARD">EMI CARD</option>
-                        <option value="VIRTUAL">VIRTUAL</option>
-                        <option value="W/O CARD">W/O CARD</option>
-                    </select>
-                </div>
-                <div style="flex: 1; min-width: 140px;">
-                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:3px;">2. APPROVED LIMIT (₹)</label>
-                    <input type="number" id="calcLimit" placeholder="E.g. 50000" oninput="recalcCurrentModel()" style="width:100%; padding:8px; font-size:13px; border:1px solid #ccc; border-radius:4px; font-weight:bold;">
-                </div>
-                <div style="flex: 1; min-width: 140px;">
-                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:3px;">3. MAX LTV (%)</label>
-                    <input type="number" id="calcLtv" placeholder="100" value="100" oninput="recalcCurrentModel()" style="width:100%; padding:8px; font-size:13px; border:1px solid #ccc; border-radius:4px; font-weight:bold;">
-                </div>
-            </div>
-
+            <h4 style="margin-top:0; color:var(--primary); font-size: 14px; margin-bottom: 12px;">⚡ 1. Search & Invoice</h4>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
                 <div style="flex: 2; min-width: 200px; position:relative;">
-                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:3px;">4. SEARCH PRODUCT</label>
+                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:3px;">SEARCH PRODUCT</label>
                     <input type="search" id="globalModelSearch" oninput="doGlobalSearch()" placeholder="Type Brand or Model Name..." style="width:100%; padding:8px; font-size:13px; border:1px solid #ccc; border-radius:4px; font-weight:bold;">
                     <div id="globalModelDropdown" class="custom-scroll" style="position: absolute; width: 100%; background: #fff; z-index: 1000; border: 1px solid #ddd; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.15); border-radius: 4px; max-height: 250px; overflow-y: auto; margin-top: 2px;"></div>
                 </div>
                 <div style="flex: 1; min-width: 140px;">
-                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:3px;">5. INVOICE AMOUNT (₹)</label>
+                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:3px;">INVOICE AMOUNT (₹)</label>
                     <input type="number" id="calcInvoice" placeholder="E.g. 35000" oninput="recalcCurrentModel()" style="width:100%; padding:8px; font-size:13px; border:1px solid #ccc; border-radius:4px; font-weight:bold;">
                 </div>
                 <div style="flex: 1; min-width: 140px;">
-                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:3px;">6. MARGIN (₹)</label>
+                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:3px;">MARGIN (₹)</label>
                     <input type="number" id="calcMargin" placeholder="0" value="0" oninput="recalcCurrentModel()" style="width:100%; padding:8px; font-size:13px; border:1px solid #ccc; border-radius:4px; font-weight:bold;">
                 </div>
             </div>
 
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 140px;">
-                    <label style="font-size:10px; font-weight:bold; color:#d35400; display:block; margin-bottom:3px;">7. TARGET DP (₹) (OPTIONAL)</label>
+                    <label style="font-size:10px; font-weight:bold; color:#d35400; display:block; margin-bottom:3px;">TARGET DP (₹) (OPTIONAL)</label>
                     <input type="number" id="calcTarget" placeholder="Reverse Calc DP" oninput="recalcCurrentModel()" style="width:100%; padding:8px; font-size:13px; border:1px solid #ccc; border-radius:4px; font-weight:bold;">
-                </div>
-                <div style="flex: 1; min-width: 140px;">
-                    <label style="font-size:10px; font-weight:bold; color:#d35400; display:block; margin-bottom:3px;">8. EMI CAPPING (₹) (OPTIONAL)</label>
-                    <input type="number" id="calcCap" placeholder="Max EMI Limit" oninput="recalcCurrentModel()" style="width:100%; padding:8px; font-size:13px; border:1px solid #ccc; border-radius:4px; font-weight:bold;">
                 </div>
             </div>
             <div style="font-size: 11px; color: var(--primary); font-weight: bold; margin-top: 10px;">💡 Tip: मॉडेल निवडल्यावर त्याची MRP थेट Invoice Amount मध्ये भरेल. तुम्ही ती मॅन्युअली बदलू शकता. जास्त LTV असलेल्या स्कीम्स आपोआप लपवल्या जातील.</div>
