@@ -803,6 +803,8 @@ function renderTableModel() {
     document.getElementById('schemeResultArea').style.display = 'block';
 }
 
+// ... (बाकीचे सर्व जुने JS फंक्शन्स इथून पुढे कंटिन्यू होतील: compMrpChanged, showComponentsModal, proceedToMatrixFromComponents इ.)
+
 function compMrpChanged() { let mrp = parseFloat(document.getElementById('compMrp').value) || 0; document.getElementById('compInv').value = mrp; let gtl = mrp > 100000 ? 2398 : (mrp > 50000 ? 1799 : (mrp > 30000 ? 1499 : (mrp > 10000 ? 1199 : (mrp > 0 ? 699 : 0)))); document.getElementById('compGtl').value = gtl; let rfcSlab = getRfcSlabValue(mrp); let rfcOpt = document.getElementById('compRfcOpt'); if(rfcOpt) { rfcOpt.value = rfcSlab; rfcOpt.innerText = rfcSlab; } if (isMobileDeviceCat(currentModalCategory)) { document.getElementById('compRfc').value = rfcSlab; } else { document.getElementById('compRfc').value = "0"; } }
 
 function showComponentsModal(baseMrp = "") {
@@ -828,7 +830,7 @@ function updateMatrixTopCard() { let c = customerQueue[activeCustomerIndex]; doc
 function loadCurrentProducts() { let c = customerQueue[activeCustomerIndex]; current_products = c.products || []; sortConfigs = c.sortConfigs || []; }
 
 function goToFinalPage() {
-    if(activeCustomerIndex === -1) return; loadCurrentProducts(); updateMatrixTopCard(); updateFinalSwitcher(); document.getElementById('unifiedHome').style.display = 'none'; document.getElementById('finalEligibleArea').style.display = 'flex'; renderMatrix(); setTimeout(() => { document.getElementById('finalEligibleArea').scrollIntoView({ behavior: 'smooth', block: 'start' }); if(current_products.length === 0) openAddProductModal(); }, 150);
+    if(activeCustomerIndex === -1) return; loadCurrentProducts(); updateMatrixTopCard(); updateFinalSwitcher(); document.getElementById('unifiedHome').style.display = 'none'; document.getElementById('finalEligibleArea').style.display = 'flex'; renderMatrix(); setTimeout(() => { document.getElementById('finalEligibleArea').scrollIntoView({ behavior: 'smooth', block: 'start' }); if(current_products.length === 0) openAddProductModal('MATRIX'); }, 150);
 }
 
 function toggleModelView(pIdx) { let wrapper = document.getElementById(`tw_${pIdx}`); let grid = document.getElementById(`cg_${pIdx}`); let icon = document.getElementById(`togIcon_${pIdx}`); if(wrapper.style.display === 'none') { wrapper.style.display = 'block'; if(grid) grid.style.display = 'grid'; icon.innerText = '▼'; } else { wrapper.style.display = 'none'; if(grid) grid.style.display = 'none'; icon.innerText = '▶'; } }
@@ -1665,6 +1667,9 @@ document.addEventListener('click', function() {
     });
 });
 
+// ==========================================
+// GLOBAL ELIGIBILITY SYSTEM (ZATPAT & DICTIONARY)
+// ==========================================
 let zcEligibleActive = false;
 let zcLimit = 0;
 let zcLtv = 100;
@@ -1760,12 +1765,17 @@ function proceedToTargetModal() {
             document.getElementById('dictBanner').style.display = 'none';
         }
         
-        document.getElementById('globalModelSearch').value = ''; 
-        document.getElementById('globalModelDropdown').style.display = 'none'; 
+        let dictDisplay = document.getElementById('dictSelectedModelDisplay');
+        if (dictDisplay) dictDisplay.innerText = "🔍 Click to Search or Add...";
+        
         document.getElementById('schemeResultArea').style.display = 'none';
         
         document.getElementById('dictionarySearchModal').style.display = 'flex'; 
-        setTimeout(() => document.getElementById('globalModelSearch').focus(), 100); 
+        
+        currentViewedModel = "";
+        dictManualSchemes = null;
+        dictIsNonTieup = false;
+        
         recalcCurrentModel();
     }
 }
