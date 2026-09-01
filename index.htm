@@ -195,7 +195,8 @@
             </div>
         </div>
 
-        <button onclick="openAddProductModal()" style="width: 100%; background:var(--warning); color:#000; padding:10px; border-radius:6px; font-weight:900; margin-bottom:8px; border: 1.5px solid #d35400; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor:pointer;">➕ ADD NEW PRODUCT (SEARCH / NON-TIEUP / MANUAL)</button>
+        <!-- Matrix मधील Add Product Button (मोड अपडेट केलाय) -->
+        <button onclick="openAddProductModal('MATRIX')" style="width: 100%; background:var(--warning); color:#000; padding:10px; border-radius:6px; font-weight:900; margin-bottom:8px; border: 1.5px solid #d35400; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor:pointer;">➕ ADD NEW PRODUCT (SEARCH / NON-TIEUP / MANUAL)</button>
         <div id="multiModelContainer"></div>
     </div>
 </main>
@@ -556,11 +557,15 @@
         <div style="background: #f0f7ff; border: 1.5px solid var(--primary); padding: 15px; border-radius: 6px; margin-bottom: 15px;">
             <h4 style="margin-top:0; color:var(--primary); font-size: 14px; margin-bottom: 12px;">⚡ 1. Search & Invoice</h4>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
-                <div style="flex: 2; min-width: 200px; position:relative;">
-                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:3px;">SEARCH PRODUCT</label>
-                    <input type="search" id="globalModelSearch" oninput="doGlobalSearch()" placeholder="Type Brand or Model Name..." style="width:100%; padding:8px; font-size:13px; border:1px solid #ccc; border-radius:4px; font-weight:bold;">
-                    <div id="globalModelDropdown" class="custom-scroll" style="position: absolute; width: 100%; background: #fff; z-index: 1000; border: 1px solid #ddd; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.15); border-radius: 4px; max-height: 250px; overflow-y: auto; margin-top: 2px;"></div>
+                <!-- Updated Search Box for Dictionary -->
+                <div style="flex: 2; min-width: 200px;">
+                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:3px;">4. SELECT PRODUCT / SCHEME</label>
+                    <button onclick="openAddProductModal('DICT')" style="width:100%; padding:8px 10px; font-size:13px; font-weight:bold; color:var(--dark); background:#fff; border:1px solid #ccc; border-radius:4px; text-align:left; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+                        <span id="dictSelectedModelDisplay">🔍 Click to Search or Add...</span>
+                        <span style="color:#aaa; font-size:10px;">▼</span>
+                    </button>
                 </div>
+                
                 <div style="flex: 1; min-width: 140px;">
                     <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:3px;">INVOICE AMOUNT (₹)</label>
                     <input type="number" id="calcInvoice" placeholder="E.g. 35000" oninput="recalcCurrentModel()" style="width:100%; padding:8px; font-size:13px; border:1px solid #ccc; border-radius:4px; font-weight:bold;">
