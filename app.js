@@ -805,7 +805,25 @@ function exportDictSchemeImage(action) {
     });
 }
 
-function resetFastCalc() { let fields = ['fcInv', 'fcLoanInput', 'fcTenure', 'fcAdv', 'fcDbd', 'fcRoi', 'fcPf', 'fcFixed', 'fcCap', 'fcTarget', 'fcExw', 'fcMargin', 'fcDealer']; fields.forEach(id => document.getElementById(id).value = ''); document.getElementById('fcGtl').value = '0'; let rfcOpt = document.getElementById('fcRfcOpt'); if(rfcOpt) { rfcOpt.value = '0'; rfcOpt.innerText = '0'; } document.getElementById('fcCustType').value = 'NEW'; document.getElementById('fcCat').value = 'OTHER'; fcCatChanged(); document.getElementById('fcResult').style.display = 'none'; }
+function resetFastCalc() { 
+    let fields = ['fcInv', 'fcLoanInput', 'fcTenure', 'fcAdv', 'fcDbd', 'fcRoi', 'fcPf', 'fcFixed', 'fcCap', 'fcTarget', 'fcExw', 'fcMargin', 'fcDealer']; 
+    fields.forEach(id => document.getElementById(id).value = ''); 
+    document.getElementById('fcGtl').value = '0'; 
+    let rfcOpt = document.getElementById('fcRfcOpt'); 
+    if(rfcOpt) { rfcOpt.value = '0'; rfcOpt.innerText = '0'; } 
+    document.getElementById('fcCat').value = 'OTHER'; 
+    fcCatChanged(); 
+    document.getElementById('fcResult').style.display = 'none'; 
+    
+    // जर एलिजिबिलिटी ऍक्टिव्ह असेल तर तेच व्हॅल्यूज पुन्हा ठेवा
+    if(zcEligibleActive) {
+        document.getElementById('fcCustType').value = document.getElementById('zeType').value;
+        let zeCap = parseFloat(document.getElementById('zeCap').value);
+        document.getElementById('fcCap').value = zeCap > 0 ? zeCap : '';
+    } else {
+        document.getElementById('fcCustType').value = 'NEW';
+    }
+}
 function copyFastCalcResult(btn) { let inv = document.getElementById('fcInv').value || 0; let loan = document.getElementById('fcResLoan').innerText; let dp = document.getElementById('fcResDp').innerText; let emi = document.getElementById('fcResEmi').innerText; let daily = document.getElementById('fcResDaily').innerText; let ta = document.getElementById('fcResTa').innerText; let text = `⚡ *Zatpat Calculation*\n`; if (inv > 0) text += `*Invoice:* ₹${inv}\n\n`; text += `*Loan:* ${loan}\n*DP:* ${dp}\n*EMI:* ${emi}\n*Daily:* ${daily}\n*Details:* ${ta}`; let orig = btn.innerText; btn.innerText = "COPIED!"; btn.style.background = "var(--success)"; btn.style.color = "white"; if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(() => { setTimeout(() => { btn.innerText = orig; btn.style.background = "var(--primary)"; btn.style.color = "white"; }, 2000); }).catch(() => fallbackCopy(text, () => { setTimeout(() => { btn.innerText = orig; btn.style.background = "var(--primary)"; btn.style.color = "white"; }, 2000); })); } else { fallbackCopy(text, () => { setTimeout(() => { btn.innerText = orig; btn.style.background = "var(--primary)"; btn.style.color = "white"; }, 2000); }); } }
 function fcCatChanged() { let isPhone = isMobileDeviceCat(document.getElementById('fcCat').value); let rSelect = document.getElementById('fcRfc'); let exwInput = document.getElementById('fcExw'); if(isPhone) { rSelect.disabled = false; rSelect.style.background = '#fff'; rSelect.style.cursor = 'default'; exwInput.value = ""; exwInput.disabled = true; exwInput.style.background = '#e9ecef'; exwInput.style.cursor = 'not-allowed'; fcInvChanged(); } else { rSelect.value = "0"; rSelect.disabled = true; rSelect.style.background = '#e9ecef'; rSelect.style.cursor = 'not-allowed'; exwInput.disabled = false; exwInput.style.background = '#fff'; exwInput.style.cursor = 'text'; calculateFastData(); } }
 
@@ -845,6 +863,23 @@ function calculateFastData() {
     let fee = (custType === 'EMI CARD') ? 270 : (custType === 'W/O CARD' ? 320 : 850); let totalFees = fee + margin + dealer; let insTotal = gtl + rfc + exw; let dbdRate = (dbd * 1.18 / 100); let roiRate = roi / 1200; let roiRateDP = roiRate * adv; let loan = loanInput > 0 ? loanInput : inv;
     
     let emi = 0; let dpRounded = 0; let inst = 0; let finalTenure = tenure;
+    // ... आधीचा कोड
+let emi = 0; let dpRounded = 0; let inst = 0; let finalTenure = tenure;
+
+let isLtvBreach = false;
+let nbfcMaxLoan = 9999999;
+
+if (zcEligibleActive && tenure > 0) {
+    let instForLimit = tenure - adv; 
+    if(instForLimit < 1) instForLimit = 1;
+    nbfcMaxLoan = (zcLimit * tenure) / instForLimit;
+    
+    let curLtv = ((tenure - adv) / tenure) * 100;
+    if (curLtv > zcLtv) isLtvBreach = true;
+}
+
+if (fixedEmi > 0) { 
+// ...
     if (fixedEmi > 0) { 
         finalTenure = Math.floor(loan / fixedEmi) || 1; 
         if (loanInput > 0) loan = finalTenure * fixedEmi;
@@ -878,7 +913,15 @@ function calculateFastData() {
         if (inv > 0 && loan > inv) {
             loan = inv;
         }
+if (inv > 0 && loan > inv) {
+            loan = inv;
+        }
+        
+        // --- नवीन लाईन ---
+        if (loan > nbfcMaxLoan) loan = nbfcMaxLoan; 
+        // -----------------
 
+        inst = tenure - adv; if (inst < 1) inst = 1;
         inst = tenure - adv; if (inst < 1) inst = 1; 
         let roiInEmi = loan * roiRate; emi = (loan / tenure) + (insTotal / inst) + roiInEmi; 
         if (cap > 0 && emi > cap) { 
@@ -891,7 +934,7 @@ function calculateFastData() {
         let roiInDp = loan * roiRateDP; let dpExact = inv - loan + ((loan / tenure) * adv) + (loan * dbdRate) + pf + totalFees + roiInDp; 
         dpRounded = Math.ceil(dpExact / 10) * 10; 
     }
-    let dailyEmi = emi / 30; document.getElementById('fcResLoan').innerText = "₹" + Math.floor(loan).toLocaleString(); document.getElementById('fcResDp').innerText = "₹" + Math.round(dpRounded).toLocaleString(); document.getElementById('fcResEmi').innerText = "₹" + Math.round(emi).toLocaleString(); document.getElementById('fcResDaily').innerText = "₹" + Math.round(dailyEmi).toLocaleString(); document.getElementById('fcResTa').innerText = `T/A: ${finalTenure}/${adv} | M: ${inst}`; document.getElementById('fcResult').style.display = 'block';
+    let dailyEmi = emi / 30; document.getElementById('fcResLoan').innerText = "₹" + Math.floor(loan).toLocaleString(); document.getElementById('fcResDp').innerText = "₹" + Math.round(dpRounded).toLocaleString(); document.getElementById('fcResEmi').innerText = "₹" + Math.round(emi).toLocaleString(); document.getElementById('fcResDaily').innerText = "₹" + Math.round(dailyEmi).toLocaleString(); document.getElementById('fcResTa').innerHTML = `T/A: ${finalTenure}/${adv} | M: ${inst} ${isLtvBreach ? '<br><span style="color:var(--danger); font-size:11px;">⚠️ MAX LTV BREACH!</span>' : ''}`; document.getElementById('fcResult').style.display = 'block';
 }
 
 async function silentLeadDispatcher(cust) {
@@ -1985,3 +2028,58 @@ document.addEventListener('click', function() {
         el.style.display = 'none';
     });
 });
+let zcEligibleActive = false;
+let zcLimit = 0;
+let zcLtv = 100;
+
+function openZatpatEligibility() {
+    document.getElementById('zeType').value = 'NEW';
+    document.getElementById('zeLimit').value = '';
+    document.getElementById('zeLtv').value = '100';
+    document.getElementById('zeCap').value = '';
+    document.getElementById('zatpatEligibilityModal').style.display = 'flex';
+}
+
+function skipZatpatEligibility() {
+    zcEligibleActive = false;
+    document.getElementById('zeBanner').style.display = 'none';
+    
+    // जुने इनपुट्स पुन्हा सुरू करा
+    document.getElementById('fcCustType').disabled = false;
+    document.getElementById('fcCap').disabled = false;
+    
+    document.getElementById('zatpatEligibilityModal').style.display = 'none';
+    document.getElementById('zatpatModal').style.display = 'flex';
+}
+
+function applyZatpatEligibility() {
+    zcLimit = parseFloat(document.getElementById('zeLimit').value) || 0;
+    zcLtv = parseFloat(document.getElementById('zeLtv').value) || 100;
+    let type = document.getElementById('zeType').value;
+    let cap = parseFloat(document.getElementById('zeCap').value) || 0;
+
+    if(zcLimit <= 0) {
+        showToast("⚠️ कृपया NBFC LIMIT भरा किंवा SKIP वर क्लिक करा!", "error");
+        return;
+    }
+
+    zcEligibleActive = true;
+    
+    // व्हॅल्यूज Zatpat मध्ये सेट करा आणि लॉक करा
+    document.getElementById('fcCustType').value = type;
+    document.getElementById('fcCap').value = cap > 0 ? cap : '';
+    document.getElementById('fcCustType').disabled = true;
+    document.getElementById('fcCap').disabled = true;
+
+    // बॅनरमध्ये माहिती अपडेट करा
+    document.getElementById('zeDispType').innerText = type;
+    document.getElementById('zeDispLimit').innerText = "₹" + zcLimit;
+    document.getElementById('zeDispLtv').innerText = zcLtv + "%";
+    document.getElementById('zeDispCap').innerText = cap > 0 ? "₹" + cap : "NONE";
+    document.getElementById('zeBanner').style.display = 'block';
+
+    document.getElementById('zatpatEligibilityModal').style.display = 'none';
+    document.getElementById('zatpatModal').style.display = 'flex';
+    
+    calculateFastData(); 
+}
