@@ -190,7 +190,7 @@ function generateMessage() {
     if (lang === 'mr') {
         msg = `सस्नेह नमस्कार, ${name}! 🙏\n\nबजाज फायनान्समध्ये आपले स्वागत आहे. आपण खरेदी केलेल्या वस्तूच्या कर्जाची (Loan) सविस्तर माहिती खालीलप्रमाणे आहे:\n\n🏬 दुकानाचे नाव (Dealer/Shop): ${shop}\n📱 वस्तूचा प्रकार (Asset): ${asset}\n📌 मासिक हप्ता (EMI): ₹${emi}/-\n📌 एकूण हप्ते (Months): ${tenure} महिने\n📅 पहिला हप्ता सुरू होण्याची तारीख: ${startDate}\n📅 शेवटचा हप्ता संपण्याची तारीख: ${endDate}\n\n⚠️ बजाज फायनान्सचे नियम व अटी:\n१) आपण घेतलेल्या वस्तूचा हप्ता दर महिन्याच्या २ तारखेला आपण दिलेल्या बँक खात्यातून (Account) कट होतो.\n२) जर कर्ज प्रक्रिया (Finance) महिन्याच्या २३ व्या तारखेपर्यंत पूर्ण झाली असेल, तर पहिला हप्ता पुढील महिन्याच्या २ तारखेला सुरू होतो.\n३) आपण ECS / NACH फॉर्मवर केलेली सही आपल्या बँकेमार्फत तपासली जाते.\n४) जर बँकेला सहीमध्ये काही तफावत (फरक) आढळल्यास, आपल्याला त्याबाबत SMS किंवा Call मार्फत पूर्वकल्पना दिली जाते.\n५) अशा वेळी, आपल्याला बजाज फायनान्सच्या कार्यालयात जाऊन योग्य सहीची पूर्तता करणे आवश्यक असते.\n६) सही न जुळल्यास बँक खात्यातून हप्ता कट होत नाही आणि बँकेच्या नियमानुसार आपल्याला 'बाऊन्स चार्ज' (दंड) आकारला जातो. हे शुल्क थेट बँकेकडे जमा होते, बजाज फायनान्सकडे नाही. या प्रक्रियेत बजाज फायनान्सचे कर्मचारी जबाबदार नसतात, याची कृपया सर्व ग्राहकांनी नोंद घ्यावी.\n७) हप्ता बाऊन्स झाल्यास बजाज फायनान्सकडून ₹५००/- बाऊन्स शुल्क (Penalty) आकारले जाते. तसेच, थकीत हप्ता जमा होईपर्यंत दररोज विलंब शुल्क (Late Fees) वाढत जाते.\n८) आपल्या बँक खात्यामध्ये लागणारी किमान शिल्लक (Minimum Balance) आणि हप्त्याची रक्कम, हप्त्याच्या तारखेच्या किमान २ दिवस आधी जमा ठेवावी.\n९) हप्ता बँक खात्यातून कट झाला की नाही हे पाहण्यासाठी मोबाईलमध्ये 'Bajaj Finserv' ॲप तपासावे. हप्ता जमा झाल्यावर आपल्या बँक खात्यात, बँक ॲपमध्ये किंवा पासबुकवर त्याची त्वरित नोंद होते व बँकेकडून SMS देखील प्राप्त होतो.\n१०) बजाज फायनान्स कार्यालय: आदिनाथ पॅराडाईज, हॉटेल शालिमारजवळ, मजगाव रोड, रत्नागिरी.\n११) महत्त्वाची सेवा माहिती: तुमच्या नोंदणीकृत मोबाईल नंबरवरून 8698010101 या नंबरवर कॉल करून तुम्ही खालील माहिती मिळवू शकता (मानक कॉल शुल्क लागू)\n१२) मुदतीपूर्वी कर्ज बंद (Loan Foreclosure) करायचे असल्यास, पुढील हप्त्याच्या किमान १० दिवस आधी बजाज फायनान्स कार्यालयात किंवा ॲपद्वारे उर्वरित रक्कम भरून कर्ज बंद करता येते.\n\nकाही अडचण असल्यास नक्की संपर्क करा. धन्यवाद! ✨`;
     } else if (lang === 'hi') {
-        msg = `नमस्ते, ${name}! 🙏\n\nबजाज फाइनेंस में स्वागत है। आपके द्वारा खरीदे गए उत्पाद के लोन (Loan) का विवरण नीचे दिया गया है:\n\n🏬 डीलर / दुकान का नाम (Dealer/Shop): ${shop}\n📱 उत्पाद का प्रकार (Asset): ${asset}\n📌 मासिक किस्त (EMI): ₹${emi}/-\n📌 कुल किस्तें (Months): ${tenure} महीने\n📅 पहली किस्त शुरू होने की तारीख: ${startDate}\n📅 अंतिम किस्त समाप्त होने की तारीख: ${endDate}\n\n⚠️ बजाज फाइनेंस के नियम व शर्तें:\n१) आपके उत्पाद की किस्त हर महीने की 2 तारीख को आपके दिए गए बैंक खाते से कटती है।\n२) यदि लोन प्रक्रिया महीने की 23 तारीख तक पूरी हो जाती है, Fox पहली किस्त अगले महीने की 2 तारीख से शुरू होती है।\n३) ECS / NACH फॉर्म पर आपके द्वारा किए गए हस्ताक्षर आपके बैंक द्वारा जांचे जाते हैं।\n४) यदि बैंक को हस्ताक्षर में कोई अंतर मिलता है, तो आपको SMS या Call के माध्यम से सूचित किया जाता है।\n५) ऐसी स्थिति में, आपको बजाज फाइनेंस कार्यालय जाकर सही हस्ताक्षर की प्रक्रिया पूरी करनी होगी।\n६) हस्ताक्षर गलत होने पर बैंक खाते से किस्त नहीं कटती है और बैंक के नियमानुसार बाउंस चार्ज (जुर्माना) लगाया जाता है। यह शुल्क सीधे बैंक के खाते में जाता है, बजाज फाइनेंस के नहीं। इस प्रक्रिया में बजाज फाइनेंस के कर्मचारी जिम्मेदार नहीं होते हैं, कृपया सभी ग्राहक ध्यान दें।\n७) किस्त बाउंस होने पर बजाज फाइनेंस की ओर से ₹500/- बाउंस शुल्क (Penalty) लगाया जाता है। साथ ही, बकाया किस्त जमा होने तक प्रतिदिन विलंब शुल्क (Late Fees) बढ़ता जाता है।\n८) अपने बैंक खाते में आवश्यक न्यूनतम राशि (Minimum Balance) के अलावा किस्त की राशि नियत तारीख से कम से कम 2 दिन पहले जमा रखें।\n९) किस्त कटी या नहीं, जानने के लिए अपने मोबाइल में 'Bajaj Finserv' ऐप चेक करें। किस्त प्राप्त होने पर आपके बैंक खाते या पासबुक में तुरंत दर्ज हो जाती है और बैंक SMS द्वारा भी सूचित करता है।\n१०) बजाज फाइनेंस कार्यालय: आदिनाथ पैराडाइज, होटल शालीमार के पास, मजगांव रोड, रत्नागिरी।\n११) महत्वपूर्ण सेवा जानकारी: अपने पंजीकृत मोबाइल नंबर से 8698010101 पर कॉल करके आप निम्नलिखित जानकारी प्राप्त कर सकते हैं (मानक कॉल शुल्क लागू)\n१२) समय से पहले लोन बंद (Foreclosure) करना चाहते हैं, तो अगली किस्त से कम से कम 10 दिन पहले बजाज फाइनेंस कार्यालय में या ऐप के माध्यम से शेष राशि का भुगतान करके लोन बंद कर सकते हैं।\n\nकिसी भी सहायता के लिए संपर्क करें। धन्यवाद! ✨`;
+        msg = `नमस्ते, ${name}! 🙏\n\nबजाज फाइनेंस में स्वागत है। आपके द्वारा खरीदे गए उत्पाद के लोन (Loan) का विवरण नीचे दिया गया है:\n\n🏬 डीलर / दुकान का नाम (Dealer/Shop): ${shop}\n📱 उत्पाद का प्रकार (Asset): ${asset}\n📌 मासिक किस्त (EMI): ₹${emi}/-\n📌 कुल किस्तें (Months): ${tenure} महीने\n📅 पहली किस्त शुरू होने की तारीख: ${startDate}\n📅 अंतिम किस्त समाप्त होने की तारीख: ${endDate}\n\n⚠️ बजाज फाइनेंस के नियम व शर्तें:\n१) आपके उत्पाद की किस्त हर महीने की 2 तारीख को आपके दिए गए बैंक खाते से कटती है।\n२) यदि लोन प्रक्रिया महीने की 23 तारीख तक पूरी हो जाती है, तो पहली किस्त अगले महीने की 2 तारीख से शुरू होती है।\n३) ECS / NACH फॉर्म पर आपके द्वारा किए गए हस्ताक्षर आपके बैंक द्वारा जांचे जाते हैं।\n४) यदि बैंक को हस्ताक्षर में कोई अंतर मिलता है, तो आपको SMS या Call के माध्यम से सूचित किया जाता है।\n५) ऐसी स्थिति में, आपको बजाज फाइनेंस कार्यालय जाकर सही हस्ताक्षर की प्रक्रिया पूरी करनी होगी।\n६) हस्ताक्षर गलत होने पर बैंक खाते से किस्त नहीं कटती है और बैंक के नियमानुसार बाउंस चार्ज (जुर्माना) लगाया जाता है। यह शुल्क सीधे बैंक के खाते में जाता है, बजाज फाइनेंस के नहीं। इस प्रक्रिया में बजाज फाइनेंस के कर्मचारी जिम्मेदार नहीं होते हैं, कृपया सभी ग्राहक ध्यान दें।\n७) किस्त बाउंस होने पर बजाज फाइनेंस की ओर से ₹500/- बाउंस शुल्क (Penalty) लगाया जाता है। साथ ही, बकाया किस्त जमा होने तक प्रतिदिन विलंब शुल्क (Late Fees) बढ़ता जाता है।\n८) अपने बैंक खाते में आवश्यक न्यूनतम राशि (Minimum Balance) के अलावा किस्त की राशि नियत तारीख से कम से कम 2 दिन पहले जमा रखें।\n९) किस्त कटी या नहीं, जानने के लिए अपने मोबाइल में 'Bajaj Finserv' ऐप चेक करें। किस्त प्राप्त होने पर आपके बैंक खाते या पासबुक में तुरंत दर्ज हो जाती है और बैंक SMS द्वारा भी सूचित करता है।\n१०) बजाज फाइनेंस कार्यालय: आदिनाथ पैराडाइज, होटल शालीमार के पास, मजगांव रोड, रत्नागिरी।\n११) महत्वपूर्ण सेवा जानकारी: अपने पंजीकृत मोबाइल नंबर से 8698010101 पर कॉल करके आप निम्नलिखित जानकारी प्राप्त कर सकते हैं (मानक कॉल शुल्क लागू)\n१२) समय से पहले लोन बंद (Foreclosure) करना चाहते हैं, तो अगली किस्त से कम से कम 10 दिन पहले बजाज फाइनेंस कार्यालय में या ऐप के माध्यम से शेष राशि का भुगतान करके लोन बंद कर सकते हैं।\n\nकिसी भी सहायता के लिए संपर्क करें। धन्यवाद! ✨`;
     } else {
         msg = `Dear ${name}, 🙏\n\nWelcome to Bajaj Finance! Here are the complete details of your recent product loan:\n\n🏬 Dealer / Shop Name: ${shop}\n📱 Asset Category: ${asset}\n📌 Monthly EMI: ₹${emi}/-\n📌 Total Tenure: ${tenure} Months\n📅 First EMI Start Date: ${startDate}\n📅 Last EMI End Date: ${endDate}\n\n⚠️ Important Bajaj Finance Terms & Conditions:\n1) Your loan EMI will be auto-debited on the 2nd of every month from your registered bank account.\n2) If the loan processing is completed on or before the 23rd of the month, the first EMI will start on the 2nd of the upcoming month.\n3) Your signature on the ECS / NACH mandate form is verified by your bank.\n4) If the bank detects any mismatch in your signature, you will be notified via SMS or Call.\n5) In such cases, you must visit the Bajaj Finance office to complete the correct signature verification formalities.\n6) If the signature mismatches, the EMI will not be debited, and your bank will levy a bounce penalty as per their rules. These charges go directly to your bank, not Bajaj Finance. Bajaj Finance staff will not be responsible for bank-levied charges.\n7) Additionally, Bajaj Finance levies a bounce penalty of ₹500/- for missed EMIs. Daily late payment charges will also accrue until the pending EMI is cleared.\n8) Please maintain the required EMI amount along with the Minimum Account Balance in your bank account at least 2 days prior to the due date.\n9) Please use the 'Bajaj Finserv' mobile app to track your EMI deductions. Once received, the credit reflects in your bank account/passbook immediately, and you will receive a confirmation SMS from your bank.\n10) Bajaj Finance Office Address: Adinath Paradise, Near Hotel Shalimar, Mazgaon Road, Ratnagiri.\n11) Important Service Information: You can obtain the following information by calling 8698010101 from your registered mobile number (standard call charges apply)\n12) If you wish to foreclose/close your loan ahead of time, please pay the outstanding amount at our office or via the app at least 10 days before your next EMI due date.\n\nPlease feel free to reach out if you have any questions. Thank you! ✨`;
     }
@@ -477,29 +477,6 @@ function generateFlyer() {
 function copyFlyerLink() { let copyText = document.getElementById('fgGeneratedLinkText'); copyText.select(); copyText.setSelectionRange(0, 99999); document.execCommand("copy"); showToast("✅ Link Copied!", "success"); }
 function shareOnWhatsAppStatus() { let generatedLink = document.getElementById('fgGeneratedLinkText').value; if (!generatedLink) { showToast("⚠️ Pehle link generate karein!", "error"); return; } let statusMessage = "🔥 *Festival Special Offers!* 🔥\n\nNaya Mobile, Laptop ya TV lene ka soch rahe ho? Zero percent interest (0% EMI) par kharidi karein!\n\n" + generatedLink; let encodedMessage = encodeURIComponent(statusMessage); window.open(`https://wa.me/?text=${encodedMessage}`, '_blank'); }
 
-function openDictionaryModal() { 
-    if(!db_records || db_records.length === 0) { showToast("⚠️ Schemes Dictionary load ho rahi hai, kripya 2 second wait karein...", "warning"); return; } 
-    document.getElementById('globalModelSearch').value = ''; 
-    document.getElementById('globalModelDropdown').style.display = 'none'; 
-    document.getElementById('schemeResultArea').style.display = 'none';
-
-    if (activeCustomerIndex !== -1 && customerQueue[activeCustomerIndex]) {
-        let c = customerQueue[activeCustomerIndex];
-        document.getElementById('calcCustType').value = c.type || "NEW";
-        document.getElementById('calcLimit').value = c.limit || "";
-        document.getElementById('calcLtv').value = c.ltv || 100;
-        document.getElementById('calcCap').value = c.cap || "";
-    } else {
-        document.getElementById('calcCustType').value = "NEW";
-        document.getElementById('calcLimit').value = "";
-        document.getElementById('calcLtv').value = "100";
-        document.getElementById('calcCap').value = "";
-    }
-
-    document.getElementById('dictionarySearchModal').style.display = 'flex'; 
-    setTimeout(() => document.getElementById('globalModelSearch').focus(), 100); 
-}
-
 function closeDictionaryModal() { document.getElementById('dictionarySearchModal').style.display = 'none'; }
 
 function doGlobalSearch() { 
@@ -551,13 +528,13 @@ function renderTableModel() {
     
     document.getElementById('globalViewerTitle').innerText = '📱 ' + currentViewedModel;
     
-    let custType = document.getElementById('calcCustType').value;
-    let ltvLimit = parseFloat(document.getElementById('calcLtv').value) || 100;
-    let limit = parseFloat(document.getElementById('calcLimit').value) || 0;
+    let custType = zcEligibleActive ? zcType : 'NEW';
+    let ltvLimit = zcEligibleActive ? zcLtv : 100;
+    let limit = zcEligibleActive ? zcLimit : 0;
     let invoice = parseFloat(document.getElementById('calcInvoice').value) || 0;
     let margin = parseFloat(document.getElementById('calcMargin').value) || 0;
     let targetDp = parseFloat(document.getElementById('calcTarget').value) || 0;
-    let emiCap = parseFloat(document.getElementById('calcCap').value) || 0;
+    let emiCap = zcEligibleActive ? zcCap : 0;
     
     let gtl = invoice > 100000 ? 2398 : (invoice > 50000 ? 1799 : (invoice > 30000 ? 1499 : (invoice > 10000 ? 1199 : (invoice > 0 ? 699 : 0))));
     
@@ -731,7 +708,7 @@ function renderTableModel() {
 }
 
 function copySingleScheme(tenure, advEmi, loan, dp, emi, fixedEmi, dbd, roi, pf, btn) {
-    let limit = parseFloat(document.getElementById('calcLimit').value) || 0;
+    let limit = zcEligibleActive ? zcLimit : 0;
     let invoice = parseFloat(document.getElementById('calcInvoice').value) || 0;
     let isCalculatedMode = (limit > 0 && invoice > 0);
     let inst = Math.max(1, parseInt(tenure) - parseInt(advEmi));
@@ -765,13 +742,13 @@ function exportDictSchemeImage(action) {
     let titleText = document.getElementById('globalViewerTitle').innerText;
     let tableHtml = document.querySelector('#schemeResultArea table').outerHTML;
 
-    let ltvLimit = document.getElementById('calcLtv').value || 100;
-    let limit = document.getElementById('calcLimit').value;
+    let ltvLimit = zcEligibleActive ? zcLtv : 100;
+    let limit = zcEligibleActive ? zcLimit : 0;
     let invoice = parseFloat(document.getElementById('calcInvoice').value) || 0;
     let margin = parseFloat(document.getElementById('calcMargin').value) || 0;
     let targetDp = parseFloat(document.getElementById('calcTarget').value) || 0;
-    let emiCap = parseFloat(document.getElementById('calcCap').value) || 0;
-    let custType = document.getElementById('calcCustType').value;
+    let emiCap = zcEligibleActive ? zcCap : 0;
+    let custType = zcEligibleActive ? zcType : 'NEW';
 
     let extraStr = `Customer: ${custType} | LTV: ${ltvLimit}% | Limit: ₹${limit} | Invoice: ₹${invoice}`;
     if (margin > 0) extraStr += ` | Margin: ₹${margin}`;
@@ -815,11 +792,10 @@ function resetFastCalc() {
     fcCatChanged(); 
     document.getElementById('fcResult').style.display = 'none'; 
     
-    // जर एलिजिबिलिटी ऍक्टिव्ह असेल तर तेच व्हॅल्यूज पुन्हा ठेवा
     if(zcEligibleActive) {
-        document.getElementById('fcCustType').value = document.getElementById('zeType').value;
-        let zeCap = parseFloat(document.getElementById('zeCap').value);
-        document.getElementById('fcCap').value = zeCap > 0 ? zeCap : '';
+        document.getElementById('fcCustType').value = zcType;
+        let capInp = document.getElementById('fcCap');
+        if(capInp) capInp.value = zcCap > 0 ? zcCap : '';
     } else {
         document.getElementById('fcCustType').value = 'NEW';
     }
@@ -859,9 +835,12 @@ function calculateFastData() {
     let roi = parseFloat(document.getElementById('fcRoi').value) || 0;
     let pf = parseFloat(document.getElementById('fcPf').value) || 0;
     let dbd = parseFloat(document.getElementById('fcDbd').value) || 0;
-    let custType = document.getElementById('fcCustType').value;
+    
+    // Using global variables if eligible, otherwise local form inputs
+    let custType = zcEligibleActive ? zcType : document.getElementById('fcCustType').value;
     let fixedEmi = parseFloat(document.getElementById('fcFixed').value) || 0;
-    let cap = parseFloat(document.getElementById('fcCap').value) || 0;
+    let cap = zcEligibleActive ? zcCap : (parseFloat(document.getElementById('fcCap').value) || 0);
+    
     let target = parseFloat(document.getElementById('fcTarget').value) || 0;
     let gtl = parseFloat(document.getElementById('fcGtl').value) || 0;
     let rfc = parseFloat(document.getElementById('fcRfc').value) || 0;
@@ -2052,58 +2031,114 @@ document.addEventListener('click', function() {
     });
 });
 
+// ==========================================
+// GLOBAL ELIGIBILITY SYSTEM (ZATPAT & DICTIONARY)
+// ==========================================
 let zcEligibleActive = false;
 let zcLimit = 0;
 let zcLtv = 100;
+let zcType = 'NEW';
+let zcCap = 0;
+let activeModalTarget = ''; // 'ZATPAT' or 'DICT'
 
-function openZatpatEligibility() {
-    document.getElementById('zeType').value = 'NEW';
-    document.getElementById('zeLimit').value = '';
-    document.getElementById('zeLtv').value = '100';
-    document.getElementById('zeCap').value = '';
-    document.getElementById('zatpatEligibilityModal').style.display = 'flex';
+function openEligibility(target) {
+    activeModalTarget = target;
+    let c = (activeCustomerIndex !== -1) ? customerQueue[activeCustomerIndex] : null;
+    
+    if (zcEligibleActive) {
+        document.getElementById('zeType').value = zcType;
+        document.getElementById('zeLimit').value = zcLimit > 0 ? zcLimit : '';
+        document.getElementById('zeLtv').value = zcLtv;
+        document.getElementById('zeCap').value = zcCap > 0 ? zcCap : '';
+    } else if (c) {
+        document.getElementById('zeType').value = c.type || "NEW";
+        document.getElementById('zeLimit').value = c.limit || '';
+        document.getElementById('zeLtv').value = c.ltv || 100;
+        document.getElementById('zeCap').value = c.cap || '';
+    } else {
+        document.getElementById('zeType').value = 'NEW';
+        document.getElementById('zeLimit').value = '';
+        document.getElementById('zeLtv').value = '100';
+        document.getElementById('zeCap').value = '';
+    }
+
+    document.getElementById('zatpatModal').style.display = 'none';
+    document.getElementById('dictionarySearchModal').style.display = 'none';
+    document.getElementById('eligibilityModal').style.display = 'flex';
 }
 
-function skipZatpatEligibility() {
+function skipEligibility() {
     zcEligibleActive = false;
-    document.getElementById('zeBanner').style.display = 'none';
-    
-    // जुने इनपुट्स पुन्हा सुरू करा
-    document.getElementById('fcCustType').disabled = false;
-    document.getElementById('fcCap').disabled = false;
-    
-    document.getElementById('zatpatEligibilityModal').style.display = 'none';
-    document.getElementById('zatpatModal').style.display = 'flex';
+    zcLimit = 0;
+    zcLtv = 100;
+    zcType = 'NEW';
+    zcCap = 0;
+
+    document.getElementById('eligibilityModal').style.display = 'none';
+    proceedToTargetModal();
 }
 
-function applyZatpatEligibility() {
-    zcLimit = parseFloat(document.getElementById('zeLimit').value) || 0;
-    zcLtv = parseFloat(document.getElementById('zeLtv').value) || 100;
-    let type = document.getElementById('zeType').value;
-    let cap = parseFloat(document.getElementById('zeCap').value) || 0;
-
-    if(zcLimit <= 0) {
+function applyEligibility() {
+    let limitVal = parseFloat(document.getElementById('zeLimit').value) || 0;
+    if(limitVal <= 0) {
         showToast("⚠️ कृपया NBFC LIMIT भरा किंवा SKIP वर क्लिक करा!", "error");
         return;
     }
 
+    zcLimit = limitVal;
+    zcLtv = parseFloat(document.getElementById('zeLtv').value) || 100;
+    zcType = document.getElementById('zeType').value;
+    zcCap = parseFloat(document.getElementById('zeCap').value) || 0;
+
     zcEligibleActive = true;
-    
-    // व्हॅल्यूज Zatpat मध्ये सेट करा आणि लॉक करा
-    document.getElementById('fcCustType').value = type;
-    document.getElementById('fcCap').value = cap > 0 ? cap : '';
-    document.getElementById('fcCustType').disabled = true;
-    document.getElementById('fcCap').disabled = true;
+    document.getElementById('eligibilityModal').style.display = 'none';
+    proceedToTargetModal();
+}
 
-    // बॅनरमध्ये माहिती अपडेट करा
-    document.getElementById('zeDispType').innerText = type;
-    document.getElementById('zeDispLimit').innerText = "₹" + zcLimit;
-    document.getElementById('zeDispLtv').innerText = zcLtv + "%";
-    document.getElementById('zeDispCap').innerText = cap > 0 ? "₹" + cap : "NONE";
-    document.getElementById('zeBanner').style.display = 'block';
+function proceedToTargetModal() {
+    if (activeModalTarget === 'ZATPAT') {
+        if (zcEligibleActive) {
+            document.getElementById('zeDispType').innerText = zcType;
+            document.getElementById('zeDispLimit').innerText = "₹" + zcLimit;
+            document.getElementById('zeDispLtv').innerText = zcLtv + "%";
+            document.getElementById('zeDispCap').innerText = zcCap > 0 ? "₹" + zcCap : "NONE";
+            document.getElementById('zeBanner').style.display = 'block';
 
-    document.getElementById('zatpatEligibilityModal').style.display = 'none';
-    document.getElementById('zatpatModal').style.display = 'flex';
-    
-    calculateFastData(); 
+            document.getElementById('fcCustType').value = zcType;
+            let capInp = document.getElementById('fcCap');
+            if(capInp) capInp.value = zcCap > 0 ? zcCap : '';
+            document.getElementById('fcCustType').disabled = true;
+            if(capInp) capInp.disabled = true;
+        } else {
+            document.getElementById('zeBanner').style.display = 'none';
+            document.getElementById('fcCustType').disabled = false;
+            let capInp = document.getElementById('fcCap');
+            if(capInp) capInp.disabled = false;
+        }
+        document.getElementById('zatpatModal').style.display = 'flex';
+        calculateFastData(); 
+    } 
+    else if (activeModalTarget === 'DICT') {
+        if (zcEligibleActive) {
+            document.getElementById('dictDispType').innerText = zcType;
+            document.getElementById('dictDispLimit').innerText = "₹" + zcLimit;
+            document.getElementById('dictDispLtv').innerText = zcLtv + "%";
+            document.getElementById('dictDispCap').innerText = zcCap > 0 ? "₹" + zcCap : "NONE";
+            document.getElementById('dictBanner').style.display = 'block';
+        } else {
+            document.getElementById('dictBanner').style.display = 'none';
+        }
+        
+        if(!db_records || db_records.length === 0) { 
+            showToast("⚠️ Schemes Dictionary load ho rahi hai, kripya 2 second wait karein...", "warning"); 
+        } 
+        
+        document.getElementById('globalModelSearch').value = ''; 
+        document.getElementById('globalModelDropdown').style.display = 'none'; 
+        document.getElementById('schemeResultArea').style.display = 'none';
+        
+        document.getElementById('dictionarySearchModal').style.display = 'flex'; 
+        setTimeout(() => document.getElementById('globalModelSearch').focus(), 100); 
+        recalcCurrentModel();
+    }
 }
