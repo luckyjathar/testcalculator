@@ -137,8 +137,9 @@
             <h3 style="color: var(--bajaj-blue); margin: 0 0 5px 0; font-size: 16px;">No Customer Selected</h3>
             <p style="color: #6c757d; font-size: 13px; font-weight: bold; margin-bottom: 15px;">Please add a new customer or select one from the queue to start calculation.</p>
             <div style="display:flex; justify-content:center; gap:10px;">
-                <button onclick="document.getElementById('addCustomerModal').style.display='flex'" style="background: var(--primary); color: white; padding: 10px 16px; border: none; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">➕ ADD CUSTOMER</button>
-                <button onclick="document.getElementById('savedQueueModal').style.display='flex'" style="background: #6c757d; color: white; padding: 10px 16px; border: none; border-radius: 4px; font-weight: bold; font-size: 12px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🔍 OPEN QUEUE</button>
+                <button onclick="document.getElementById('addCustomerModal').style.display='flex'" style="background: var(--primary); color: white; padding: 12px 20px; border: none; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); width: 100%; max-width: 350px;">
+                    ➕ ADD CUSTOMER & OPEN QUEUE
+                </button>
             </div>
         </div>
     </div>
@@ -311,65 +312,64 @@
     </div>
 </div>
 
-<!-- 2. ADD CUSTOMER MODAL -->
+<!-- COMBINED ADD CUSTOMER & SAVED QUEUE MODAL -->
 <div id="addCustomerModal" class="modal" style="align-items:center; justify-content:center;">
-    <div class="modal-content" style="max-width: 350px; padding: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">
+    <div class="modal-content" style="max-width: 420px; padding: 20px; max-height: 90vh; overflow-y: auto;">
+        
+        <!-- HEADER -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;">
             <h3 style="margin:0; color:var(--primary); font-size: 16px !important; display: flex; align-items: center; gap: 6px;">
-                <span style="font-size:18px;">📝</span> ADD NEW CUSTOMER
-            </h3>
-            <button onclick="document.getElementById('addCustomerModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px; padding:0;">✖</button>
-        </div>
-        
-        <div style="display:none;">
-            <label class="popup-input-label">MOBILE NO.</label>
-            <input type="text" id="cqMobile" placeholder="10 Digits" maxlength="10" oninput="checkDuplicateMobile(this.value)" class="popup-input">
-            <div id="mobileDupWarning" style="color: var(--danger); font-size: 11px !important; font-weight: 900; display: none; margin-top: 3px; background: #ffebee; padding: 4px 6px; border-radius: 4px; border-left: 3px solid var(--danger);"></div>
-        </div>
-        <div style="margin-bottom:12px;"><label class="popup-input-label">CUSTOMER NAME</label><input type="text" id="cqName" placeholder="Enter Name" class="popup-input"></div>
-        <div style="margin-bottom:12px;"><label class="popup-input-label">CUSTOMER TYPE</label>
-            <select id="cqType" class="popup-input">
-                <option value="NEW">NEW</option><option value="EMI CARD">EMI CARD</option><option value="VIRTUAL">VIRTUAL</option><option value="W/O CARD">W/O CARD</option>
-            </select>
-        </div>
-        <div style="margin-bottom:12px;"><label class="popup-input-label">NBFC LIMIT (₹)</label><input type="number" id="cqLimit" placeholder="₹ Amount" class="popup-input"></div>
-        <div style="margin-bottom:12px;"><label class="popup-input-label">MAX LTV %</label><input type="number" id="cqLtv" value="100" max="100" oninput="if(this.value>100)this.value=100;" class="popup-input"></div>
-        <div style="margin-bottom:15px;"><label class="popup-input-label">EMI CAPPING</label><input type="number" id="cqCap" placeholder="₹ Cap" class="popup-input"></div>
-        
-        <div style="display:flex; gap:10px;">
-            <button id="addToQueueBtn" onclick="addCustomerToQueue(); document.getElementById('addCustomerModal').style.display='none';" style="flex:2; background:#28a745; color:white; padding:12px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">ADD TO QUEUE</button>
-            <button onclick="document.getElementById('addCustomerModal').style.display='none'" style="flex:1; background:#dc3545; color:white; padding:12px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">CANCEL</button>
-        </div>
-    </div>
-</div>
-
-<!-- 3. SAVED QUEUE MODAL -->
-<div id="savedQueueModal" class="modal" style="align-items:center; justify-content:center;">
-    <div class="modal-content" style="max-width: 400px; padding: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">
-            <h3 style="margin:0; color:#6c757d; font-size: 16px !important; display: flex; align-items: center; gap: 6px;">
-                <span style="font-size:18px;">👥</span> SAVED QUEUE (<span id="queueCount">0</span>)
+                <span style="font-size:18px;">👥</span> CUSTOMER MANAGER
             </h3>
             <div style="display:flex; gap:10px; align-items: center;">
                 <button onclick="openRecycleBin(); document.getElementById('infoName').innerText='-';" style="background:#fff; border:1px solid #ccc; border-radius:4px; padding: 4px 8px; font-weight:bold; font-size:12px; cursor:pointer;" title="Recycle Bin">🗑️ Bin</button>
-                <button onclick="document.getElementById('savedQueueModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px; padding:0;">✖</button>
+                <button onclick="document.getElementById('addCustomerModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px; padding:0;">✖</button>
             </div>
         </div>
         
-        <input type="text" id="queueSearch" placeholder="🔍 Search saved customer by name, limit..." oninput="renderCustomerQueue()" class="popup-input" style="margin-bottom: 10px;">
-        <div id="customerQueueList" class="custom-scroll" style="display:flex; flex-direction:column; gap:6px; overflow-y:auto; max-height: 250px; padding-right:4px;"></div>
-        
-        <div style="display:flex; gap:4px; margin-top:10px; border-top:1px solid #ccc; padding-top:10px; flex-wrap:wrap;">
-            <button id="uniCopyBtn" onclick="uniCopy()" style="flex:1; background:var(--warning); color:#000; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">📋 COPY</button>
-            <button id="uniSelectBtn" onclick="uniSelect(); document.getElementById('savedQueueModal').style.display='none';" style="flex:1.2; background:var(--primary); color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">▶ SELECT</button>
-            <button id="uniEditBtn" onclick="uniEdit()" style="flex:1; background:var(--indigo); color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">✏️ EDIT</button>
-            <button id="uniDeleteBtn" onclick="uniDelete(); document.getElementById('infoName').innerText='-';" style="flex:1; background:var(--danger); color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">✖ DEL</button>
-            <button id="uniInviteBtn" onclick="uniInvite()" style="flex:1.2; background:#25D366; color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">💬 INVITE</button>
+        <!-- TOP: ADD CUSTOMER FORM -->
+        <div style="background: #f8f9fa; border: 1px solid #e0e0e0; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+            <h4 style="margin: 0 0 10px 0; color: var(--indigo); font-size: 13px;">📝 ADD NEW CUSTOMER</h4>
+            <div style="display:none;">
+                <label class="popup-input-label">MOBILE NO.</label>
+                <input type="text" id="cqMobile" placeholder="10 Digits" maxlength="10" oninput="checkDuplicateMobile(this.value)" class="popup-input">
+                <div id="mobileDupWarning" style="color: var(--danger); font-size: 11px !important; font-weight: 900; display: none; margin-top: 3px; background: #ffebee; padding: 4px 6px; border-radius: 4px; border-left: 3px solid var(--danger);"></div>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                <div><label class="popup-input-label">CUSTOMER NAME</label><input type="text" id="cqName" placeholder="Enter Name" class="popup-input"></div>
+                <div><label class="popup-input-label">NBFC LIMIT (₹)</label><input type="number" id="cqLimit" placeholder="₹ Amount" class="popup-input"></div>
+                <div>
+                    <label class="popup-input-label">CUSTOMER TYPE</label>
+                    <select id="cqType" class="popup-input">
+                        <option value="NEW">NEW</option><option value="EMI CARD">EMI CARD</option><option value="VIRTUAL">VIRTUAL</option><option value="W/O CARD">W/O CARD</option>
+                    </select>
+                </div>
+                <div><label class="popup-input-label">MAX LTV %</label><input type="number" id="cqLtv" value="100" max="100" oninput="if(this.value>100)this.value=100;" class="popup-input"></div>
+            </div>
+            <div style="margin-bottom:10px;"><label class="popup-input-label">EMI CAPPING</label><input type="number" id="cqCap" placeholder="₹ Cap" class="popup-input"></div>
+            
+            <button id="addToQueueBtn" onclick="addCustomerToQueue();" style="width:100%; background:#28a745; color:white; padding:10px; border-radius:4px; font-weight:bold; border:none; cursor:pointer; font-size:12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">➕ ADD TO QUEUE & SAVE</button>
+        </div>
+
+        <!-- BOTTOM: QUEUE DATA -->
+        <div style="border-top: 2px dashed #ccc; padding-top: 15px;">
+            <h4 style="margin:0 0 10px 0; color:#6c757d; font-size: 13px !important; display: flex; align-items: center; justify-content: space-between;">
+                <span>👥 SAVED QUEUE (<span id="queueCount">0</span>)</span>
+            </h4>
+            
+            <input type="text" id="queueSearch" placeholder="🔍 Search saved customer by name, limit..." oninput="renderCustomerQueue()" class="popup-input" style="margin-bottom: 10px;">
+            <div id="customerQueueList" class="custom-scroll" style="display:flex; flex-direction:column; gap:6px; overflow-y:auto; max-height: 200px; padding-right:4px;"></div>
+            
+            <!-- Queue Action Buttons -->
+            <div style="display:flex; gap:4px; margin-top:10px; border-top:1px solid #ccc; padding-top:10px; flex-wrap:wrap;">
+                <button id="uniCopyBtn" onclick="uniCopy()" style="flex:1; background:var(--warning); color:#000; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">📋 COPY</button>
+                <button id="uniSelectBtn" onclick="uniSelect(); document.getElementById('addCustomerModal').style.display='none';" style="flex:1.2; background:var(--primary); color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">▶ SELECT</button>
+                <button id="uniEditBtn" onclick="uniEdit()" style="flex:1; background:var(--indigo); color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">✏️ EDIT</button>
+                <button id="uniDeleteBtn" onclick="uniDelete(); document.getElementById('infoName').innerText='-';" style="flex:1; background:var(--danger); color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">✖ DEL</button>
+                <button id="uniInviteBtn" onclick="uniInvite()" style="flex:1.2; background:#25D366; color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">💬 INVITE</button>
+            </div>
         </div>
         
-        <div style="display:flex; margin-top:15px;">
-            <button onclick="document.getElementById('savedQueueModal').style.display='none'" style="width:100%; background:#dc3545; color:white; padding:12px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">CLOSE</button>
-        </div>
     </div>
 </div>
 
