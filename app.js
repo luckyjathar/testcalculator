@@ -530,10 +530,12 @@ function selectModel(name) {
 
 function quickNonTieup() { 
     if (productSearchMode === 'MATRIX' && !isLimitValid()) return; 
-    if(db_records.length === 0) { showToast("⚠️ Master database fetch me error hai!", "error"); return; } 
+    
     document.getElementById('addProductModal').style.display = 'none'; 
     let tieup = db_records.filter(r => r.model === SPECIAL_MODEL); 
     let cats = [...new Set(tieup.map(r => r.category))].sort(); 
+    if(cats.length === 0) cats = ["PHONE(WEB-MOBILE)", "LED TV", "WASHING MACHINE", "REFRIGERATOR", "AC"];
+    
     document.getElementById('categoryGrid').innerHTML = cats.map(c => { let label = (c === 'PHONE(WEB-MOBILE)') ? 'PHONE, TABLET, SMART WATCH' : c; return `<div style="background:var(--indigo);color:white;padding:12px;border-radius:4px;cursor:pointer;font-weight:900;text-align:center;" onclick="selectCategory('${c}')">${label}</div>`; }).join(''); 
     document.getElementById('catSelectionModal').style.display = 'flex'; 
 }
@@ -1670,6 +1672,32 @@ let zcType = 'NEW';
 let zcCap = 0;
 let activeModalTarget = ''; // 'ZATPAT' or 'DICT'
 
+function openEligibility(target) {
+    activeModalTarget = target;
+    let c = (activeCustomerIndex !== -1) ? customerQueue[activeCustomerIndex] : null;
+    
+    if (zcEligibleActive) {
+        document.getElementById('zeType').value = zcType;
+        document.getElementById('zeLimit').value = zcLimit > 0 ? zcLimit : '';
+        document.getElementById('zeLtv').value = zcLtv;
+        document.getElementById('zeCap').value = zcCap > 0 ? zcCap : '';
+    } else if (c) {
+        document.getElementById('zeType').value = c.type || "NEW";
+        document.getElementById('zeLimit').value = c.limit || '';
+        document.getElementById('zeLtv').value = c.ltv || 100;
+        document.getElementById('zeCap').value = c.cap || '';
+    } else {
+        document.getElementById('zeType').value = 'NEW';
+        document.getElementById('zeLimit').value = '';
+        document.getElementById('zeLtv').value = '100';
+        document.getElementById('zeCap').value = '';
+    }
+
+    document.getElementById('zatpatModal').style.display = 'none';
+    document.getElementById('dictionarySearchModal').style.display = 'none';
+    document.getElementById('eligibilityModal').style.display = 'flex';
+}
+
 function skipEligibility() {
     zcEligibleActive = false;
     zcLimit = 0;
@@ -1696,38 +1724,6 @@ function applyEligibility() {
     zcEligibleActive = true;
     document.getElementById('eligibilityModal').style.display = 'none';
     proceedToTargetModal();
-}
-
-function openEligibility(target) {
-    // जर मास्टर डेटा लोड झाला नसेल, तर एलिजिबिलिटी फॉर्म उघडण्याआधीच थांबवा
-    if (target === 'DICT' && (!db_records || db_records.length === 0)) {
-        showToast("⚠️ Schemes Dictionary load ho rahi hai, kripya 2 second wait karein...", "warning");
-        return;
-    }
-
-    activeModalTarget = target;
-    let c = (activeCustomerIndex !== -1) ? customerQueue[activeCustomerIndex] : null;
-    
-    if (zcEligibleActive) {
-        document.getElementById('zeType').value = zcType;
-        document.getElementById('zeLimit').value = zcLimit > 0 ? zcLimit : '';
-        document.getElementById('zeLtv').value = zcLtv;
-        document.getElementById('zeCap').value = zcCap > 0 ? zcCap : '';
-    } else if (c) {
-        document.getElementById('zeType').value = c.type || "NEW";
-        document.getElementById('zeLimit').value = c.limit || '';
-        document.getElementById('zeLtv').value = c.ltv || 100;
-        document.getElementById('zeCap').value = c.cap || '';
-    } else {
-        document.getElementById('zeType').value = 'NEW';
-        document.getElementById('zeLimit').value = '';
-        document.getElementById('zeLtv').value = '100';
-        document.getElementById('zeCap').value = '';
-    }
-
-    document.getElementById('zatpatModal').style.display = 'none';
-    document.getElementById('dictionarySearchModal').style.display = 'none';
-    document.getElementById('eligibilityModal').style.display = 'flex';
 }
 
 function proceedToTargetModal() {
@@ -1763,8 +1759,6 @@ function proceedToTargetModal() {
         } else {
             document.getElementById('dictBanner').style.display = 'none';
         }
-        
-        // इथून तो मेसेज दाखवणारा जुना कोड काढून टाकला आहे, त्यामुळे आता Apply केल्यावर अडचण येणार नाही.
         
         document.getElementById('globalModelSearch').value = ''; 
         document.getElementById('globalModelDropdown').style.display = 'none'; 
