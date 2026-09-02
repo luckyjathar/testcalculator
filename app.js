@@ -499,12 +499,40 @@ function openAddProductModal(mode = 'MATRIX') {
 }
 
 function doSearch(id, ddId) {
-    let q = document.getElementById(id).value.toUpperCase().trim(); let dd = document.getElementById(ddId); if(!q) { dd.style.display='none'; return; }
-    let validRecords = db_records.filter(r => r.model !== SPECIAL_MODEL); let matches = validRecords.filter(r => { let m = r.model || ""; let b = r.brand || ""; let c = r.category || ""; return m.includes(q) || b.includes(q) || c.includes(q); }).map(r => r.model); matches = [...new Set(matches)].slice(0, 15);
-    if (matches.length === 0) { dd.innerHTML = `<div style="padding:10px; color:#d35400; font-weight:bold; text-align:center;">No matching models found.</div>`; dd.style.display = 'block'; return; }
-    dd.innerHTML = matches.map(m => { let rec = validRecords.find(x => x.model === m); let brandTag = rec && rec.brand ? `<span style="font-size:10px; color:#0984e3; font-weight:900; margin-right:5px;">[${rec.brand}]</span>` : ''; return `<div style="padding:10px; border-bottom:1px solid #eee; cursor:pointer; font-weight:800;" onclick="selectModel('${m.replace(/'/g, "\\'")}')">${brandTag}${m}</div>`; }).join(''); dd.style.display = 'block';
+    let rawQ = document.getElementById(id).value.toUpperCase(); 
+    let q = rawQ.trim(); // Original query for standard matching
+    let qNoSpace = rawQ.replace(/\s+/g, ''); // Query with spaces removed for flexible matching
+    
+    let dd = document.getElementById(ddId); 
+    if(!q) { dd.style.display='none'; return; }
+    
+    let validRecords = db_records.filter(r => r.model !== SPECIAL_MODEL); 
+    let matches = validRecords.filter(r => { 
+        let m = r.model ? r.model.toUpperCase() : ""; 
+        let b = r.brand ? r.brand.toUpperCase() : ""; 
+        let c = r.category ? r.category.toUpperCase() : ""; 
+        
+        let mNoSpace = m.replace(/\s+/g, ''); // Model name with spaces removed
+        
+        // Check standard includes OR no-space includes
+        return m.includes(q) || mNoSpace.includes(qNoSpace) || b.includes(q) || c.includes(q); 
+    }).map(r => r.model); 
+    
+    matches = [...new Set(matches)].slice(0, 15);
+    
+    if (matches.length === 0) { 
+        dd.innerHTML = `<div style="padding:10px; color:#d35400; font-weight:bold; text-align:center;">No matching models found.</div>`; 
+        dd.style.display = 'block'; 
+        return; 
+    }
+    
+    dd.innerHTML = matches.map(m => { 
+        let rec = validRecords.find(x => x.model === m); 
+        let brandTag = rec && rec.brand ? `<span style="font-size:10px; color:#0984e3; font-weight:900; margin-right:5px;">[${rec.brand}]</span>` : ''; 
+        return `<div style="padding:10px; border-bottom:1px solid #eee; cursor:pointer; font-weight:800;" onclick="selectModel('${m.replace(/'/g, "\\'")}')">${brandTag}${m}</div>`; 
+    }).join(''); 
+    dd.style.display = 'block';
 }
-
 function selectModel(name) { 
     document.getElementById('modalMatrixSearchDropdown').style.display = 'none'; 
     document.getElementById('modalMatrixSearch').value = ''; 
