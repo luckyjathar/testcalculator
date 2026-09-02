@@ -254,15 +254,22 @@
         
         <!-- ZATPAT ELIGIBILITY BANNER -->
         <div id="zeBanner" style="display:none; background:#e8f4f8; border:1px solid var(--bajaj-blue); border-radius:6px; padding:10px; margin-bottom:12px; font-size:11px; font-weight:900; color:var(--indigo);">
-            <div style="display:flex; justify-content:space-between; margin-bottom:4px; border-bottom:1px dashed #ccc; padding-bottom:4px;">
-                <span>TYPE: <span id="zeDispType" style="color:var(--danger);">NEW</span></span>
-                <span>LIMIT: <span id="zeDispLimit" style="color:var(--success);">₹0</span></span>
+            <div style="display:flex; justify-content:space-between; align-items: stretch;">
+                <div style="flex: 1;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px; border-bottom:1px dashed #ccc; padding-bottom:4px; padding-right:10px;">
+                        <span>TYPE: <span id="zeDispType" style="color:var(--danger);">NEW</span></span>
+                        <span>LIMIT: <span id="zeDispLimit" style="color:var(--success);">₹0</span></span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding-right:10px;">
+                        <span>LTV: <span id="zeDispLtv" style="color:var(--primary);">100%</span></span>
+                        <span>CAP: <span id="zeDispCap" style="color:var(--primary);">NONE</span></span>
+                    </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px; border-left:1px solid #ccc; padding-left:10px; justify-content: center;">
+                    <button onclick="resetFastCalc()" style="padding:4px 8px; background:var(--danger); color:#fff; font-weight:bold; border:none; border-radius:4px; cursor:pointer; font-size:10px; width: 100%;">🔄 RESET</button>
+                    <button onclick="openEligibility('ZATPAT')" style="padding:4px 8px; background:var(--warning); color:#000; font-weight:bold; border:none; border-radius:4px; cursor:pointer; font-size:10px; width: 100%;">✏️ EDIT</button>
+                </div>
             </div>
-            <div style="display:flex; justify-content:space-between;">
-                <span>LTV: <span id="zeDispLtv" style="color:var(--primary);">100%</span></span>
-                <span>CAP: <span id="zeDispCap" style="color:var(--primary);">NONE</span></span>
-            </div>
-            <button onclick="openEligibility('ZATPAT')" style="width:100%; margin-top:8px; padding:6px; background:var(--warning); color:#000; font-weight:bold; border:none; border-radius:4px; cursor:pointer; font-size:11px;">✏️ EDIT ELIGIBILITY</button>
         </div>
 
         <!-- ZATPAT CALC MODAL HEADER -->
@@ -270,11 +277,7 @@
             <h3 style="margin:0; color:var(--bajaj-blue); font-size: 16px !important; display: flex; align-items: center; gap: 6px;">
                 <span style="font-size:18px;">🧮</span> PRO ZATPAT CALC
             </h3>
-            <div style="display:flex; gap:10px; align-items: center;">
-                <button onclick="openEligibility('ZATPAT')" style="background:#e8f4f8; color:var(--bajaj-blue); padding:4px 8px; border-radius:4px; font-weight:bold; font-size:11px !important; border:1px solid var(--bajaj-blue); cursor:pointer;">⚙️ ELIG</button>
-                <button onclick="resetFastCalc()" style="background:var(--warning); color:#000; padding:4px 8px; border-radius:4px; font-weight:bold; font-size:11px !important; border:none; cursor:pointer;">🔄 RESET</button>
-                <button onclick="document.getElementById('zatpatModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px; padding:0;">✖</button>
-            </div>
+            <button onclick="document.getElementById('zatpatModal').style.display='none'" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; font-size:18px; padding:0;">✖</button>
         </div>
         
         <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:12px;">
@@ -306,19 +309,10 @@
                 <label class="compact-label">ROI (%)</label>
                 <input type="number" id="fcRoi" placeholder="0" step="0.01" oninput="calculateFastData();" class="compact-input">
             </div>
-            <div class="compact-row">
-                <label class="compact-label">CUSTOMER TYPE</label>
-                <select id="fcCustType" onchange="calculateFastData();" class="compact-input">
-                    <option value="NEW">NEW</option><option value="EMI CARD">EMI CARD</option><option value="VIRTUAL">VIRTUAL</option><option value="W/O CARD">W/O CARD</option>
-                </select>
-            </div>
+            <!-- Type and Capping Row Removed as per request -->
             <div class="compact-row">
                 <label class="compact-label">FIXED EMI (₹)</label>
                 <input type="number" id="fcFixed" placeholder="Optional" oninput="calculateFastData();" class="compact-input">
-            </div>
-            <div class="compact-row">
-                <label class="compact-label">EMI CAPPING (₹)</label>
-                <input type="number" id="fcCap" placeholder="MAX" oninput="calculateFastData();" class="compact-input">
             </div>
             <div class="compact-row">
                 <label class="compact-label">TARGET DP (₹)</label>
