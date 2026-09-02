@@ -178,7 +178,7 @@ function formatDate(dateObj, lang) {
     const hiMonths = ["जनवरी", "फरवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"];
     const enMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const day = String(dateObj.getDate()).padStart(2, '0'); const year = dateObj.getFullYear();
-    if (lang === 'mr') return `०२ ${mrMonths[dateObj.getMonth()]} ${year}`; if (lang === 'hi') return `${day} ${hiMonths[dateObj.getMonth()]} ${year}`; return `${day} ${enMonths[dateObj.getMonth()]} ${year}`;
+    if (lang === 'mr') return `०२ ${mrMonths[dateObj.getMonth()]}${year}`; if (lang === 'hi') return `${day} ${hiMonths[dateObj.getMonth()]}${year}`; return `${day} ${enMonths[dateObj.getMonth()]}${year}`;
 }
 
 function generateMessage() {
@@ -1826,4 +1826,131 @@ function resetFastCalc() {
     document.getElementById('fcTenure').value = '';
     document.getElementById('fcAdv').value = '';
     document.getElementById('fcDbd').value = '';
-    documentI'm having a hard time fulfilling your request. Can I help you with something else instead?
+    document.getElementById('fcPf').value = '';
+    document.getElementById('fcRoi').value = '';
+    document.getElementById('fcFixed').value = '';
+    document.getElementById('fcTarget').value = '';
+    document.getElementById('fcCat').value = 'OTHER';
+    document.getElementById('fcGtl').value = '0';
+    document.getElementById('fcRfc').value = '0';
+    document.getElementById('fcExw').value = '';
+    document.getElementById('fcMargin').value = '';
+    document.getElementById('fcDealer').value = '';
+    document.getElementById('fcResult').style.display = 'none';
+    
+    openEligibility('ZATPAT');
+}
+
+// 5. रिअल-टाइम फायनल कॅल्क्युलेशन 
+function calculateFastData() {
+    let inv = parseFloat(document.getElementById('fcInv').value) || 0;
+    let loan = parseFloat(document.getElementById('fcLoanInput').value) || 0;
+    let tenure = parseInt(document.getElementById('fcTenure').value) || 0;
+    let adv = parseInt(document.getElementById('fcAdv').value) || 0;
+    let dbd = parseFloat(document.getElementById('fcDbd').value) || 0;
+    let pf = parseFloat(document.getElementById('fcPf').value) || 0;
+    let roi = parseFloat(document.getElementById('fcRoi').value) || 0;
+    let fixedEmi = parseFloat(document.getElementById('fcFixed').value) || 0;
+    
+    let gtl = parseFloat(document.getElementById('fcGtl').value) || 0;
+    let rfc = parseFloat(document.getElementById('fcRfc').value) || 0;
+    let exw = parseFloat(document.getElementById('fcExw').value) || 0;
+    let margin = parseFloat(document.getElementById('fcMargin').value) || 0;
+    let dealer = parseFloat(document.getElementById('fcDealer').value) || 0;
+
+    let type = zcEligibleActive ? zcType : 'NEW';
+    let emiCap = zcEligibleActive ? zcCap : 0;
+    
+    let fee = (type === 'EMI CARD') ? 270 : (type === 'W/O CARD' ? 320 : 850);
+    let totalFees = fee + margin + dealer;
+
+    if (inv === 0 || loan === 0 || tenure === 0) {
+        document.getElementById('fcResult').style.display = 'none';
+        return;
+    }
+
+    let dbdRate = (dbd * 1.18 / 100);
+    let roiRate = roi / 1200;
+    let roiRateDP = roiRate * adv;
+    
+    let emi = 0, dp = 0, inst = 0, actualTenure = tenure;
+
+    if (fixedEmi > 0) {
+        actualTenure = Math.floor(loan / fixedEmi) || 1;
+        loan = actualTenure * fixedEmi;
+        inst = actualTenure - adv;
+        if (inst < 1) inst = 1;
+        
+        let roiInEmi = loan * roiRate;
+        let insTotal = gtl + rfc + exw;
+        emi = fixedEmi + (insTotal / inst) + roiInEmi;
+        
+        let roiInDp = loan * roiRateDP;
+        let dpExact = inv - loan + (fixedEmi * adv) + (loan * dbdRate) + pf + totalFees + roiInDp;
+        dp = Math.ceil(dpExact / 10) * 10;
+    } else {
+        inst = tenure - adv;
+        if (inst < 1) inst = 1;
+        let insTotal = gtl + rfc + exw;
+        
+        let baseEmi = loan / tenure;
+        if (baseEmi > 0 && baseEmi < 900) baseEmi = 900; 
+
+        let roiInEmi = loan * roiRate;
+        emi = baseEmi + (insTotal / inst) + roiInEmi;
+
+        if (emiCap > 0 && emi > emiCap) {
+            loan = (emiCap - (insTotal / inst)) / ((1 / tenure) + roiRate);
+            if (loan < 0) loan = 0;
+            if (inv > 0 && loan > inv) loan = inv;
+            
+            baseEmi = loan / tenure;
+            if (baseEmi > 0 && baseEmi < 900) baseEmi = 900; 
+
+            roiInEmi = loan * roiRate;
+            emi = baseEmi + (insTotal / inst) + roiInEmi;
+        }
+
+        let roiInDp = loan * roiRateDP;
+        let dpExact = inv - loan + (baseEmi * adv) + (loan * dbdRate) + pf + totalFees + roiInDp;
+        dp = Math.ceil(dpExact / 10) * 10;
+    }
+    
+    let daily = emi / 30;
+
+    // Displaying Real-time Output in UI
+    document.getElementById('fcResInv').innerText = "₹" + inv.toLocaleString();
+    document.getElementById('fcResLoan').innerText = "₹" + Math.floor(loan).toLocaleString();
+    document.getElementById('fcResTa').innerText = `${actualTenure}/${adv}`;
+    document.getElementById('fcResDp').innerText = "₹" + dp.toLocaleString();
+    document.getElementById('fcResEmi').innerText = "₹" + Math.round(emi).toLocaleString() + " x " + inst;
+    document.getElementById('fcResDaily').innerText = "₹" + Math.round(daily).toLocaleString();
+
+    // Show Result Panel
+    document.getElementById('fcResult').style.display = 'block';
+}
+
+// 6. कॉपी बटणाचे फंक्शन (नवीन फॉरमॅटनुसार)
+function copyFastCalcResult(btn) {
+    let type = zcEligibleActive ? zcType : 'NEW';
+    let limit = zcEligibleActive && zcLimit > 0 ? zcLimit.toLocaleString() : '0';
+    let ltv = zcEligibleActive ? zcLtv : '100';
+    let cap = zcEligibleActive && zcCap > 0 ? zcCap : null;
+
+    let inv = document.getElementById('fcResInv').innerText;
+    let loan = document.getElementById('fcResLoan').innerText;
+    let ta = document.getElementById('fcResTa').innerText;
+    let dp = document.getElementById('fcResDp').innerText;
+    let emi = document.getElementById('fcResEmi').innerText;
+    let daily = document.getElementById('fcResDaily').innerText;
+    
+    let cappingText = cap ? `\n🔹 *EMI CAPPING: ${cap}*` : '';
+
+    let text = `⚡ *Eligibility Details* ⚡\n🔹 *Type: ${type}*\n🔹 *Limit: ${limit}*\n🔹 *LTV: ${ltv}%*${cappingText}\n\n⚡ *Scheme Details* ⚡\n🔹 *Invoice Amount: ${inv}*\n🔹 *Loan Amount: ${loan}*\n🔹 *Scheme: ${ta}*\n🔹 *Net Downpayment: ${dp}*\n🔹 *Monthly EMI: ${emi}*\n🔹 *Daily EMI: ${daily}*`;
+    
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => showToast("📋 Calculation Copied!", "success")).catch(() => fallbackCopy(text, () => showToast("📋 Calculation Copied!", "success")));
+    } else {
+        fallbackCopy(text, () => showToast("📋 Calculation Copied!", "success"));
+    }
+}
