@@ -1763,7 +1763,7 @@ function proceedToTargetModal() {
     }
 }
 
-// 1. Invoice रक्कम टाकल्यावर लोन आणि GTL/RFC ऑटो-अपडेट
+// १. Invoice रक्कम टाकल्यावर लोन आणि GTL/RFC ऑटो-अपडेट
 function fcInvChanged() {
     let inv = parseFloat(document.getElementById('fcInv').value) || 0;
     document.getElementById('fcLoanInput').value = inv; 
@@ -1776,7 +1776,7 @@ function fcInvChanged() {
     fcCatChanged();
 }
 
-// 2. कॅटेगरी बदलल्यावर RFC चा नियम लागू करणे
+// २. कॅटेगरी बदलल्यावर RFC चा नियम लागू करणे
 function fcCatChanged() {
     let inv = parseFloat(document.getElementById('fcInv').value) || 0;
     let cat = document.getElementById('fcCat').value;
@@ -1803,7 +1803,7 @@ function fcCatChanged() {
     calculateFastData();
 }
 
-// 3. मॅन्युअल लोन ऍडजस्ट करताना 50% आणि 100% चा नियम
+// ३. मॅन्युअल लोन ऍडजस्ट करताना 50% आणि 100% चा नियम
 function validateFastLoanMin() {
     let inv = parseFloat(document.getElementById('fcInv').value) || 0;
     let loan = parseFloat(document.getElementById('fcLoanInput').value) || 0;
@@ -1819,7 +1819,7 @@ function validateFastLoanMin() {
     calculateFastData();
 }
 
-// 4. फॉर्म रिसेट आणि थेट Eligibility विंडो उघडणे
+// ४. फॉर्म रिसेट आणि थेट Eligibility विंडो उघडणे
 function resetFastCalc() {
     document.getElementById('fcInv').value = '';
     document.getElementById('fcLoanInput').value = '';
@@ -1840,8 +1840,7 @@ function resetFastCalc() {
     
     openEligibility('ZATPAT');
 }
-
-// 5. रिअल-टाइम फायनल कॅल्क्युलेशन 
+// ५. रिअल-टाइम फायनल कॅल्क्युलेशन 
 function calculateFastData() {
     let inv = parseFloat(document.getElementById('fcInv').value) || 0;
     let loan = parseFloat(document.getElementById('fcLoanInput').value) || 0;
@@ -1929,8 +1928,7 @@ function calculateFastData() {
     // Show Result Panel
     document.getElementById('fcResult').style.display = 'block';
 }
-
-// 6. कॉपी बटणाचे फंक्शन (नवीन फॉरमॅटनुसार)
+// ६. कॉपी बटणाचे फंक्शन (नवीन फॉरमॅटनुसार)
 function copyFastCalcResult(btn) {
     let type = zcEligibleActive ? zcType : 'NEW';
     let limit = zcEligibleActive && zcLimit > 0 ? zcLimit.toLocaleString() : '0';
