@@ -1840,7 +1840,7 @@ function resetFastCalc() {
     
     openEligibility('ZATPAT');
 }
-// ५. रिअल-टाइम फायनल कॅल्क्युलेशन 
+// रिअल-टाइम फायनल कॅल्क्युलेशन आणि LTV Rule
 function calculateFastData() {
     let inv = parseFloat(document.getElementById('fcInv').value) || 0;
     let loan = parseFloat(document.getElementById('fcLoanInput').value) || 0;
@@ -1859,23 +1859,50 @@ function calculateFastData() {
 
     let type = zcEligibleActive ? zcType : 'NEW';
     let emiCap = zcEligibleActive ? zcCap : 0;
+    let ltvLimit = zcEligibleActive ? zcLtv : 100;
     
     let fee = (type === 'EMI CARD') ? 270 : (type === 'W/O CARD' ? 320 : 850);
     let totalFees = fee + margin + dealer;
 
+    let resBox = document.getElementById('fcResult');
+    let successBox = document.getElementById('fcSuccessBox');
+    let errorBox = document.getElementById('fcErrorBox');
+    let errorText = document.getElementById('fcErrorText');
+
     if (inv === 0 || loan === 0 || tenure === 0) {
-        document.getElementById('fcResult').style.display = 'none';
+        resBox.style.display = 'none';
         return;
     }
+
+    let actualTenure = tenure;
+    if (fixedEmi > 0) {
+        actualTenure = Math.floor(loan / fixedEmi) || 1;
+    }
+
+    // ⚡ LTV RULE CHECK ⚡
+    let curLTV = actualTenure > 0 ? ((actualTenure - adv) / actualTenure) * 100 : 0;
+    
+    if (curLTV > ltvLimit) {
+        errorText.innerText = `Allowed LTV is ${ltvLimit}%, but current scheme LTV is ${Math.round(curLTV)}%.`;
+        successBox.style.display = 'none';
+        errorBox.style.display = 'block';
+        resBox.style.borderColor = 'var(--danger)';
+        resBox.style.display = 'block';
+        return;
+    }
+
+    // Passed LTV Rule -> Show Calculation
+    successBox.style.display = 'block';
+    errorBox.style.display = 'none';
+    resBox.style.borderColor = 'var(--primary)';
 
     let dbdRate = (dbd * 1.18 / 100);
     let roiRate = roi / 1200;
     let roiRateDP = roiRate * adv;
     
-    let emi = 0, dp = 0, inst = 0, actualTenure = tenure;
+    let emi = 0, dp = 0, inst = 0;
 
     if (fixedEmi > 0) {
-        actualTenure = Math.floor(loan / fixedEmi) || 1;
         loan = actualTenure * fixedEmi;
         inst = actualTenure - adv;
         if (inst < 1) inst = 1;
@@ -1925,8 +1952,7 @@ function calculateFastData() {
     document.getElementById('fcResEmi').innerText = "₹" + Math.round(emi).toLocaleString() + " x " + inst;
     document.getElementById('fcResDaily').innerText = "₹" + Math.round(daily).toLocaleString();
 
-    // Show Result Panel
-    document.getElementById('fcResult').style.display = 'block';
+    resBox.style.display = 'block';
 }
 // ६. कॉपी बटणाचे फंक्शन (नवीन फॉरमॅटनुसार)
 function copyFastCalcResult(btn) {
