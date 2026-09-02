@@ -162,9 +162,7 @@
             <button onclick="goHome()" style="background:var(--danger); color:white; padding:6px 10px; border-radius:4px; font-weight:bold; font-size:11px; border:none; cursor:pointer;">✖ CLOSE</button>
         </div>
 
-        <!-- ================================================================= -->
         <!-- CUSTOMER DETAILS IN A SINGLE HORIZONTAL LINE -->
-        <!-- ================================================================= -->
         <div style="background: #253241; border-radius: 8px; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); margin-bottom: 10px; border: 1px solid #3b4b5e;">
             
             <!-- Top Row: Name, Phone & Action Icons -->
@@ -252,7 +250,7 @@
 <div id="zatpatModal" class="modal" style="align-items:center; justify-content:center;">
     <div class="modal-content" id="fastCalcContainer" style="max-width: 380px; padding: 15px 20px;">
         
-        <!-- ZATPAT ELIGIBILITY BANNER -->
+        <!-- ZATPAT ELIGIBILITY BANNER (With Right-Aligned Edit & Reset) -->
         <div id="zeBanner" style="display:none; background:#e8f4f8; border:1px solid var(--bajaj-blue); border-radius:6px; padding:10px; margin-bottom:12px; font-size:11px; font-weight:900; color:var(--indigo);">
             <div style="display:flex; justify-content:space-between; align-items: stretch;">
                 <div style="flex: 1;">
@@ -266,8 +264,8 @@
                     </div>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:4px; border-left:1px solid #ccc; padding-left:10px; justify-content: center;">
-                    <button onclick="resetFastCalc()" style="padding:4px 8px; background:var(--danger); color:#fff; font-weight:bold; border:none; border-radius:4px; cursor:pointer; font-size:10px; width: 100%;">🔄 RESET</button>
-                    <button onclick="openEligibility('ZATPAT')" style="padding:4px 8px; background:var(--warning); color:#000; font-weight:bold; border:none; border-radius:4px; cursor:pointer; font-size:10px; width: 100%;">✏️ EDIT</button>
+                    <button onclick="resetFastCalc()" style="padding:4px 8px; background:var(--warning); color:#000; font-weight:bold; border:none; border-radius:4px; cursor:pointer; font-size:10px; width: 100%;">🔄 RESET</button>
+                    <button onclick="openEligibility('ZATPAT')" style="padding:4px 8px; background:var(--bajaj-blue); color:#fff; font-weight:bold; border:none; border-radius:4px; cursor:pointer; font-size:10px; width: 100%;">✏️ EDIT</button>
                 </div>
             </div>
         </div>
@@ -309,7 +307,6 @@
                 <label class="compact-label">ROI (%)</label>
                 <input type="number" id="fcRoi" placeholder="0" step="0.01" oninput="calculateFastData();" class="compact-input">
             </div>
-            <!-- Type and Capping Row Removed as per request -->
             <div class="compact-row">
                 <label class="compact-label">FIXED EMI (₹)</label>
                 <input type="number" id="fcFixed" placeholder="Optional" oninput="calculateFastData();" class="compact-input">
@@ -368,8 +365,6 @@
 <!-- COMBINED ADD CUSTOMER & SAVED QUEUE MODAL -->
 <div id="addCustomerModal" class="modal" style="align-items:center; justify-content:center;">
     <div class="modal-content" style="max-width: 420px; padding: 20px; max-height: 90vh; overflow-y: auto;">
-        
-        <!-- HEADER -->
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;">
             <h3 style="margin:0; color:var(--primary); font-size: 16px !important; display: flex; align-items: center; gap: 6px;">
                 <span style="font-size:18px;">👥</span> CUSTOMER MANAGER
@@ -380,7 +375,6 @@
             </div>
         </div>
         
-        <!-- TOP: ADD CUSTOMER FORM -->
         <div style="background: #f8f9fa; border: 1px solid #e0e0e0; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
             <h4 style="margin: 0 0 10px 0; color: var(--indigo); font-size: 13px;">📝 ADD NEW CUSTOMER</h4>
             <div style="display:none;">
@@ -404,7 +398,6 @@
             <button id="addToQueueBtn" onclick="addCustomerToQueue();" style="width:100%; background:#28a745; color:white; padding:10px; border-radius:4px; font-weight:bold; border:none; cursor:pointer; font-size:12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">➕ ADD TO QUEUE & SAVE</button>
         </div>
 
-        <!-- BOTTOM: QUEUE DATA -->
         <div style="border-top: 2px dashed #ccc; padding-top: 15px;">
             <h4 style="margin:0 0 10px 0; color:#6c757d; font-size: 13px !important; display: flex; align-items: center; justify-content: space-between;">
                 <span>👥 SAVED QUEUE (<span id="queueCount">0</span>)</span>
@@ -413,7 +406,6 @@
             <input type="text" id="queueSearch" placeholder="🔍 Search saved customer by name, limit..." oninput="renderCustomerQueue()" class="popup-input" style="margin-bottom: 10px;">
             <div id="customerQueueList" class="custom-scroll" style="display:flex; flex-direction:column; gap:6px; overflow-y:auto; max-height: 200px; padding-right:4px;"></div>
             
-            <!-- Queue Action Buttons -->
             <div style="display:flex; gap:4px; margin-top:10px; border-top:1px solid #ccc; padding-top:10px; flex-wrap:wrap;">
                 <button id="uniCopyBtn" onclick="uniCopy()" style="flex:1; background:var(--warning); color:#000; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">📋 COPY</button>
                 <button id="uniSelectBtn" onclick="uniSelect(); document.getElementById('addCustomerModal').style.display='none';" style="flex:1.2; background:var(--primary); color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">▶ SELECT</button>
@@ -422,7 +414,6 @@
                 <button id="uniInviteBtn" onclick="uniInvite()" style="flex:1.2; background:#25D366; color:white; opacity:0.5; pointer-events:none; padding:8px; font-size:11px !important; font-weight:bold; border:none; border-radius:4px;">💬 INVITE</button>
             </div>
         </div>
-        
     </div>
 </div>
 
@@ -552,12 +543,10 @@
             <button onclick="openEligibility('DICT')" style="width:100%; margin-top:8px; padding:6px; background:var(--warning); color:#000; font-weight:bold; border:none; border-radius:4px; cursor:pointer; font-size:11px;">✏️ EDIT ELIGIBILITY</button>
         </div>
         
-        <!-- हा बॉक्स लपवला आहे (display: none;) जेणेकरून JS क्रॅश होणार नाही -->
         <div style="display: none; background: #f0f7ff; border: 1.5px solid var(--primary); padding: 15px; border-radius: 6px; margin-bottom: 15px;">
             <h4 style="margin-top:0; color:var(--primary); font-size: 14px; margin-bottom: 12px;">⚡ 1. Search & Invoice</h4>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
                 
-                <!-- Updated Search Box for Dictionary -->
                 <div style="flex: 2; min-width: 200px;">
                     <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:3px;">SELECT PRODUCT / SCHEME</label>
                     <button onclick="openAddProductModal('DICT')" style="width:100%; padding:8px 10px; font-size:13px; font-weight:bold; color:var(--dark); background:#fff; border:1px solid #ccc; border-radius:4px; text-align:left; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
@@ -777,7 +766,6 @@
         </div>
         
         <div id="dealerSearchResults" class="custom-scroll" style="display:flex; flex-direction:column; gap:8px; max-height:350px; overflow-y:auto; padding-right:5px;">
-            <!-- JavaScript will populate the results here -->
         </div>
     </div>
 </div>
@@ -790,6 +778,6 @@
 </footer>
 
 <!-- Link to our separate JS file -->
-<script src="app.js?v=10.0"></script>
+<script src="app.js?v=10.1"></script>
 </body>
 </html>
