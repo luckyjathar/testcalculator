@@ -429,7 +429,7 @@ window.onload = async function() {
         updateLoginUI(savedName, true); 
     } 
     
-    // जर हे फंक्शन अस्तित्वात असेल तरच रन होईल, नाहीतर क्रॅश होणार नाही
+    // क्रॅश थांबवण्यासाठी सुरक्षित कडीशन लावली आहे
     if (typeof generateStackCards === "function") {
         generateStackCards();
     }
@@ -461,6 +461,7 @@ window.onload = async function() {
         renderCustomerQueue(); 
         updateUniversalActionButtons();
 
+        // डेटाबेस सक्सेस झाल्यावर मास्टर डेटा लोड होईल
         fetchFromMasterStream(); 
         setTimeout(() => checkForExcelUpdates(), 3000);
     } catch(e) { 
