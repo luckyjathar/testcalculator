@@ -250,7 +250,7 @@
 <div id="zatpatModal" class="modal" style="align-items:center; justify-content:center;">
     <div class="modal-content" id="fastCalcContainer" style="max-width: 380px; padding: 15px 20px;">
         
-        <!-- ZATPAT ELIGIBILITY BANNER -->
+        <!-- ZATPAT ELIGIBILITY BANNER (With Right-Aligned Edit & Reset) -->
         <div id="zeBanner" style="display:none; background:#e8f4f8; border:1px solid var(--bajaj-blue); border-radius:6px; padding:10px; margin-bottom:12px; font-size:11px; font-weight:900; color:var(--indigo);">
             <div style="display:flex; justify-content:space-between; align-items: stretch;">
                 <div style="flex: 1;">
@@ -307,6 +307,7 @@
                 <label class="compact-label">ROI (%)</label>
                 <input type="number" id="fcRoi" placeholder="0" step="0.01" oninput="calculateFastData();" class="compact-input">
             </div>
+            <!-- Type and Capping Row Removed -->
             <div class="compact-row">
                 <label class="compact-label">FIXED EMI (₹)</label>
                 <input type="number" id="fcFixed" placeholder="Optional" oninput="calculateFastData();" class="compact-input">
@@ -349,27 +350,17 @@
 
         <div id="fcResult" style="display:none; margin-top:12px; background:#fff; border:2px solid var(--primary); padding:15px; border-radius:6px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
             <div style="text-align:center; font-weight:900; color:var(--warning); font-size:14px; margin-bottom:12px; text-transform:uppercase;">⚡ Scheme Details ⚡</div>
-            
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:4px;">
-                <span style="font-weight:bold; color:#555;">INVOICE AMOUNT:</span> <span id="fcResInv" style="color:var(--dark); font-weight:900;">₹0</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:4px;">
-                <span style="font-weight:bold; color:#555;">LOAN AMOUNT:</span> <span id="fcResLoan" style="color:var(--dark); font-weight:900;">₹0</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:4px;">
-                <span style="font-weight:bold; color:#555;">SCHEME:</span> <span id="fcResTa" style="color:var(--indigo); font-weight:900;">0/0</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:4px;">
-                <span style="font-weight:bold; color:#555;">NET DOWNPAYMENT:</span> <span id="fcResDp" style="color:var(--success); font-weight:900;">₹0</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:4px;">
-                <span style="font-weight:bold; color:var(--primary);">MONTHLY EMI:</span> <span id="fcResEmi" style="color:var(--primary); font-weight:900;">₹0</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                <span style="font-weight:bold; color:#555;">DAILY EMI:</span> <span id="fcResDaily" style="color:#d35400; font-weight:900;">₹0</span>
-            </div>
-            
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:4px;"><span style="font-weight:bold; color:#555;">INVOICE AMOUNT:</span> <span id="fcResInv" style="color:var(--dark); font-weight:900;">₹0</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:4px;"><span style="font-weight:bold; color:#555;">LOAN AMOUNT:</span> <span id="fcResLoan" style="color:var(--dark); font-weight:900;">₹0</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:4px;"><span style="font-weight:bold; color:#555;">SCHEME:</span> <span id="fcResTa" style="color:var(--indigo); font-weight:900;">0/0</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:4px;"><span style="font-weight:bold; color:#555;">NET DOWNPAYMENT:</span> <span id="fcResDp" style="color:var(--success); font-weight:900;">₹0</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:4px;"><span style="font-weight:bold; color:var(--primary);">MONTHLY EMI:</span> <span id="fcResEmi" style="color:var(--primary); font-weight:900;">₹0</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="font-weight:bold; color:#555;">DAILY EMI:</span> <span id="fcResDaily" style="color:#d35400; font-weight:900;">₹0</span></div>
             <button onclick="copyFastCalcResult(this)" style="width:100%; margin-top:12px; background:var(--primary); color:white; padding:10px; border-radius:4px; font-weight:bold; box-shadow: 0 2px 4px rgba(9, 132, 227, 0.3); border:none; cursor:pointer;">📋 COPY CALCULATION</button>
+        </div>
+        
+        <div style="display:flex; gap:10px; margin-top:12px;">
+            <button onclick="document.getElementById('zatpatModal').style.display='none'" style="width:100%; background:#dc3545; color:white; padding:10px; border-radius:4px; font-weight:bold; border:none; cursor:pointer;">CLOSE</button>
         </div>
     </div>
 </div>
@@ -789,7 +780,6 @@
     </div>
 </footer>
 
-<!-- Link to our separate JS file -->
 <script src="app.js?v=10.2"></script>
 </body>
 </html>
