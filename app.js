@@ -499,24 +499,24 @@ function openAddProductModal(mode = 'MATRIX') {
 }
 
 function doSearch(id, ddId) {
-    let rawQ = document.getElementById(id).value.toUpperCase(); 
-    let q = rawQ.trim(); // Original query for standard matching
-    let qNoSpace = rawQ.replace(/\s+/g, ''); // Query with spaces removed for flexible matching
+    let rawQ = document.getElementById(id).value; 
+    let q = rawQ.toUpperCase().trim(); 
+    let qNoSpace = rawQ.toUpperCase().replace(/\s+/g, ''); 
     
     let dd = document.getElementById(ddId); 
     if(!q) { dd.style.display='none'; return; }
     
     let validRecords = db_records.filter(r => r.model !== SPECIAL_MODEL); 
     let matches = validRecords.filter(r => { 
-        let m = r.model ? r.model.toUpperCase() : ""; 
-        let b = r.brand ? r.brand.toUpperCase() : ""; 
-        let c = r.category ? r.category.toUpperCase() : ""; 
+        // सर्वात महत्त्वाचा बदल: String() वापरून नंबरला टेक्स्टमध्ये बदलले
+        let m = r.model ? String(r.model).toUpperCase() : ""; 
+        let b = r.brand ? String(r.brand).toUpperCase() : ""; 
+        let c = r.category ? String(r.category).toUpperCase() : ""; 
         
-        let mNoSpace = m.replace(/\s+/g, ''); // Model name with spaces removed
+        let mNoSpace = m.replace(/\s+/g, ''); 
         
-        // Check standard includes OR no-space includes
         return m.includes(q) || mNoSpace.includes(qNoSpace) || b.includes(q) || c.includes(q); 
-    }).map(r => r.model); 
+    }).map(r => String(r.model)); 
     
     matches = [...new Set(matches)].slice(0, 15);
     
@@ -527,7 +527,7 @@ function doSearch(id, ddId) {
     }
     
     dd.innerHTML = matches.map(m => { 
-        let rec = validRecords.find(x => x.model === m); 
+        let rec = validRecords.find(x => String(x.model) === m); 
         let brandTag = rec && rec.brand ? `<span style="font-size:10px; color:#0984e3; font-weight:900; margin-right:5px;">[${rec.brand}]</span>` : ''; 
         return `<div style="padding:10px; border-bottom:1px solid #eee; cursor:pointer; font-weight:800;" onclick="selectModel('${m.replace(/'/g, "\\'")}')">${brandTag}${m}</div>`; 
     }).join(''); 
