@@ -257,7 +257,7 @@ let tempFgModel = "";
 let tempFgBitly = ""; 
 
 let currentViewedModel = "";
-let productSearchMode = 'MATRIX'; // 'MATRIX' or 'DICT'
+let productSearchMode = 'MATRIX';
 let dictIsNonTieup = false;
 let dictCategory = "";
 let dictManualSchemes = null;
@@ -285,7 +285,11 @@ function standardizeCategoryName(cat) { if (!cat) return "OTHER"; let c = String
 function getRfcSlabValue(val) { let amount = parseFloat(val) || 0; if (amount < 8000) return 0; if (amount <= 10000) return 1109; if (amount <= 15000) return 1631; if (amount <= 20000) return 2147; if (amount <= 25000) return 2695; if (amount <= 30000) return 3215; if (amount <= 35000) return 3648; if (amount <= 40000) return 4219; if (amount <= 50000) return 5720; if (amount <= 60000) return 8686; if (amount <= 100000) return 11438; if (amount <= 200000) return 16677; return 0; }
 function getNonTieupPfValue(category, amount) { let cat = String(category || "").toUpperCase().replace(/\s+/g, '').trim(); let val = parseFloat(amount) || 0; if (cat.includes('DESKTOP') || cat.includes('LAPTOP')) { return 699; } if (cat === 'PHONE(WEB-MOBILE)' || cat.includes('PHONE') || cat.includes('TABLET') || cat.includes('WATCH') || cat.includes('PRINTER') || cat.includes('HEADPHONE') || cat === 'SMARTPHONES' || cat === 'MOBILE') { if (val <= 30000) return 499; if (val <= 50000) return 599; return 699; } return null; }
 
-const GITHUB_RAW_URL = "https://raw.githubusercontent.com/luckyjathar/testcalculator/main/master_data.xlsx";const DB_NAME = "PersistentPortalDB"; const DB_VERSION = 2; const STORE_NAME = "dataStore"; let dbInstance;
+const GITHUB_RAW_URL = "https://raw.githubusercontent.com/luckyjathar/testcalculator/main/master_data.xlsx";
+const DB_NAME = "PersistentPortalDB"; 
+const DB_VERSION = 2; 
+const STORE_NAME = "dataStore"; 
+let dbInstance;
 
 function initDB() { return new Promise((resolve, reject) => { let request = indexedDB.open(DB_NAME, DB_VERSION); request.onupgradeneeded = function(e) { let db = e.target.result; if (!db.objectStoreNames.contains(STORE_NAME)) { db.createObjectStore(STORE_NAME); } }; request.onsuccess = function(e) { dbInstance = e.target.result; resolve(dbInstance); }; request.onerror = function(e) { reject(e); }; }); }
 function saveToDB(key, data) { return new Promise((resolve, reject) => { if (!dbInstance) return reject("DB not initialized"); try { let tx = dbInstance.transaction(STORE_NAME, 'readwrite'); let store = tx.objectStore(STORE_NAME); let req = store.put(JSON.stringify(data), key); req.onsuccess = () => resolve(); req.onerror = (e) => reject(e.target.error); } catch(e) { reject(e); } }); }
@@ -298,7 +302,6 @@ function parseExcelDate(val) { if (!val) return null; if (typeof val === 'number
 
 async function saveQueueToLocal(shouldCloudSync = true) { try { let compactQueue = customerQueue.map(c => { let cp = (c.products || []).map(p => { let { calculatedData, allSchemes, ...keepProduct } = p; return keepProduct; }); return { ...c, products: cp }; }); localStorage.setItem('persistent_queue_backup', JSON.stringify(compactQueue)); localStorage.setItem('persistent_active_idx_backup', activeCustomerIndex); await saveToDB('persistent_queue', compactQueue); await saveToDB('persistent_active_idx', activeCustomerIndex); if(shouldCloudSync && loggedInUserEmail) { triggerSilentCloudSync(); } } catch(e) { console.error("Local Save Interrupted", e); } }
 
-// === FETCH MASTER DATA FUNCTION ===
 const CACHE_DURATION_MS = 12 * 60 * 60 * 1000; 
 
 async function fetchFromMasterStream(forceSync = false) {
@@ -423,13 +426,44 @@ async function fetchFromMasterStream(forceSync = false) {
     }
 }
 
+function mapData(r, src) {
+    let keys = Object.keys(r);
+    let getVal = (colNames) => {
+        let f = keys.find(k => colNames.includes(k.toUpperCase().trim()));
+        return f ? r[f] : "";
+    };
+    let model = String(getVal(["MODEL", "PRODUCT", "MODEL NAME"])).trim();
+    let cat = standardizeCategoryName(getVal(["CATEGORY", "ASSET CATEGORY", "ASSET"]));
+    let brand = String(getVal(["BRAND", "OEM"])).trim();
+    let mrp = parseFloat(getVal(["MRP", "PRICE"])) || 0;
+    let tenure = parseInt(getVal(["TENURE", "GROSS TENURE", "MONTHS"])) || 0;
+    let advEmi = parseInt(getVal(["ADVANCE", "ADV EMI", "ADVANCE EMI"])) || 0;
+    let fixedEmi = parseInt(getVal(["FIXED EMI", "EMI"])) || 0;
+    let dbd = parseFloat(getVal(["DBD", "DBD%"])) || 0;
+    let pf = parseInt(getVal(["PF", "PROCESSING FEE"])) || 0;
+    let roi = parseFloat(getVal(["ROI", "ROI%"])) || 0;
+    let minLoan = parseFloat(getVal(["MIN LOAN", "MIN"])) || 0;
+    let maxLoan = parseFloat(getVal(["MAX LOAN", "MAX"])) || 9999999;
+    let expVal = getVal(["EXPIRY", "EXPIRY DATE", "VALID TILL"]);
+    let expStr = "";
+    if (expVal) {
+        let d = parseExcelDate(expVal);
+        if (d) {
+            let day = String(d.getDate()).padStart(2, '0');
+            let m = String(d.getMonth() + 1).padStart(2, '0');
+            let y = d.getFullYear();
+            expStr = `${day}/${m}/${y}`;
+        }
+    }
+    return { model: (src === SPECIAL_MODEL) ? SPECIAL_MODEL : model, brand, category: cat, mrp, tenure, advEmi, fixedEmi, dbd, pf, roi, minLoan, maxLoan, expiryDateStr: expStr };
+}
+
 window.onload = async function() {
     if(loggedInUserEmail) { 
         let savedName = localStorage.getItem('persistent_user_name') || "User"; 
         updateLoginUI(savedName, true); 
     } 
     
-    // क्रॅश थांबवण्यासाठी सुरक्षित कडीशन लावली आहे
     if (typeof generateStackCards === "function") {
         generateStackCards();
     }
@@ -461,13 +495,13 @@ window.onload = async function() {
         renderCustomerQueue(); 
         updateUniversalActionButtons();
 
-        // डेटाबेस सक्सेस झाल्यावर मास्टर डेटा लोड होईल
         fetchFromMasterStream(); 
         setTimeout(() => checkForExcelUpdates(), 3000);
     } catch(e) { 
         console.error("Local Data Initialization Failure", e); 
     }
 };
+
 function openFlyerGenModal() { document.getElementById('fgSalesName').value = ''; document.getElementById('fgSalesMobile').value = ''; document.getElementById('fgDealerSearch').value = ''; document.getElementById('fgDealerList').innerHTML = ''; tempFgDealerId = ""; tempFgDealerName = ""; tempFgBitly = ""; clearFgModel(); document.getElementById('fgOfferType').value = 'NONE'; toggleFgOfferInput(); document.getElementById('fgSelectedDealerBox').style.display = 'none'; document.getElementById('flyerGeneratedLinkBox').style.display = 'none'; document.getElementById('flyerGenModal').style.display = 'flex'; }
 function toggleFgOfferInput() { let type = document.getElementById('fgOfferType').value; let box = document.getElementById('fgOfferValBox'); let label = document.getElementById('fgOfferValLabel'); let inp = document.getElementById('fgOfferValue'); if(type === "NONE") { box.style.display = 'none'; inp.value = ''; } else if(type === "FREEBIE") { box.style.display = 'block'; label.innerText = "ENTER GIFT NAME"; inp.placeholder = "E.g. Earbuds / Smartwatch"; } else { box.style.display = 'block'; label.innerText = "ENTER UPTO AMOUNT (₹)"; inp.placeholder = "E.g. 2500"; } }
 function searchFgDealer() { let q = document.getElementById('fgDealerSearch').value.toLowerCase().trim(); let list = document.getElementById('fgDealerList'); if(!q) { list.innerHTML = ''; return; } let matches = dealer_records.map(d => parseDealerObj(d)).filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q) || p.city.toLowerCase().includes(q)).slice(0, 10); list.innerHTML = matches.map(p => { let displayStr = `${p.name}${p.city ? ' - ' + p.city : ''} (${p.code})`; return `<div onclick="selectFgDealer('${p.code}', '${p.name.replace(/'/g, "\\'")}', '${p.city.replace(/'/g, "\\'")}', '${encodeURIComponent(p.bitly||'')}')" style="padding:8px; border-bottom:1px solid #eee; cursor:pointer; background:#fff; font-size:12px; font-weight:bold; color:var(--bajaj-blue);">🏪 ${displayStr}</div>`; }).join(''); }
@@ -505,23 +539,16 @@ function openAddProductModal(mode = 'MATRIX') {
 function doSearch(id, ddId) {
     let rawQ = document.getElementById(id).value; 
     let q = rawQ.toUpperCase().trim(); 
-    
     let dd = document.getElementById(ddId); 
     if(!q) { dd.style.display='none'; return; }
     
-    // युझरने दिलेले शब्द स्पेसने वेगळे करा (उदा. "17 256" -> ["17", "256"])
     let searchTerms = q.split(/\s+/);
-    
     let validRecords = db_records.filter(r => r.model !== SPECIAL_MODEL); 
     let matches = validRecords.filter(r => { 
         let m = r.model ? String(r.model).toUpperCase() : ""; 
         let b = r.brand ? String(r.brand).toUpperCase() : ""; 
         let c = r.category ? String(r.category).toUpperCase() : ""; 
-        
-        // मॉडेल, ब्रँड आणि कॅटेगरी एकत्र करा
         let combinedText = m + " " + b + " " + c; 
-        
-        // युझरने टाकलेले सर्व शब्द (उदा. 17 आणि 256) त्या एकत्रित माहितीत कुठेही आहेत का ते तपासा
         return searchTerms.every(term => combinedText.includes(term)); 
     }).map(r => String(r.model)); 
     
@@ -540,12 +567,12 @@ function doSearch(id, ddId) {
     }).join(''); 
     dd.style.display = 'block';
 }
+
 function selectModel(name) { 
     document.getElementById('modalMatrixSearchDropdown').style.display = 'none'; 
     document.getElementById('modalMatrixSearch').value = ''; 
     document.getElementById('addProductModal').style.display = 'none'; 
     
-    // Dictionary Mode
     if (productSearchMode === 'DICT') {
         dictIsNonTieup = false;
         dictManualSchemes = null;
@@ -553,7 +580,6 @@ function selectModel(name) {
         return;
     }
 
-    // Matrix Mode
     if (!isLimitValid()) return; 
     let raw = db_records.filter(r => r.model === name); 
     let baseMrp = raw.find(s => s.mrp > 0)?.mrp || ""; 
@@ -565,7 +591,6 @@ function selectModel(name) {
 
 function quickNonTieup() { 
     if (productSearchMode === 'MATRIX' && !isLimitValid()) return; 
-    
     document.getElementById('addProductModal').style.display = 'none'; 
     let tieup = db_records.filter(r => r.model === SPECIAL_MODEL); 
     let cats = [...new Set(tieup.map(r => r.category))].sort(); 
@@ -579,7 +604,6 @@ function selectCategory(catName) {
     document.getElementById('catSelectionModal').style.display = 'none'; 
     let displayName = (catName === 'PHONE(WEB-MOBILE)') ? 'PHONE / TABLET / SMART WATCH' : catName; 
     
-    // Dictionary Mode
     if (productSearchMode === 'DICT') {
         dictIsNonTieup = true;
         dictCategory = catName;
@@ -588,7 +612,6 @@ function selectCategory(catName) {
         return;
     }
 
-    // Matrix Mode
     tempPendingProduct = { name: SPECIAL_MODEL + " - " + displayName, isNT: true, category: catName }; 
     currentModalCategory = catName; 
     finalizeProductAddition(); 
@@ -599,7 +622,7 @@ function viewGlobalModel(name) {
     let displayTitle = name;
     
     if (name === SPECIAL_MODEL && dictIsNonTieup) displayTitle = SPECIAL_MODEL + " - " + dictCategory;
-    if (dictManualSchemes) displayTitle = name; // already contains "MANUAL - "
+    if (dictManualSchemes) displayTitle = name; 
     
     let displayEl = document.getElementById('dictSelectedModelDisplay');
     if(displayEl) displayEl.innerText = "📱 " + displayTitle;
@@ -635,7 +658,6 @@ function recalcCurrentModel() {
 
 function renderTableModel() {
     let schemes = [];
-    
     if (dictManualSchemes) {
         schemes = dictManualSchemes;
     } else if (dictIsNonTieup) {
@@ -665,7 +687,6 @@ function renderTableModel() {
     let fee = (custType === 'EMI CARD') ? 270 : (custType === 'W/O CARD' ? 320 : 850);
 
     let validSchemes = schemes.filter(s => s.tenure > 0 || s.fixedEmi > 0);
-    
     let today = new Date(); today.setHours(0,0,0,0);
     validSchemes = validSchemes.filter(s => {
         if(!s.expiryDateStr) return true;
@@ -702,14 +723,13 @@ function renderTableModel() {
 
     validSchemes.forEach(s => { 
         s.calcLTV = s.tenure > 0 ? ((s.tenure - s.advEmi)/s.tenure)*100 : 0; 
-        
         let dynamicPf = s.pf;
         if (dictIsNonTieup) {
             let checkAmount = invoice > 0 ? invoice : (limit < 9999999 && limit > 0 ? limit : 0);
             let slabPf = getNonTieupPfValue(dictCategory, checkAmount);
             if (slabPf !== null) dynamicPf = slabPf;
         }
-        s.displayPf = dynamicPf; // store for display
+        s.displayPf = dynamicPf;
         
         if (isCalculatedMode) {
             let nbfcMax = (limit * s.tenure) / (s.tenure - s.advEmi || 1);
@@ -838,8 +858,6 @@ function renderTableModel() {
     document.getElementById('schemeResultArea').style.display = 'block';
 }
 
-// ... (बाकीचे सर्व जुने JS फंक्शन्स इथून पुढे कंटिन्यू होतील: compMrpChanged, showComponentsModal, proceedToMatrixFromComponents इ.)
-
 function compMrpChanged() { let mrp = parseFloat(document.getElementById('compMrp').value) || 0; document.getElementById('compInv').value = mrp; let gtl = mrp > 100000 ? 2398 : (mrp > 50000 ? 1799 : (mrp > 30000 ? 1499 : (mrp > 10000 ? 1199 : (mrp > 0 ? 699 : 0)))); document.getElementById('compGtl').value = gtl; let rfcSlab = getRfcSlabValue(mrp); let rfcOpt = document.getElementById('compRfcOpt'); if(rfcOpt) { rfcOpt.value = rfcSlab; rfcOpt.innerText = rfcSlab; } if (isMobileDeviceCat(currentModalCategory)) { document.getElementById('compRfc').value = rfcSlab; } else { document.getElementById('compRfc').value = "0"; } }
 
 function showComponentsModal(baseMrp = "") {
@@ -924,6 +942,7 @@ function renderMatrix() {
         container.appendChild(div); recalcModel(pIdx);
     });
 }
+
 function syncInsurance(pIdx, mrpVal, baseLoanVal, triggerType = 'NONE') {
     let prod = current_products[pIdx]; let isPhoneWebMobile = isMobileDeviceCat(prod.category); let gtl = baseLoanVal > 100000 ? 2398 : (baseLoanVal > 50000 ? 1799 : (baseLoanVal > 30000 ? 1499 : (baseLoanVal > 10000 ? 1199 : (baseLoanVal > 0 ? 699 : 0)))); let rfcSlab = getRfcSlabValue(mrpVal); let inp = prod.inputs;
     if(triggerType === 'MRP' || triggerType === 'INV') { inp.gtl = gtl; if(triggerType === 'MRP') inp.rfc = isPhoneWebMobile ? rfcSlab : 0; } else if (triggerType === 'LOAN') { inp.gtl = gtl; }
@@ -1039,7 +1058,6 @@ function renderRows(pIdx) {
 
         let rowClass = (d.isFixed ? "fixed-row " : "") + (isLtvB || isBoundB ? "ltv-breach " : "") + (d.isExpired && !isInactive ? "expired-row " : "") + (isInactive ? "inactive-row " : "");
         
-        // Action Button Dropdown (Size reduced for mobile)
         let actionMenuBtnHtml = `
         <div style="position:relative; display:inline-block;">
             <button onclick="toggleActionMenu(${pIdx}, ${d.dIdx}, event)" style="background:var(--primary); color:white; border:none; padding:4px 6px; border-radius:4px; font-weight:bold; cursor:pointer; font-size: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.2); min-width: 40px; letter-spacing:0;">ACT▼</button>
@@ -1057,7 +1075,6 @@ function renderRows(pIdx) {
             <td class="hidden-col">${d.category}</td><td class="hidden-col">${+parseFloat(d.dbd).toFixed(3)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.dbdAmt||0).toLocaleString()}</span></td><td class="hidden-col">₹${d.pf}</td><td class="hidden-col">${+parseFloat(d.roi).toFixed(2)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(d.roiAmt||0).toLocaleString()}</span></td><td class="hidden-col">${d.fixedEmi > 0 ? '₹'+d.fixedEmi : 'N/A'}</td><td class="hidden-col" id="ltv_${pIdx}_${d.dIdx}">${Math.round(d.curLTV)}%</td><td class="hidden-col" id="nd_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--bajaj-blue);">₹${Math.round(d.netDisb).toLocaleString()}</td><td class="hidden-col" id="extra_${pIdx}_${d.dIdx}" style="font-weight:900; color:var(--danger);">₹${Math.round(d.extra).toLocaleString()}</td>
             ${isNT ? `<td class="bound-col" style="padding:4px 1px; font-size:11px; white-space:nowrap;">${d.minLoan > 0 ? '₹' + d.minLoan : '0'}</td><td class="bound-col" style="padding:4px 1px; font-size:11px; white-space:nowrap;">${d.maxLoan < 9999999 ? '₹' + d.maxLoan : 'NO'}</td>` : `<td style="padding:4px 1px; color:#777; font-size:11px; white-space:nowrap;">₹${Math.floor(d.nbfcMaxL)}</td>`}
             
-            <!-- Loan Column Full Visibility Fix (Width and font updated) -->
             <td style="padding:4px 2px; text-align:center; vertical-align:middle; white-space:nowrap;" title="Click to Edit Loan Amount">
                 <div style="display:inline-flex; justify-content:center; align-items:center;">
                     <span style="color:var(--primary); font-weight:900; font-size:13px;">₹</span>
@@ -1210,25 +1227,23 @@ let requestWhatsAppDispatch = false;
 function proceedGenerateImage() { requestWhatsAppDispatch = false; document.getElementById('custInfoPromptModal').style.display = 'none'; doGenerateCustomerImage(); }
 function proceedGenerateImageAndWhatsAppCopy() { requestWhatsAppDispatch = true; document.getElementById('custInfoPromptModal').style.display = 'none'; doGenerateCustomerImage(); }
 
-/* === NEW: DAILY INDIAN FESTIVAL THEME FUNCTION === */
 function getDailyTheme() {
     const festivalThemes = [
-        { bg: "linear-gradient(135deg, #D35400 0%, #F39C12 100%)", text: "#fff", accent: "#FFF", icon: "🪔" }, // Diwali
-        { bg: "linear-gradient(135deg, #C0392B 0%, #E74C3C 100%)", text: "#fff", accent: "#F1C40F", icon: "🌺" }, // Ganesh Chaturthi
-        { bg: "linear-gradient(135deg, #1E8449 0%, #2ECC71 100%)", text: "#fff", accent: "#F1C40F", icon: "🚩" }, // Gudi Padwa
-        { bg: "linear-gradient(135deg, #8E44AD 0%, #E74C3C 100%)", text: "#fff", accent: "#F1C40F", icon: "🎨" }, // Holi
-        { bg: "linear-gradient(135deg, #2980B9 0%, #6DD5FA 100%)", text: "#fff", accent: "#000", icon: "🪁" }, // Makar Sankranti
-        { bg: "linear-gradient(135deg, #B92B27 0%, #1565C0 100%)", text: "#fff", accent: "#F1C40F", icon: "🏹" }, // Dussehra
-        { bg: "linear-gradient(135deg, #e52d27 0%, #b31217 100%)", text: "#fff", accent: "#F1C40F", icon: "💃" }  // Navratri
+        { bg: "linear-gradient(135deg, #D35400 0%, #F39C12 100%)", text: "#fff", accent: "#FFF", icon: "🪔" }, 
+        { bg: "linear-gradient(135deg, #C0392B 0%, #E74C3C 100%)", text: "#fff", accent: "#F1C40F", icon: "🌺" }, 
+        { bg: "linear-gradient(135deg, #1E8449 0%, #2ECC71 100%)", text: "#fff", accent: "#F1C40F", icon: "🚩" }, 
+        { bg: "linear-gradient(135deg, #8E44AD 0%, #E74C3C 100%)", text: "#fff", accent: "#F1C40F", icon: "🎨" }, 
+        { bg: "linear-gradient(135deg, #2980B9 0%, #6DD5FA 100%)", text: "#fff", accent: "#000", icon: "🪁" }, 
+        { bg: "linear-gradient(135deg, #B92B27 0%, #1565C0 100%)", text: "#fff", accent: "#F1C40F", icon: "🏹" }, 
+        { bg: "linear-gradient(135deg, #e52d27 0%, #b31217 100%)", text: "#fff", accent: "#F1C40F", icon: "💃" }
     ];
     const today = new Date().getDate(); 
     return festivalThemes[today % festivalThemes.length];
 }
 
-/* === PIXEL-PERFECT EXACT QUOTATION IMAGE GENERATOR (NO OUTER BOX, BLUE LINE, MASSIVE FONTS) === */
 function doGenerateCustomerImage() {
     let quoteDiv = document.createElement('div'); 
-    quoteDiv.style.width = "780px"; /* रुंदी थोडी वाढवली जेणेकरून मोठे फॉन्ट छान बसतील */
+    quoteDiv.style.width = "780px";
     quoteDiv.style.padding = "16px"; 
     quoteDiv.style.background = "#f8fafc"; 
     quoteDiv.style.position = "absolute"; 
@@ -1239,31 +1254,21 @@ function doGenerateCustomerImage() {
     let c = customerQueue[activeCustomerIndex]; 
     let ltvLimit = c?.ltv || 100;
     
-    // Customer Name Formatting: Title Case
     let rawName = c?.name && c.name !== "-" ? c.name : "Valued Customer";
     let custName = rawName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
     let custMobile = c?.mobile && c.mobile !== "" ? c.mobile : "N/A";
 
-    // 1. Top Modern Gradient Header
     let html = `
     <div style="background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid #e2e8f0;">
-        
-        <!-- Header Banner -->
         <div style="background: linear-gradient(180deg, #095797 0%, #153e75 100%); padding: 20px 16px 22px 16px; color: #ffffff; text-align: center; border-radius: 16px 16px 0 0;">
             <h2 style="margin: 0 0 14px 0; font-size: 30px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
                 🎉 EXCLUSIVE OFFERS FOR YOU!
             </h2> 
-
-            <!-- Approved Eligibility Container -->
             <div style="display: block; width: 96%; margin: 0 auto; background: rgba(255, 255, 255, 0.08); border: 2px dashed rgba(255,255,255,0.4); border-radius: 10px; padding: 14px 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                
-                <!-- Customer Details -->
                 <div style="font-size: 21px; font-weight: 900; color: #ffffff; letter-spacing: 0.5px; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; display: flex; justify-content: space-between; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
                     <span>🧑 Customer Name: <span style="color: #bfdbfe;">${custName}</span></span>
                     <span>📱 <span style="color: #bfdbfe;">${custMobile}</span></span>
                 </div>
-
-                <!-- Eligibility Details -->
                 <div style="display: flex; gap: 18px; font-size: 24px; font-weight: 900; align-items: center; justify-content: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
                     <span>LIMIT: <b style="color: #34d399;">₹${c?.limit ? c.limit.toLocaleString() : 0}</b></span>
                     <span style="opacity: 0.5;">|</span>
@@ -1273,7 +1278,6 @@ function doGenerateCustomerImage() {
                 </div>
             </div>
         </div>
-
         <div style="padding: 20px;">
     `;
 
@@ -1294,7 +1298,6 @@ function doGenerateCustomerImage() {
         hasV = true; 
         let invAmt = prod.inputs.inv > 0 ? prod.inputs.inv : prod.inputs.mrp;
 
-        // Sorting Logic for Badges
         let sortedByDp = [...validS].sort((a,b) => a.dp - b.dp);
         let winDp = sortedByDp[0];
         
@@ -1305,7 +1308,6 @@ function doGenerateCustomerImage() {
         let highlightIds = [winDp?.dIdx, winEmi?.dIdx].filter(Boolean);
         let otherSchemes = validS.filter(s => !highlightIds.includes(s.dIdx)).sort((a,b) => a.dp - b.dp);
 
-        // Combine all schemes into one array
         let allSchemes = [];
         if (winDp) allSchemes.push({ ...winDp, isWinDp: true });
         if (winEmi && (!winDp || winEmi.dIdx !== winDp.dIdx)) allSchemes.push({ ...winEmi, isWinEmi: true });
@@ -1315,8 +1317,6 @@ function doGenerateCustomerImage() {
 
         html += `
             <div style="border-left: 12px solid #034887; background: #ffffff; margin-bottom: ${marginBottom}; box-shadow: 0 4px 15px rgba(0,0,0,0.06);">
-                
-                <!-- Product Title Header -->
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 22px 20px 20px 20px; border-bottom: 2px solid #e2e8f0; background: #ffffff;">
                     <div style="display: flex; align-items: center; gap: 14px; flex: 1;">
                         <span style="font-size: 32px;">📱</span>
@@ -1330,7 +1330,6 @@ function doGenerateCustomerImage() {
                     </div>
                 </div>
 
-                <!-- SINGLE UNIFIED SCHEMES TABLE (Massive Fonts) -->
                 <table style="width: 100%; border-collapse: collapse; text-align: center;">
                     <thead style="background: #f8fafc; color: #334155; border-bottom: 2px solid #cbd5e1;">
                         <tr style="font-size: 18px; font-weight: 900; letter-spacing: 0.5px;">
@@ -1344,13 +1343,11 @@ function doGenerateCustomerImage() {
                     <tbody>
         `;
 
-        // Render all schemes uniformly with HUGE font sizes
         allSchemes.forEach((d, i) => {
             let isLast = (i === allSchemes.length - 1);
             let bBorder = isLast ? 'none' : '1px solid #e2e8f0';
             let bgCol = (d.isWinDp) ? '#f0fdf4' : (d.isWinEmi ? '#eff6ff' : (i % 2 === 0 ? '#ffffff' : '#f8fafc'));
             
-            // Build badges if applicable
             let badges = [];
             if (d.isWinDp) {
                 badges.push('<span style="background: #059669; color: white; font-size: 13px; font-weight: 900; padding: 5px 12px; border-radius: 6px; width: 85%;">▼ LOWEST DP</span>');
@@ -1419,7 +1416,7 @@ function doGenerateCustomerImage() {
                 canvas.toBlob(blob => {
                     try { 
                         navigator.clipboard.write([ new ClipboardItem({ "image/png": blob }) ]).then(() => { 
-                            showToast("📋 Image copied to clipboard!", "success");
+                            showToast("📋 Image copied to clipboard!", "success"); 
                             let mobile = c?.mobile || ""; 
                             if(mobile && mobile.length >= 10) window.open(`https://wa.me/91${mobile}`, '_blank'); 
                         }); 
@@ -1433,7 +1430,9 @@ function doGenerateCustomerImage() {
     });
 }
 
-/* === DEALER LINKS WITH STAR (FAVORITES) & SECURE DIRECT LINK FEATURE === */
+function closeImageViewer() { document.getElementById('imageViewerModal').style.display = 'none'; }
+
+/* === DEALER LINKS WITH STAR (FAVORITES) === */
 let showingOnlyStarred = false;
 
 function getStarredDealers() {
@@ -1507,19 +1506,6 @@ function openDealerSearchModal() {
 
 function closeDealerSearchModal() { 
     document.getElementById('dealerSearchModal').style.display = 'none'; 
-}
-
-function openBitlyLink(url) { 
-    if (url && url !== '#' && url.trim() !== '') { 
-        let targetUrl = url.trim();
-        if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) { 
-            targetUrl = 'https://' + targetUrl; 
-        } 
-        window.open(targetUrl, '_blank'); 
-        closeDealerSearchModal(); 
-    } else { 
-        showToast('⚠️ Is dealer ke liye Bitly link available nahi hai!', 'warning'); 
-    } 
 }
 
 function searchDealer() {
@@ -1596,34 +1582,15 @@ function searchDealer() {
     }).join('');
 }
 
-let lastTapTime = 0;
-let lastTapIdx = -1;
-
-function handleCustomerTap(idx) {
-    let currentTime = new Date().getTime();
-    let tapLength = currentTime - lastTapTime;
-
-    if (tapLength < 400 && tapLength > 0 && lastTapIdx === idx) {
-        setActiveCustomer(idx); 
-        lastTapTime = 0; 
-    } else {
-        selectQueueItem(idx); 
-        lastTapTime = currentTime;
-        lastTapIdx = idx;
-    }
-}
-
 async function checkForExcelUpdates() {
     try {
         let repoUrl = "https://api.github.com/repos/luckyjathar/testcalculator/commits?path=master_data.xlsx&page=1&per_page=1";
         let res = await fetch(repoUrl);
-        
         if (res.ok) {
             let data = await res.json();
             if (data && data.length > 0) {
                 let latestCommitTime = new Date(data[0].commit.committer.date).getTime();
                 let localSavedTime = await getFromDB('master_data_version_time') || 0;
-
                 if (localSavedTime > 0 && latestCommitTime > localSavedTime) {
                     showUpdateNotification();
                 } else if (localSavedTime === 0) {
@@ -1657,10 +1624,8 @@ function showUpdateNotification() {
 async function forceRefreshMasterData() {
     let updateDiv = document.getElementById('updateNotificationBar');
     if(updateDiv) updateDiv.innerHTML = "⏳ डाउनलोड सुरू आहे, कृपया थांबा...";
-    
     await saveToDB('master_data_time', 0); 
     await fetchFromMasterStream(true); 
-    
     let repoUrl = "https://api.github.com/repos/luckyjathar/testcalculator/commits?path=master_data.xlsx&page=1&per_page=1";
     let res = await fetch(repoUrl);
     if(res.ok) {
@@ -1670,23 +1635,17 @@ async function forceRefreshMasterData() {
             await saveToDB('master_data_version_time', latestCommitTime);
         }
     }
-    
     if(updateDiv) updateDiv.style.display = 'none';
     showToast("✅ डेटा यशस्वीरित्या अपडेट झाला!", "success");
 }
 
-/* === ACTION DROPDOWN MENU CONTROLLER === */
 function toggleActionMenu(pIdx, dIdx, event) {
     event.stopPropagation();
-    
-    // आधी सुरु असलेले इतर सगळे मेनू बंद करा
     document.querySelectorAll('.act-menu-dropdown').forEach(el => {
         if (el.id !== `actMenu_${pIdx}_${dIdx}`) {
             el.style.display = 'none';
         }
     });
-    
-    // जो क्लिक केलाय तो टॉगल करा
     let menu = document.getElementById(`actMenu_${pIdx}_${dIdx}`);
     if(menu.style.display === 'none' || menu.style.display === '') {
         menu.style.display = 'flex';
@@ -1695,22 +1654,21 @@ function toggleActionMenu(pIdx, dIdx, event) {
     }
 }
 
-// स्क्रीनवर कुठेही बाहेर क्लिक केल्यास मेनू बंद होईल
 document.addEventListener('click', function() {
     document.querySelectorAll('.act-menu-dropdown').forEach(el => {
         el.style.display = 'none';
     });
 });
 
-// ==========================================
-// GLOBAL ELIGIBILITY SYSTEM (ZATPAT & DICTIONARY)
-// ==========================================
+/* ==============================================================
+   PRO ZATPAT CALC & GLOBAL ELIGIBILITY FUNCTIONS
+   ============================================================== */
 let zcEligibleActive = false;
 let zcLimit = 0;
 let zcLtv = 100;
 let zcType = 'NEW';
 let zcCap = 0;
-let activeModalTarget = ''; // 'ZATPAT' or 'DICT'
+let activeModalTarget = ''; 
 
 function openEligibility(target) {
     activeModalTarget = target;
@@ -1774,17 +1732,8 @@ function proceedToTargetModal() {
             document.getElementById('zeDispLtv').innerText = zcLtv + "%";
             document.getElementById('zeDispCap').innerText = zcCap > 0 ? "₹" + zcCap : "NONE";
             document.getElementById('zeBanner').style.display = 'block';
-
-            document.getElementById('fcCustType').value = zcType;
-            let capInp = document.getElementById('fcCap');
-            if(capInp) capInp.value = zcCap > 0 ? zcCap : '';
-            document.getElementById('fcCustType').disabled = true;
-            if(capInp) capInp.disabled = true;
         } else {
             document.getElementById('zeBanner').style.display = 'none';
-            document.getElementById('fcCustType').disabled = false;
-            let capInp = document.getElementById('fcCap');
-            if(capInp) capInp.disabled = false;
         }
         document.getElementById('zatpatModal').style.display = 'flex';
         calculateFastData(); 
@@ -1804,7 +1753,6 @@ function proceedToTargetModal() {
         if (dictDisplay) dictDisplay.innerText = "🔍 Click to Search or Add...";
         
         document.getElementById('schemeResultArea').style.display = 'none';
-        
         document.getElementById('dictionarySearchModal').style.display = 'flex'; 
         
         currentViewedModel = "";
@@ -1812,5 +1760,185 @@ function proceedToTargetModal() {
         dictIsNonTieup = false;
         
         recalcCurrentModel();
+    }
+}
+
+// 1. Invoice रक्कम टाकल्यावर लोन आणि GTL/RFC ऑटो-अपडेट
+function fcInvChanged() {
+    let inv = parseFloat(document.getElementById('fcInv').value) || 0;
+    document.getElementById('fcLoanInput').value = inv; // बाय-डिफॉल्ट सेम राहील
+    
+    // GTL नियम
+    let gtl = inv > 100000 ? 2398 : (inv > 50000 ? 1799 : (inv > 30000 ? 1499 : (inv > 10000 ? 1199 : (inv > 0 ? 699 : 0))));
+    document.getElementById('fcGtl').value = gtl;
+    
+    // RFC नियम लागू करा
+    fcCatChanged();
+}
+
+// 2. कॅटेगरी बदलल्यावर RFC चा नियम लागू करणे
+function fcCatChanged() {
+    let inv = parseFloat(document.getElementById('fcInv').value) || 0;
+    let cat = document.getElementById('fcCat').value;
+    let rfcSelect = document.getElementById('fcRfc');
+    let rfcOpt = document.getElementById('fcRfcOpt');
+    
+    let rfcSlab = getRfcSlabValue(inv);
+
+    if (cat === 'PHONE(WEB-MOBILE)') {
+        rfcSelect.disabled = false;
+        if(rfcOpt) {
+            rfcOpt.value = rfcSlab;
+            rfcOpt.innerText = rfcSlab;
+        }
+        rfcSelect.value = rfcSlab;
+    } else {
+        rfcSelect.disabled = true;
+        if(rfcOpt) {
+            rfcOpt.value = 0;
+            rfcOpt.innerText = 0;
+        }
+        rfcSelect.value = 0;
+    }
+    calculateFastData();
+}
+
+// 3. मॅन्युअल लोन ऍडजस्ट करताना 50% आणि 100% चा नियम
+function validateFastLoanMin() {
+    let inv = parseFloat(document.getElementById('fcInv').value) || 0;
+    let loan = parseFloat(document.getElementById('fcLoanInput').value) || 0;
+    let minLoan = inv * 0.50;
+    
+    if (inv > 0 && loan < minLoan) {
+        document.getElementById('fcLoanInput').value = minLoan;
+        showToast("⚠️ लोन अमाऊंट इन्व्हॉइसच्या ५०% पेक्षा कमी असू शकत नाही!", "error");
+    } else if (inv > 0 && loan > inv) {
+        document.getElementById('fcLoanInput').value = inv;
+        showToast("⚠️ लोन इन्व्हॉइसपेक्षा जास्त असू शकत नाही!", "warning");
+    }
+    calculateFastData();
+}
+
+// 4. फॉर्म रिसेट आणि थेट Eligibility विंडो उघडणे
+function resetFastCalc() {
+    document.getElementById('fcInv').value = '';
+    document.getElementById('fcLoanInput').value = '';
+    document.getElementById('fcTenure').value = '';
+    document.getElementById('fcAdv').value = '';
+    document.getElementById('fcDbd').value = '';
+    document.getElementById('fcPf').value = '';
+    document.getElementById('fcRoi').value = '';
+    document.getElementById('fcFixed').value = '';
+    document.getElementById('fcTarget').value = '';
+    document.getElementById('fcCat').value = 'OTHER';
+    document.getElementById('fcGtl').value = '0';
+    document.getElementById('fcRfc').value = '0';
+    document.getElementById('fcExw').value = '';
+    document.getElementById('fcMargin').value = '';
+    document.getElementById('fcDealer').value = '';
+    document.getElementById('fcResult').style.display = 'none';
+    
+    openEligibility('ZATPAT');
+}
+
+// 5. रिअल-टाइम फायनल कॅल्क्युलेशन 
+function calculateFastData() {
+    let inv = parseFloat(document.getElementById('fcInv').value) || 0;
+    let loan = parseFloat(document.getElementById('fcLoanInput').value) || 0;
+    let tenure = parseInt(document.getElementById('fcTenure').value) || 0;
+    let adv = parseInt(document.getElementById('fcAdv').value) || 0;
+    let dbd = parseFloat(document.getElementById('fcDbd').value) || 0;
+    let pf = parseFloat(document.getElementById('fcPf').value) || 0;
+    let roi = parseFloat(document.getElementById('fcRoi').value) || 0;
+    let fixedEmi = parseFloat(document.getElementById('fcFixed').value) || 0;
+    
+    let gtl = parseFloat(document.getElementById('fcGtl').value) || 0;
+    let rfc = parseFloat(document.getElementById('fcRfc').value) || 0;
+    let exw = parseFloat(document.getElementById('fcExw').value) || 0;
+    let margin = parseFloat(document.getElementById('fcMargin').value) || 0;
+    let dealer = parseFloat(document.getElementById('fcDealer').value) || 0;
+
+    let type = zcEligibleActive ? zcType : 'NEW';
+    let emiCap = zcEligibleActive ? zcCap : 0;
+    
+    let fee = (type === 'EMI CARD') ? 270 : (type === 'W/O CARD' ? 320 : 850);
+    let totalFees = fee + margin + dealer;
+
+    if (inv === 0 || loan === 0 || tenure === 0) {
+        document.getElementById('fcResult').style.display = 'none';
+        return;
+    }
+
+    let dbdRate = (dbd * 1.18 / 100);
+    let roiRate = roi / 1200;
+    let roiRateDP = roiRate * adv;
+    
+    let emi = 0, dp = 0, inst = 0, actualTenure = tenure;
+
+    if (fixedEmi > 0) {
+        actualTenure = Math.floor(loan / fixedEmi) || 1;
+        loan = actualTenure * fixedEmi;
+        inst = actualTenure - adv;
+        if (inst < 1) inst = 1;
+        
+        let roiInEmi = loan * roiRate;
+        let insTotal = gtl + rfc + exw;
+        emi = fixedEmi + (insTotal / inst) + roiInEmi;
+        
+        let roiInDp = loan * roiRateDP;
+        let dpExact = inv - loan + (fixedEmi * adv) + (loan * dbdRate) + pf + totalFees + roiInDp;
+        dp = Math.ceil(dpExact / 10) * 10;
+    } else {
+        inst = tenure - adv;
+        if (inst < 1) inst = 1;
+        let insTotal = gtl + rfc + exw;
+        
+        let baseEmi = loan / tenure;
+        if (baseEmi > 0 && baseEmi < 900) baseEmi = 900; 
+
+        let roiInEmi = loan * roiRate;
+        emi = baseEmi + (insTotal / inst) + roiInEmi;
+
+        if (emiCap > 0 && emi > emiCap) {
+            loan = (emiCap - (insTotal / inst)) / ((1 / tenure) + roiRate);
+            if (loan < 0) loan = 0;
+            if (inv > 0 && loan > inv) loan = inv;
+            
+            baseEmi = loan / tenure;
+            if (baseEmi > 0 && baseEmi < 900) baseEmi = 900; 
+
+            roiInEmi = loan * roiRate;
+            emi = baseEmi + (insTotal / inst) + roiInEmi;
+        }
+
+        let roiInDp = loan * roiRateDP;
+        let dpExact = inv - loan + (baseEmi * adv) + (loan * dbdRate) + pf + totalFees + roiInDp;
+        dp = Math.ceil(dpExact / 10) * 10;
+    }
+    
+    let daily = emi / 30;
+
+    document.getElementById('fcResLoan').innerText = "₹" + Math.floor(loan).toLocaleString();
+    document.getElementById('fcResDp').innerText = "₹" + dp.toLocaleString();
+    document.getElementById('fcResEmi').innerText = "₹" + Math.round(emi).toLocaleString();
+    document.getElementById('fcResDaily').innerText = "₹" + Math.round(daily).toLocaleString();
+    document.getElementById('fcResTa').innerText = `T/A: ${actualTenure}/${adv} | M: ${inst}`;
+
+    document.getElementById('fcResult').style.display = 'block';
+}
+
+function copyFastCalcResult(btn) {
+    let loan = document.getElementById('fcResLoan').innerText;
+    let dp = document.getElementById('fcResDp').innerText;
+    let emi = document.getElementById('fcResEmi').innerText;
+    let daily = document.getElementById('fcResDaily').innerText;
+    let ta = document.getElementById('fcResTa').innerText;
+    
+    let text = `⚡ *ZATPAT LOAN QUOTE* ⚡\n\n🔹 *Loan Amount:* ${loan}\n🔹 *Net Downpayment:* ${dp}\n🔹 *Monthly EMI:* ${emi}\n🔹 *Daily EMI:* ${daily}\n🔹 *Details:* ${ta}`;
+    
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => showToast("📋 Calculation Copied!", "success")).catch(() => fallbackCopy(text, () => showToast("📋 Calculation Copied!", "success")));
+    } else {
+        fallbackCopy(text, () => showToast("📋 Calculation Copied!", "success"));
     }
 }
