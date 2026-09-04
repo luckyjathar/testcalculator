@@ -645,23 +645,42 @@
     </div>
 </div>
 
+<!-- UPDATED ADD NEW PRODUCT MODAL (AS PER IMAGE DESIGN) -->
 <div id="addProductModal" class="modal" style="align-items:center; justify-content:center;">
-    <div class="modal-content" style="max-width: 350px;">
-        <h3 style="margin-top:0; color:var(--bajaj-blue); border-bottom: 2px solid #ddd; padding-bottom: 6px;">🔍 ADD NEW PRODUCT</h3>
-        <div style="position:relative; margin-bottom: 12px;">
-            <label style="color:var(--indigo); margin-bottom:4px; display:block;">SEARCH MODEL</label>
-            <input type="search" id="modalMatrixSearch" oninput="doSearch('modalMatrixSearch', 'modalMatrixSearchDropdown')" placeholder="Type model, brand or category..." style="width:100%;">
-            <div id="modalMatrixSearchDropdown" style="position: absolute; width: 100%; background: #fff; z-index: 1000; border: 1px solid #ddd; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.15); border-radius: 4px; max-height: 200px; overflow-y: auto;"></div>
+    <div class="modal-content" style="max-width: 400px; padding: 22px; border-radius: 8px; background: #fff;">
+        
+        <!-- Header -->
+        <div style="display: flex; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 18px;">
+            <span style="font-size: 22px; margin-right: 10px;">🔍</span>
+            <h3 style="margin: 0; color: #1565c0; font-size: 17px !important; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">ADD NEW PRODUCT</h3>
         </div>
-        <div style="display:flex; gap:8px;">
-            <button onclick="quickNonTieup();" style="flex:1; background:var(--warning); color:#000;">⚡ NON TIEUP</button>
-            <button onclick="openMultiStackModal();" style="flex:1.2; background:var(--indigo); color:white;">+ MANUAL (10 SCHEMES)</button>
+
+        <!-- Search Input -->
+        <div style="position:relative; margin-bottom: 18px;">
+            <label style="font-size: 11px; font-weight: 900; color: #1e293b; display: block; margin-bottom: 6px; text-transform: uppercase;">SEARCH MODEL</label>
+            <input type="search" id="modalMatrixSearch" oninput="doSearch('modalMatrixSearch', 'modalMatrixSearchDropdown')" placeholder="Type model, brand or category..." style="width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 14px; font-weight: bold; box-sizing: border-box; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#1565c0'" onblur="this.style.borderColor='#cbd5e1'">
+            
+            <!-- Dropdown for Search Results -->
+            <div id="modalMatrixSearchDropdown" class="custom-scroll" style="position: absolute; width: 100%; background: #fff; z-index: 1000; border: 1px solid #ddd; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border-radius: 6px; max-height: 220px; overflow-y: auto; margin-top: 4px;"></div>
         </div>
-        <button onclick="document.getElementById('addProductModal').style.display='none'" style="width:100%; background:var(--danger); color:white; margin-top:12px;">CANCEL</button>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button onclick="quickNonTieup();" style="flex: 1; background: #f39c12; color: #000; font-weight: 900; border: none; padding: 12px 6px; border-radius: 6px; font-size: 12px; cursor: pointer; text-transform: uppercase; box-shadow: 0 3px 6px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; gap: 4px;">
+                <span style="color: #fff2cc; font-size: 14px;">⚡</span> NON TIEUP
+            </button>
+            <button onclick="openMultiStackModal();" style="flex: 1; background: #34495e; color: #fff; font-weight: 900; border: none; padding: 12px 6px; border-radius: 6px; font-size: 11px; cursor: pointer; text-transform: uppercase; box-shadow: 0 3px 6px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center;">
+                + MANUAL (10 SCHEMES)
+            </button>
+        </div>
+
+        <!-- Cancel Button -->
+        <button onclick="document.getElementById('addProductModal').style.display='none'" style="width: 100%; background: #dc3545; color: #fff; font-weight: 900; border: none; padding: 12px; border-radius: 6px; font-size: 14px; cursor: pointer; text-transform: uppercase; box-shadow: 0 3px 6px rgba(0,0,0,0.15); letter-spacing: 1px;">
+            CANCEL
+        </button>
     </div>
 </div>
-
-<div id="quoteSelectionModal" class="modal" style="align-items:center; justify-content:center;">
+        <div id="quoteSelectionModal" class="modal" style="align-items:center; justify-content:center;">
     <div class="modal-content" style="max-width:350px;">
         <h3 style="margin-top:0; color:var(--bajaj-blue);">🖼️ Select Models for Quotation</h3>
         <div id="quoteModelCheckboxes" style="display:flex; flex-direction:column; gap:6px; max-height:220px; overflow-y:auto; margin-bottom:15px; padding-right:5px;" class="custom-scroll"></div>
