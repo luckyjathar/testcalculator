@@ -527,9 +527,13 @@ function shareOnWhatsAppStatus() { let generatedLink = document.getElementById('
 
 function closeDictionaryModal() { document.getElementById('dictionarySearchModal').style.display = 'none'; }
 
+// -------------------------------------------------------------
+// UPDATED SEARCH LOGIC & HOVER UI IMPLEMENTATION
+// -------------------------------------------------------------
+
 function openAddProductModal(mode = 'MATRIX') { 
     productSearchMode = mode;
-    if (mode === 'MATRIX' && !isLimitValid()) return; 
+    if (mode === 'MATRIX' && typeof isLimitValid === 'function' && !isLimitValid()) return; 
     document.getElementById('modalMatrixSearch').value = ''; 
     document.getElementById('modalMatrixSearchDropdown').style.display = 'none'; 
     document.getElementById('addProductModal').style.display = 'flex'; 
@@ -544,6 +548,7 @@ function doSearch(id, ddId) {
     
     let searchTerms = q.split(/\s+/);
     let validRecords = db_records.filter(r => r.model !== SPECIAL_MODEL); 
+    
     let matches = validRecords.filter(r => { 
         let m = r.model ? String(r.model).toUpperCase() : ""; 
         let b = r.brand ? String(r.brand).toUpperCase() : ""; 
@@ -555,15 +560,21 @@ function doSearch(id, ddId) {
     matches = [...new Set(matches)].slice(0, 15);
     
     if (matches.length === 0) { 
-        dd.innerHTML = `<div style="padding:10px; color:#d35400; font-weight:bold; text-align:center;">No matching models found.</div>`; 
+        dd.innerHTML = `<div style="padding:12px; color:#dc2626; font-size:13px; font-weight:bold; text-align:center;">⚠️ No matching models found.</div>`; 
         dd.style.display = 'block'; 
         return; 
     }
     
     dd.innerHTML = matches.map(m => { 
         let rec = validRecords.find(x => String(x.model) === m); 
-        let brandTag = rec && rec.brand ? `<span style="font-size:10px; color:#0984e3; font-weight:900; margin-right:5px;">[${rec.brand}]</span>` : ''; 
-        return `<div style="padding:10px; border-bottom:1px solid #eee; cursor:pointer; font-weight:800;" onclick="selectModel('${m.replace(/'/g, "\\'")}')">${brandTag}${m}</div>`; 
+        let brandTag = rec && rec.brand ? `<span style="font-size:10px; background:#eff6ff; color:#1d4ed8; padding:3px 6px; border-radius:4px; font-weight:900; margin-right:8px; border:1px solid #bfdbfe;">${rec.brand}</span>` : ''; 
+        
+        return `<div style="padding:12px 10px; border-bottom:1px solid #f1f5f9; cursor:pointer; font-weight:800; font-size:13px; color:#1e293b; transition:0.2s;" 
+                     onmouseover="this.style.background='#f8fafc'; this.style.color='#1565c0'" 
+                     onmouseout="this.style.background='#fff'; this.style.color='#1e293b'" 
+                     onclick="selectModel('${m.replace(/'/g, "\\'")}')">
+                    ${brandTag}${m}
+                </div>`; 
     }).join(''); 
     dd.style.display = 'block';
 }
@@ -580,7 +591,7 @@ function selectModel(name) {
         return;
     }
 
-    if (!isLimitValid()) return; 
+    if (typeof isLimitValid === 'function' && !isLimitValid()) return; 
     let raw = db_records.filter(r => r.model === name); 
     let baseMrp = raw.find(s => s.mrp > 0)?.mrp || ""; 
     let cat = raw[0]?.category || ""; 
@@ -590,15 +601,29 @@ function selectModel(name) {
 }
 
 function quickNonTieup() { 
-    if (productSearchMode === 'MATRIX' && !isLimitValid()) return; 
+    if (productSearchMode === 'MATRIX' && typeof isLimitValid === 'function' && !isLimitValid()) return; 
     document.getElementById('addProductModal').style.display = 'none'; 
+    
     let tieup = db_records.filter(r => r.model === SPECIAL_MODEL); 
     let cats = [...new Set(tieup.map(r => r.category))].sort(); 
     if(cats.length === 0) cats = ["PHONE(WEB-MOBILE)", "LED TV", "WASHING MACHINE", "REFRIGERATOR", "AC"];
     
-    document.getElementById('categoryGrid').innerHTML = cats.map(c => { let label = (c === 'PHONE(WEB-MOBILE)') ? 'PHONE, TABLET, SMART WATCH' : c; return `<div style="background:var(--indigo);color:white;padding:12px;border-radius:4px;cursor:pointer;font-weight:900;text-align:center;" onclick="selectCategory('${c}')">${label}</div>`; }).join(''); 
+    document.getElementById('categoryGrid').innerHTML = cats.map(c => { 
+        let label = (c === 'PHONE(WEB-MOBILE)') ? 'PHONE / TABLET' : c; 
+        return `<div style="background:#1e3a8a; color:white; padding:14px 8px; border-radius:6px; cursor:pointer; font-weight:900; font-size:12px; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.1); border:1px solid #1e40af; transition:0.2s;"
+                     onmouseover="this.style.background='#1e40af'" 
+                     onmouseout="this.style.background='#1e3a8a'"
+                     onclick="selectCategory('${c}')">
+                    ${label}
+                </div>`; 
+    }).join(''); 
+    
     document.getElementById('catSelectionModal').style.display = 'flex'; 
 }
+
+// -------------------------------------------------------------
+// END UPDATED SEARCH LOGIC
+// -------------------------------------------------------------
 
 function selectCategory(catName) { 
     document.getElementById('catSelectionModal').style.display = 'none'; 
