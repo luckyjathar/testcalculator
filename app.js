@@ -1785,9 +1785,13 @@ function proceedToTargetModal() {
         dictIsNonTieup = false;
         
         recalcCurrentModel();
+
+        // 🔥 हा नवीन कोड ऍड केला आहे, ज्यामुळे Apply केल्यावर लगेच ADD NEW PRODUCT उघडेल
+        setTimeout(() => {
+            openAddProductModal('DICT');
+        }, 150);
     }
 }
-
 // १. Invoice रक्कम टाकल्यावर लोन आणि GTL/RFC ऑटो-अपडेट
 function fcInvChanged() {
     let inv = parseFloat(document.getElementById('fcInv').value) || 0;
