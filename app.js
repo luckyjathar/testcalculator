@@ -534,10 +534,21 @@ function closeDictionaryModal() { document.getElementById('dictionarySearchModal
 function openAddProductModal(mode = 'MATRIX') { 
     productSearchMode = mode;
     if (mode === 'MATRIX' && typeof isLimitValid === 'function' && !isLimitValid()) return; 
-    document.getElementById('modalMatrixSearch').value = ''; 
-    document.getElementById('modalMatrixSearchDropdown').style.display = 'none'; 
-    document.getElementById('addProductModal').style.display = 'flex'; 
-    setTimeout(() => document.getElementById('modalMatrixSearch').focus(), 100);
+    
+    let searchInput = document.getElementById('modalMatrixSearch');
+    let dropdown = document.getElementById('modalMatrixSearchDropdown');
+    let modal = document.getElementById('addProductModal');
+
+    if(searchInput) searchInput.value = ''; 
+    if(dropdown) dropdown.style.display = 'none'; 
+    if(modal) {
+        modal.style.zIndex = "100010"; // Ensures Add Product Modal is ALWAYS in front of Dictionary
+        modal.style.display = 'flex'; 
+    }
+    
+    setTimeout(() => {
+        if(searchInput) searchInput.focus();
+    }, 100);
 }
 
 function doSearch(id, ddId) {
@@ -576,6 +587,7 @@ function doSearch(id, ddId) {
                     ${brandTag}${m}
                 </div>`; 
     }).join(''); 
+    dd.style.zIndex = "100020";
     dd.style.display = 'block';
 }
 
@@ -618,7 +630,11 @@ function quickNonTieup() {
                 </div>`; 
     }).join(''); 
     
-    document.getElementById('catSelectionModal').style.display = 'flex'; 
+    let catModal = document.getElementById('catSelectionModal');
+    if(catModal) {
+        catModal.style.zIndex = "100015";
+        catModal.style.display = 'flex'; 
+    }
 }
 
 // -------------------------------------------------------------
@@ -1786,12 +1802,13 @@ function proceedToTargetModal() {
         
         recalcCurrentModel();
 
-        // 🔥 हा नवीन कोड ऍड केला आहे, ज्यामुळे Apply केल्यावर लगेच ADD NEW PRODUCT उघडेल
+        // 🔥 हा नवीन कोड ऍड केला आहे, ज्यामुळे Apply किंवा Skip केल्यावर लगेच ADD NEW PRODUCT उघडेल
         setTimeout(() => {
             openAddProductModal('DICT');
         }, 150);
     }
 }
+
 // १. Invoice रक्कम टाकल्यावर लोन आणि GTL/RFC ऑटो-अपडेट
 function fcInvChanged() {
     let inv = parseFloat(document.getElementById('fcInv').value) || 0;
