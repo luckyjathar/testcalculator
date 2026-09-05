@@ -556,8 +556,9 @@ function doSearch(id, ddId) {
     let rawQ = document.getElementById(id).value; 
     let q = rawQ.toUpperCase().trim(); 
     let dd = document.getElementById(ddId); 
-    if(!q) { dd.style.display='none'; return; }
     
+    if(!q) { dd.style.display='none'; return; }
+
     // १. चेक करा की मास्टर डेटा लोड झालाय का?
     if (!db_records || db_records.length === 0) {
         dd.innerHTML = `<div style="padding:12px; color:#dc2626; font-size:13px; font-weight:bold; text-align:center;">⚠️ Master Data Load झाला नाही किंवा सर्व मॉडेल्सची Expiry Date संपली आहे.</div>`; 
@@ -565,37 +566,29 @@ function doSearch(id, ddId) {
         return; 
     }
 
-    let searchTerms = q.split(/\s+/);
+    // स्पेशल कॅरेक्टर्स (-, /) काढून फक्त अक्षरे आणि अंक शोधणे 
+    let searchTerms = q.replace(/[^A-Z0-9]/g, ' ').split(/\s+/).filter(t => t);
     let validRecords = db_records.filter(r => r.model !== SPECIAL_MODEL); 
     
-    if (validRecords.length === 0) {
-        dd.innerHTML = `<div style="padding:12px; color:#dc2626; font-size:13px; font-weight:bold; text-align:center;">⚠️ Sheet 1 (Main Data) मधील मॉडेल्स सापडले नाहीत.</div>`; 
-        dd.style.display = 'block'; 
-        return; 
-    }
-
-    // २. अडव्हान्स मॅचिंग लॉजिक (स्पेस किंवा डॅश असेल तरीही शोधेल)
     let matches = validRecords.filter(r => { 
         let m = r.model ? String(r.model).toUpperCase() : ""; 
         let b = r.brand ? String(r.brand).toUpperCase() : ""; 
         let c = r.category ? String(r.category).toUpperCase() : ""; 
         
-        // कंबाईन टेक्स्ट करून त्यातील डॅश (-) आणि स्वल्पविराम (,) काढून स्पेस टाका
-        let combinedText = (m + " " + b + " " + c).replace(/[-,\/]/g, " "); 
-        
+        let combinedText = (m + " " + b + " " + c).replace(/[^A-Z0-9]/g, " "); 
         return searchTerms.every(term => combinedText.includes(term)); 
     }).map(r => String(r.model)); 
     
     matches = [...new Set(matches)].slice(0, 15);
-    
-    // ३. रिझल्ट न मिळाल्यास योग्य अलर्ट दाखवा
+
+    // २. रिझल्ट न मिळाल्यास
     if (matches.length === 0) { 
-        dd.innerHTML = `<div style="padding:12px; color:#dc2626; font-size:13px; font-weight:bold; text-align:center;">⚠️ No matching models found.<br><span style="font-size:10px; color:#666; font-weight:normal;">(कृपया चेक करा की Excel मध्ये हे मॉडेल आहे का आणि त्याची Expiry Date संपलेली नाही ना.)</span></div>`; 
+        dd.innerHTML = `<div style="padding:12px; color:#dc2626; font-size:13px; font-weight:bold; text-align:center;">⚠️ No matching models found.<br><span style="font-size:10px; color:#666;">(Excel मध्ये मॉडेल आहे का आणि Expiry Date संपलेली नाही ना, हे तपासा.)</span></div>`; 
         dd.style.display = 'block'; 
         return; 
     }
     
-    // ४. रिझल्ट्स दाखवा
+    // ३. रिझल्ट्स दाखवा
     dd.innerHTML = matches.map(m => { 
         let rec = validRecords.find(x => String(x.model) === m); 
         let brandTag = rec && rec.brand ? `<span style="font-size:10px; background:#eff6ff; color:#1d4ed8; padding:3px 6px; border-radius:4px; font-weight:900; margin-right:8px; border:1px solid #bfdbfe;">${rec.brand}</span>` : ''; 
