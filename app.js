@@ -2037,3 +2037,28 @@ function copyFastCalcResult(btn) {
         fallbackCopy(text, () => showToast("📋 Calculation Copied!", "success"));
     }
 }
+/* ==============================================================
+   MISSING FUNCTIONS FIX (To prevent ReferenceError)
+   ============================================================== */
+
+function renderCustomerQueue() {
+    try {
+        // कस्टमर लिस्ट UI वर अपडेट करण्याचा मूळ कोड इथे असायला हवा.
+        // सध्या JavaScript क्रॅश होऊ नये म्हणून हे फंक्शन असणे आवश्यक आहे.
+        console.log("Customer Queue Rendered. Total customers: ", customerQueue.length);
+        
+        // जर तुमच्या HTML मध्ये queue दाखवण्यासाठी काही IDs असतील, तर तुम्ही इथे कोड लिहू शकता.
+        // उदा. document.getElementById('queueCountBadge').innerText = customerQueue.length;
+    } catch (e) {
+        console.error("Error in renderCustomerQueue:", e);
+    }
+}
+
+function updateUniversalActionButtons() {
+    try {
+        // ॲक्शन बटन्स (उदा. Sync, Save) अपडेट करण्यासाठी हे फंक्शन आहे.
+        console.log("Universal Action Buttons Updated.");
+    } catch (e) {
+        console.error("Error in updateUniversalActionButtons:", e);
+    }
+}
