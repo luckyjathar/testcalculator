@@ -677,7 +677,7 @@ function selectCategory(catName) {
 }
 
 /* ==============================================================
-   DICTIONARY MULTI-PRODUCT LOGIC (UPDATED)
+   DICTIONARY MULTI-PRODUCT LOGIC (UPDATED WITH CONTROL GRID)
    ============================================================== */
 function viewGlobalModel(name) {
     let displayTitle = name;
@@ -703,14 +703,26 @@ function viewGlobalModel(name) {
         return;
     }
 
-    // Add to dictionary queue at the top
+    let invAmt = rec.mrp || 0;
+    let initGtl = invAmt > 100000 ? 2398 : (invAmt > 50000 ? 1799 : (invAmt > 30000 ? 1499 : (invAmt > 10000 ? 1199 : (invAmt > 0 ? 699 : 0))));
+    let initRfc = isMobileDeviceCat(rec.category) ? getRfcSlabValue(invAmt) : 0;
+
     dictProductsQueue.unshift({
         id: Date.now(),
         name: displayTitle,
-        inv: rec.mrp || "",
+        inv: invAmt || "",
         isNonTieup: dictIsNonTieup,
         category: rec.category,
-        schemes: schemes
+        schemes: schemes,
+        inputs: {
+            cap: zcCap || "",
+            target: "",
+            gtl: initGtl,
+            rfc: initRfc,
+            exw: 0,
+            margin: 0,
+            dealer: 0
+        }
     });
 
     dictManualSchemes = null;
@@ -720,8 +732,22 @@ function viewGlobalModel(name) {
     renderDictionaryQueue();
 }
 
-function updateDictInv(index, val) {
-    dictProductsQueue[index].inv = val;
+function updateDictVal(pIdx, field, val) {
+    let v = val === "" ? "" : parseFloat(val) || 0;
+    let prod = dictProductsQueue[pIdx];
+    
+    if (field === 'inv') {
+        prod.inv = v;
+        let gtl = v > 100000 ? 2398 : (v > 50000 ? 1799 : (v > 30000 ? 1499 : (v > 10000 ? 1199 : (v > 0 ? 699 : 0))));
+        prod.inputs.gtl = gtl;
+        if (isMobileDeviceCat(prod.category)) {
+            prod.inputs.rfc = getRfcSlabValue(v);
+        } else {
+            prod.inputs.rfc = 0;
+        }
+    } else {
+        prod.inputs[field] = v;
+    }
     renderDictionaryQueue(); 
 }
 
@@ -745,15 +771,23 @@ function renderDictionaryQueue() {
     let custType = zcEligibleActive ? zcType : 'NEW';
     let ltvLimit = zcEligibleActive ? zcLtv : 100;
     let limit = zcEligibleActive ? zcLimit : 0;
-    let emiCap = zcEligibleActive ? zcCap : 0;
+    let globalEmiCap = zcEligibleActive ? zcCap : 0;
     let today = new Date(); today.setHours(0,0,0,0);
 
     let html = dictProductsQueue.map((prod, pIdx) => {
         let cardId = `dictCard_${pIdx}`;
         let invoice = parseFloat(prod.inv) || 0;
         let isCalculatedMode = (limit > 0 && invoice > 0);
-        let gtl = invoice > 100000 ? 2398 : (invoice > 50000 ? 1799 : (invoice > 30000 ? 1499 : (invoice > 10000 ? 1199 : (invoice > 0 ? 699 : 0))));
         let fee = (custType === 'EMI CARD') ? 270 : (custType === 'W/O CARD' ? 320 : 850);
+        let isPhoneWebMobile = isMobileDeviceCat(prod.category);
+        let rfcSlab = getRfcSlabValue(invoice);
+
+        // Calculate based on inputs array
+        let inp = prod.inputs;
+        let totalFees = fee + (parseFloat(inp.margin)||0) + (parseFloat(inp.dealer)||0);
+        let currentEmiCap = parseFloat(inp.cap) > 0 ? parseFloat(inp.cap) : globalEmiCap;
+        let targetDp = parseFloat(inp.target) || 0;
+        let insTotal = (parseFloat(inp.gtl)||0) + (parseFloat(inp.rfc)||0) + (parseFloat(inp.exw)||0);
 
         let validSchemes = prod.schemes.filter(s => {
             if(!s.expiryDateStr) return true;
@@ -791,27 +825,45 @@ function renderDictionaryQueue() {
                     if(currentTenure < 1) currentTenure = 1;
                     
                     finalLoan = currentTenure * s.fixedEmi;
+                    if (targetDp > 0) {
+                        let numerator = targetDp - invoice - (s.fixedEmi * s.advEmi) - dynamicPf - totalFees;
+                        let denominator = dbdRate + roiRateDP - 1;
+                        let solvedLoan = numerator / denominator;
+                        let solvedTenure = Math.floor(solvedLoan / s.fixedEmi);
+                        if (solvedTenure > maxTotalTenure) solvedTenure = maxTotalTenure;
+                        finalLoan = Math.max(0, solvedTenure * s.fixedEmi);
+                    }
+
                     if (finalLoan > invoice) finalLoan = Math.floor(invoice/s.fixedEmi)*s.fixedEmi;
                     currentTenure = Math.floor(finalLoan / s.fixedEmi) || 1;
                     inst = currentTenure - s.advEmi;
                     if(inst < 1) inst = 1;
                     
                     let roiInEmi = finalLoan * roiRate;
-                    emi = s.fixedEmi + (gtl / inst) + roiInEmi;
+                    emi = s.fixedEmi + (insTotal / inst) + roiInEmi;
                     let roiInDp = finalLoan * roiRateDP;
-                    dp = invoice - finalLoan + (s.fixedEmi * s.advEmi) + dynamicPf + fee + (finalLoan * dbdRate) + roiInDp;
+                    dp = invoice - finalLoan + (s.fixedEmi * s.advEmi) + dynamicPf + totalFees + (finalLoan * dbdRate) + roiInDp;
                     s.currentTenure = currentTenure;
                     s.calcInst = inst;
                 } else {
                     finalLoan = Math.min(nbfcMax, invoice);
+
+                    if (targetDp > 0) {
+                        let advRate = s.advEmi / s.tenure;
+                        let numerator = targetDp - invoice - dynamicPf - totalFees;
+                        let denominator = advRate + dbdRate + roiRateDP - 1;
+                        let solvedLoan = numerator / denominator;
+                        finalLoan = Math.min(finalLoan, Math.max(0, Math.floor(solvedLoan)));
+                    }
+
                     let baseEmi = finalLoan / s.tenure;
                     if (baseEmi > 0 && baseEmi < 900) baseEmi = 900; 
 
                     let roiInEmi = finalLoan * roiRate;
-                    emi = baseEmi + (gtl / inst) + roiInEmi;
+                    emi = baseEmi + (insTotal / inst) + roiInEmi;
                     
-                    if (emiCap > 0 && emi > emiCap) {
-                        finalLoan = (emiCap - (gtl / inst)) / ((1 / s.tenure) + roiRate);
+                    if (currentEmiCap > 0 && emi > currentEmiCap) {
+                        finalLoan = (currentEmiCap - (insTotal / inst)) / ((1 / s.tenure) + roiRate);
                         if(finalLoan < 0) finalLoan = 0;
                         if (invoice > 0 && finalLoan > invoice) finalLoan = invoice; 
                         
@@ -819,11 +871,11 @@ function renderDictionaryQueue() {
                         if (baseEmi > 0 && baseEmi < 900) baseEmi = 900;
 
                         roiInEmi = finalLoan * roiRate;
-                        emi = baseEmi + (gtl / inst) + roiInEmi;
+                        emi = baseEmi + (insTotal / inst) + roiInEmi;
                     }
 
                     let roiInDp = finalLoan * roiRateDP;
-                    dp = invoice - finalLoan + (baseEmi * s.advEmi) + dynamicPf + fee + (finalLoan * dbdRate) + roiInDp;
+                    dp = invoice - finalLoan + (baseEmi * s.advEmi) + dynamicPf + totalFees + (finalLoan * dbdRate) + roiInDp;
                     s.currentTenure = s.tenure;
                     s.calcInst = inst;
                 }
@@ -873,17 +925,64 @@ function renderDictionaryQueue() {
             ? `<tr><th style="background:#e3f2fd; padding:10px 4px;">T/A</th><th style="background:#e3f2fd; padding:10px 4px;">LTV%</th><th style="background:#e8f5e9; color:var(--success); padding:10px 4px;">LOAN</th><th style="background:#fff3e0; color:#d35400; padding:10px 4px;">DIFF</th><th style="background:#e8f5e9; color:var(--success); padding:10px 4px;">NET DP</th><th style="background:#e3f2fd; color:var(--primary); padding:10px 4px;">EMI</th><th style="background:#e3f2fd; color:var(--primary); padding:10px 4px;">M</th><th style="padding:10px 4px;">ACT</th></tr>`
             : `<tr><th style="background:#e3f2fd; padding:10px 4px;">T/A</th><th style="background:#e3f2fd; padding:10px 4px;">LTV%</th><th style="background:#e3f2fd; padding:10px 4px;">FIXED EMI</th><th style="background:#e3f2fd; padding:10px 4px;">DBD%</th><th style="background:#e3f2fd; padding:10px 4px;">ROI%</th><th style="background:#e3f2fd; padding:10px 4px;">PF</th></tr>`;
 
+        // Control Grid HTML 
+        let controlGridHtml = `
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
+                <div>
+                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:2px;">EMI CAPPING</label>
+                    <input type="number" value="${inp.cap}" placeholder="MAX" oninput="updateDictVal(${pIdx},'cap',this.value)" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:2px;">TARGET DP</label>
+                    <input type="number" value="${inp.target}" placeholder="0" oninput="updateDictVal(${pIdx},'target',this.value)" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:2px;">GTL</label>
+                    <select onchange="updateDictVal(${pIdx},'gtl',this.value)" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
+                        <option value="0" ${inp.gtl == 0 ? 'selected' : ''}>0</option>
+                        <option value="699" ${inp.gtl == 699 ? 'selected' : ''}>699</option>
+                        <option value="1099" ${inp.gtl == 1099 ? 'selected' : ''}>1099</option>
+                        <option value="1199" ${inp.gtl == 1199 ? 'selected' : ''}>1199</option>
+                        <option value="1499" ${inp.gtl == 1499 ? 'selected' : ''}>1499</option>
+                        <option value="1799" ${inp.gtl == 1799 ? 'selected' : ''}>1799</option>
+                        <option value="2398" ${inp.gtl == 2398 ? 'selected' : ''}>2398</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:2px;">RFC</label>
+                    <select onchange="updateDictVal(${pIdx},'rfc',this.value)" ${isPhoneWebMobile ? '' : 'disabled style="background:#e9ecef; cursor:not-allowed;"'} style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
+                        <option value="0">0</option>
+                        ${isPhoneWebMobile ? `<option value="${rfcSlab}" ${inp.rfc > 0 ? 'selected' : ''}>${rfcSlab}</option>` : ''}
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:2px;">EXW</label>
+                    <input type="number" value="${inp.exw}" placeholder="0" oninput="updateDictVal(${pIdx},'exw',this.value)" ${isPhoneWebMobile ? 'disabled style="background:#e9ecef; cursor:not-allowed;"' : ''} style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:2px;">MARGIN</label>
+                    <input type="number" value="${inp.margin}" placeholder="0" oninput="updateDictVal(${pIdx},'margin',this.value)" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:2px;">DEALER</label>
+                    <input type="number" value="${inp.dealer}" placeholder="0" oninput="updateDictVal(${pIdx},'dealer',this.value)" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
+                </div>
+            </div>
+        `;
+
         return `
         <div id="${cardId}" style="background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
                 <h4 style="margin: 0; color: var(--indigo); font-size: 16px; flex: 1; min-width: 250px;">📱 ${prod.name}</h4>
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <input type="number" placeholder="Enter Invoice" value="${prod.inv}" oninput="updateDictInv(${pIdx}, this.value)" style="padding: 8px; width: 140px; border: 1px solid #0984e3; border-radius: 4px; font-weight: bold; background: #f0f8ff;" />
+                    <input type="number" placeholder="Enter Invoice" value="${prod.inv}" oninput="updateDictVal(${pIdx}, 'inv', this.value)" style="padding: 8px; width: 140px; border: 1px solid #0984e3; border-radius: 4px; font-weight: bold; background: #f0f8ff;" />
                     <button onclick="copyDictImage('${cardId}', this)" style="background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px;">📋 COPY IMAGE</button>
-                    <button onclick="downloadDictImage('${cardId}', '${prod.name.replace(/'/g, "\\'")}')" style="background: var(--success); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px;">⬇️ DOWNLOAD</button>
                     <button onclick="removeDictProduct(${pIdx})" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">✖</button>
                 </div>
             </div>
+            
+            ${controlGridHtml}
+
             <div style="overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13px;">
                     <thead>${theadHtml}</thead>
@@ -919,26 +1018,10 @@ function copyDictImage(cardId, btnElement) {
                     showToast("📋 Image copied to clipboard!", "success");
                 });
             } catch(e) {
-                showToast("⚠️ Copy failed. Try downloading.", "error");
+                showToast("⚠️ Copy failed.", "error");
                 btnElement.innerHTML = originalText;
             }
         }, "image/png");
-    });
-}
-
-function downloadDictImage(cardId, modelName) {
-    let card = document.getElementById(cardId);
-    if(!card) return;
-    
-    html2canvas(card, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
-        let a = document.createElement("a");
-        a.href = canvas.toDataURL("image/png");
-        let safeName = modelName.replace(/[^a-zA-Z0-9]/g, "_");
-        a.download = `Smart_Scheme_${safeName}.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        showToast("✅ Image Downloaded!", "success");
     });
 }
 
