@@ -188,7 +188,7 @@ function generateMessage() {
     const endDate = document.getElementById('msgEndDate').value || '-'; const lang = document.getElementById('msgLang').value;
     let msg = "";
     if (lang === 'mr') {
-        msg = `सस्नेह नमस्कार, ${name}! 🙏\n\nबजाज फायनान्समध्ये आपले स्वागत आहे. आपण खरेदी केलेल्या वस्तूच्या कर्जाची (Loan) सविस्तर माहिती खालीलप्रमाणे आहे:\n\n🏬 दुकानाचे नाव (Dealer/Shop): ${shop}\n📱 वस्तूचा प्रकार (Asset): ${asset}\n📌 मासिक हप्ता (EMI): ₹${emi}/-\n📌 एकूण हप्ते (Months): ${tenure} महिने\n📅 पहिला हप्ता सुरू होण्याची तारीख: ${startDate}\n📅 शेवटचा हप्ता संपण्याची तारीख: ${endDate}\n\n⚠️ बजाज फायनान्सचे नियम व अटी:\n१) आपण घेतलेल्या वस्तूचा हप्ता दर महिन्याच्या २ तारखेला आपण दिलेल्या बँक खात्यातून (Account) कट होतो.\n२) जर कर्ज प्रक्रिया (Finance) महिन्याच्या २३ व्या तारखेपर्यंत पूर्ण झाली असेल, तर पहिला हप्ता पुढील महिन्याच्या २ तारखेला सुरू होतो.\n३) आपण ECS / NACH फॉर्मवर केलेली सही आपल्या बँकेमार्फत तपासली जाते.\n४) जर बँकेला सहीमध्ये काही तफावत (फरक) आढळल्यास, आपल्याला त्याबाबत SMS किंवा Call मार्फत पूर्वकल्पना दिली जाते.\n५) अशा वेळी, आपल्याला बजाज फायनान्सच्या कार्यालयात जाऊन योग्य सहीची पूर्तता करणे आवश्यक असते.\n६) सही न जुळल्यास बँक खात्यातून हप्ता कट होत नाही आणि बँकेच्या नियमानुसार आपल्याला 'बाऊन्स चार्ज' (दंड) आकारला जातो. हे शुल्क थेट बँकेकडे जमा होते, बजाज फायनान्सकडे नाही. या प्रक्रियेत बजाज फायनान्सचे कर्मचारी जबाबदार नसतात, याची कृपया सर्व ग्राहकांनी नोंद घ्यावी.\n७) हप्ता बाऊन्स झाल्यास बजाज फायनान्सकडून ₹५००/- बाऊन्स शुल्क (Penalty) आकारले जाते. तसेच, थकीत हप्ता जमा होईपर्यंत दररोज विलंब शुल्क (Late Fees) वाढत जाते.\n८) आपल्या बँक खात्यामध्ये लागणारी किमान शिल्लक (Minimum Balance) आणि हप्त्याची रक्कम, हप्त्याच्या तारखेच्या किमान २ दिवस आधी जमा ठेवावी.\n९) हप्ता बँक खात्यातून कट झाला की नाही हे पाहण्यासाठी मोबाईलमध्ये 'Bajaj Finserv' ॲप तपासावे. हप्ता जमा झाल्यावर आपल्या बँक खात्यात, बँक ॲपमध्ये किंवा पासबुकवर त्याची त्वरित नोंद होते व बँकेकडून SMS देखील प्राप्त होतो.\n१०) बजाज फायनान्स कार्यालय: आदिनाथ पॅराडाईज, हॉटेल शालिमारजवळ, मजगाव रोड, रत्नागिरी.\n११) महत्त्वाची सेवा माहिती: तुमच्या नोंदणीकृत मोबाईल नंबरवरून 8698010101 या नंबरवर कॉल करून तुम्ही खालील माहिती मिळवू शकता (मानक कॉल शुल्क लागू)\n१२) मुदतीपूर्वी कर्ज बंद (Loan Foreclosure) करायचे असल्यास, पुढील हप्त्याच्या किमान १० दिवस आधी बजाज फायनान्स कार्यालयात किंवा ॲपद्वारे उर्वरित रक्कम भरून कर्ज बंद करता येते.\n\nकाही अडचण असल्यास नक्की संपर्क करा. धन्यवाद! ✨`;
+        msg = `सस्नेह नमस्कार, ${name}! 🙏\n\nबजाज फायनान्समध्ये आपले स्वागत आहे. आपण खरेदी केलेल्या वस्तूच्या कर्जाची (Loan) सविस्तर माहिती खालीलप्रमाणे आहे:\n\n🏬 दुकानाचे नाव (Dealer/Shop): ${shop}\n📱 वस्तूचा प्रकार (Asset): ${asset}\n📌 मासिक हप्ता (EMI): ₹${emi}/-\n📌 एकूण हप्ते (Months): ${tenure} महिने\n📅 पहिला हप्ता सुरू होण्याची तारीख: ${startDate}\n📅 शेवटचा हप्ता संपण्याची तारीख: ${endDate}\n\n⚠️ बजाज फायनान्सचे नियम व अटी:\n१) आपण घेतलेल्या वस्तूचा हप्ता दर महिन्याच्या २ तारखेला आपण दिलेल्या बँक खात्यातून (Account) कट होतो.\n२) जर कर्ज प्रक्रिया (Finance) महिन्याच्या २३ व्या तारखेपर्यंत पूर्ण झाली असेल, तर पहिला हप्ता पुढील महिन्याच्या २ तारखेला सुरू होतो.\n३) आपण ECS / NACH फॉर्मवर केलेली सही आपल्या बँकेमार्फत तपासली जाते.\n४) जर बँकेला सहीमध्ये काही तफावत (फरक) आढळल्यास, आपल्याला त्याबाबत SMS किंवा Call मार्फत पूर्वकल्पना दिली जाते.\n५) अशा वेळी, आपल्याला बजाज फायनान्सच्या कार्यालयात जाऊन योग्य सहीची পূर्तता करणे आवश्यक असते.\n६) सही न जुळल्यास बँक खात्यातून हप्ता कट होत नाही आणि बँकेच्या नियमानुसार आपल्याला 'बाऊन्स चार्ज' (दंड) आकारला जातो. हे शुल्क थेट बँकेकडे जमा होते, बजाज फायनान्सकडे नाही. या प्रक्रियेत बजाज फायनान्सचे कर्मचारी जबाबदार नसतात, याची कृपया सर्व ग्राहकांनी नोंद घ्यावी.\n७) हप्ता बाऊन्स झाल्यास बजाज फायनान्सकडून ₹५००/- बाऊन्स शुल्क (Penalty) आकारले जाते. तसेच, थकीत हप्ता जमा होईपर्यंत दररोज विलंब शुल्क (Late Fees) वाढत जाते.\n८) आपल्या बँक खात्यामध्ये लागणारी किमान शिल्लक (Minimum Balance) आणि हप्त्याची रक्कम, हप्त्याच्या तारखेच्या किमान २ दिवस आधी जमा ठेवावी.\n९) हप्ता बँक खात्यातून कट झाला की नाही हे पाहण्यासाठी मोबाईलमध्ये 'Bajaj Finserv' ॲप तपासावे. हप्ता जमा झाल्यावर आपल्या बँक खात्यात, बँक ॲपमध्ये किंवा पासबुकवर त्याची त्वरित नोंद होते व बँकेकडून SMS देखील प्राप्त होतो.\n१०) बजाज फायनान्स कार्यालय: आदिनाथ पॅराडाईज, हॉटेल शालिमारजवळ, मजगाव रोड, रत्नागिरी.\n११) महत्त्वाची सेवा माहिती: तुमच्या नोंदणीकृत मोबाईल नंबरवरून 8698010101 या नंबरवर कॉल करून तुम्ही खालील माहिती मिळवू शकता (मानक कॉल शुल्क लागू)\n१२) मुदतीपूर्वी कर्ज बंद (Loan Foreclosure) करायचे असल्यास, पुढील हप्त्याच्या किमान १० दिवस आधी बजाज फायनान्स कार्यालयात किंवा ॲपद्वारे उर्वरित रक्कम भरून कर्ज बंद करता येते.\n\nकाही अडचण असल्यास नक्की संपर्क करा. धन्यवाद! ✨`;
     } else if (lang === 'hi') {
         msg = `नमस्ते, ${name}! 🙏\n\nबजाज फाइनेंस में स्वागत है। आपके द्वारा खरीदे गए उत्पाद के लोन (Loan) का विवरण नीचे दिया गया है:\n\n🏬 डीलर / दुकान का नाम (Dealer/Shop): ${shop}\n📱 उत्पाद का प्रकार (Asset): ${asset}\n📌 मासिक किस्त (EMI): ₹${emi}/-\n📌 कुल किस्तें (Months): ${tenure} महीने\n📅 पहली किस्त शुरू होने की तारीख: ${startDate}\n📅 अंतिम किस्त समाप्त होने की तारीख: ${endDate}\n\n⚠️ बजाज फाइनेंस के नियम व शर्तें:\n१) आपके उत्पाद की किस्त हर महीने की 2 तारीख को आपके दिए गए बैंक खाते से कटती है।\n२) यदि लोन प्रक्रिया महीने की 23 तारीख तक पूरी हो जाती है, तो पहली किस्त अगले महीने की 2 तारीख से शुरू होती है।\n३) ECS / NACH फॉर्म पर आपके द्वारा किए गए हस्ताक्षर आपके बैंक द्वारा जांचे जाते हैं।\n४) यदि बैंक को हस्ताक्षर में कोई अंतर मिलता है, तो आपको SMS या Call के माध्यम से सूचित किया जाता है।\n५) ऐसी स्थिति में, आपको बजाज फाइनेंस कार्यालय जाकर सही हस्ताक्षर की प्रक्रिया पूरी करनी होगी।\n६) हस्ताक्षर गलत होने पर बैंक खाते से किस्त नहीं कटती है और बैंक के नियमानुसार बाउंस चार्ज (जुर्माना) लगाया जाता है। यह शुल्क सीधे बैंक के खाते में जाता है, बजाज फाइनेंस के नहीं। इस प्रक्रिया में बजाज फाइनेंस के कर्मचारी जिम्मेदार नहीं होते हैं, कृपया सभी ग्राहक ध्यान दें।\n७) किस्त बाउंस होने पर बजाज फाइनेंस की ओर से ₹500/- बाउंस शुल्क (Penalty) लगाया जाता है। साथ ही, बकाया किस्त जमा होने तक प्रतिदिन विलंब शुल्क (Late Fees) बढ़ता जाता है।\n८) अपने बैंक खाते में आवश्यक न्यूनतम राशि (Minimum Balance) के अलावा किस्त की राशि नियत तारीख से कम से कम 2 दिन पहले जमा रखें।\n९) किस्त कटी या नहीं, जानने के लिए अपने मोबाइल में 'Bajaj Finserv' ऐप चेक करें। किस्त प्राप्त होने पर आपके बैंक खाते या पासबुक में तुरंत दर्ज हो जाती है और बैंक SMS द्वारा भी सूचित करता है।\n१०) बजाज फाइनेंस कार्यालय: आदिनाथ पैराडाइज, होटल शालीमार के पास, मजगांव रोड, रत्नागिरी।\n११) महत्वपूर्ण सेवा जानकारी: अपने पंजीकृत मोबाइल नंबर से 8698010101 पर कॉल करके आप निम्नलिखित जानकारी प्राप्त कर सकते हैं (मानक कॉल शुल्क लागू)\n१२) समय से पहले लोन बंद (Foreclosure) करना चाहते हैं, तो अगली किस्त से कम से कम 10 दिन पहले बजाज फाइनेंस कार्यालय में या ऐप के माध्यम से शेष राशि का भुगतान करके लोन बंद कर सकते हैं।\n\nकिसी भी सहायता के लिए संपर्क करें। धन्यवाद! ✨`;
     } else {
@@ -677,7 +677,7 @@ function selectCategory(catName) {
 }
 
 /* ==============================================================
-   DICTIONARY MULTI-PRODUCT LOGIC (UPDATED WITH CONTROL GRID)
+   DICTIONARY MULTI-PRODUCT LOGIC (UPDATED WITH CONTROL GRID & COLUMN SHIFT)
    ============================================================== */
 function viewGlobalModel(name) {
     let displayTitle = name;
@@ -715,7 +715,7 @@ function viewGlobalModel(name) {
         category: rec.category,
         schemes: schemes,
         inputs: {
-            maxLoan: "", // Default to no manual cap
+            maxLoan: "", 
             cap: zcCap || "",
             target: "",
             gtl: initGtl,
@@ -724,7 +724,7 @@ function viewGlobalModel(name) {
             margin: 0,
             dealer: 0
         },
-        isEditOpen: false // Controls visibility of the control grid
+        isEditOpen: false 
     });
 
     dictManualSchemes = null;
@@ -756,7 +756,7 @@ function updateDictVal(pIdx, field, val) {
         }
     } else {
         if(field === 'maxLoan' && val === "") {
-            prod.inputs[field] = ""; // Allow empty string for no constraint
+            prod.inputs[field] = ""; 
         } else {
             prod.inputs[field] = v;
         }
@@ -783,14 +783,14 @@ function renderDictionaryQueue() {
     
     let custType = zcEligibleActive ? zcType : 'NEW';
     let ltvLimit = zcEligibleActive ? zcLtv : 100;
-    let limit = zcEligibleActive && zcLimit > 0 ? zcLimit : 9999999; // Treat 0 as unlimited for inner logic
+    let limit = zcEligibleActive && zcLimit > 0 ? zcLimit : 9999999; 
     let globalEmiCap = zcEligibleActive ? zcCap : 0;
     let today = new Date(); today.setHours(0,0,0,0);
 
     let html = dictProductsQueue.map((prod, pIdx) => {
         let cardId = `dictCard_${pIdx}`;
         let invoice = parseFloat(prod.inv) || 0;
-        let isCalculatedMode = (invoice > 0); // Always show details if invoice exists
+        let isCalculatedMode = (invoice > 0); 
         let fee = (custType === 'EMI CARD') ? 270 : (custType === 'W/O CARD' ? 320 : 850);
         let isPhoneWebMobile = isMobileDeviceCat(prod.category);
         let rfcSlab = getRfcSlabValue(invoice);
@@ -849,7 +849,6 @@ function renderDictionaryQueue() {
                         finalLoan = Math.max(0, solvedTenure * s.fixedEmi);
                     }
 
-                    // Apply User Max Loan & Invoice Cap
                     let capLimit = Math.min(invoice > 0 ? invoice : 9999999, absoluteMaxLoan);
                     if (finalLoan > capLimit) {
                         finalLoan = Math.floor(capLimit / s.fixedEmi) * s.fixedEmi;
@@ -920,13 +919,13 @@ function renderDictionaryQueue() {
             let displayTenure = s.currentTenure ? s.currentTenure : s.tenure;
             if (isCalculatedMode) {
                 return `<tr>
-                    <td style="font-weight:900; color:var(--indigo); padding:10px 4px; border-bottom:1px solid #eee;">${displayTenure}/${s.advEmi}</td>
                     <td style="font-weight:bold; color:var(--bajaj-blue); padding:10px 4px; border-bottom:1px solid #eee;">${Math.round(s.calcLTV)}%</td>
                     <td style="background:#f4fcf6; color:var(--success); font-weight:900; padding:10px 4px; border-bottom:1px solid #eee;">₹${Math.floor(s.calcLoan).toLocaleString()}</td>
                     <td style="background:#fff3e0; color:#d35400; font-weight:900; padding:10px 4px; border-bottom:1px solid #eee;">₹${Math.floor(s.calcDiff).toLocaleString()}</td>
                     <td style="background:#f4fcf6; color:var(--success); font-weight:900; padding:10px 4px; border-bottom:1px solid #eee;">₹${Math.round(s.calcDp).toLocaleString()}</td>
                     <td style="background:#eef6ff; color:var(--primary); font-weight:900; padding:10px 4px; border-bottom:1px solid #eee;">₹${Math.round(s.calcEmi).toLocaleString()}</td>
                     <td style="font-weight:900; color:var(--primary); background:#eef6ff; padding:10px 4px; border-bottom:1px solid #eee;">${s.calcInst}</td>
+                    <td style="font-weight:900; color:var(--indigo); padding:10px 4px; border-bottom:1px solid #eee;">${displayTenure}/${s.advEmi}</td>
                     <td style="padding:10px 4px; border-bottom:1px solid #eee;"><button style="padding:4px 6px; font-size:10px; background:var(--primary); color:white; border:none; border-radius:3px; cursor:pointer;" onclick="copySingleScheme('${displayTenure}', '${s.advEmi}', '${s.calcLoan}', '${s.calcDp}', '${s.calcEmi}', '${s.fixedEmi}', '${s.dbd}', '${s.roi}', '${s.displayPf}', this)">COPY</button></td>
                 </tr>`;
             } else {
@@ -934,19 +933,20 @@ function renderDictionaryQueue() {
                 let dbdStr = invoice > 0 ? `${+parseFloat(s.dbd).toFixed(3)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(dbdAmtPreview).toLocaleString()}</span>` : `${+parseFloat(s.dbd).toFixed(3)}%`;
 
                 return `<tr>
-                    <td style="font-weight:900; color:var(--indigo); padding:10px 4px; border-bottom:1px solid #eee;">${displayTenure}/${s.advEmi}</td>
                     <td style="font-weight:bold; color:var(--bajaj-blue); padding:10px 4px; border-bottom:1px solid #eee;">${Math.round(s.calcLTV)}%</td>
                     <td style="font-weight:900; color:var(--primary); padding:10px 4px; border-bottom:1px solid #eee;">${s.fixedEmi > 0 ? '₹'+s.fixedEmi : 'N/A'}</td>
                     <td style="padding:10px 4px; border-bottom:1px solid #eee;">${dbdStr}</td>
                     <td style="padding:10px 4px; border-bottom:1px solid #eee;">${+parseFloat(s.roi).toFixed(2)}%</td>
                     <td style="font-weight:900; padding:10px 4px; border-bottom:1px solid #eee;">₹${s.displayPf}</td>
+                    <td style="font-weight:900; color:var(--indigo); padding:10px 4px; border-bottom:1px solid #eee;">${displayTenure}/${s.advEmi}</td>
                 </tr>`;
             }
         }).join('');
 
+        // T/A shifted to the right side of M column
         let theadHtml = isCalculatedMode 
-            ? `<tr><th style="background:#e3f2fd; padding:10px 4px;">T/A</th><th style="background:#e3f2fd; padding:10px 4px;">LTV%</th><th style="background:#e8f5e9; color:var(--success); padding:10px 4px;">LOAN</th><th style="background:#fff3e0; color:#d35400; padding:10px 4px;">DIFF</th><th style="background:#e8f5e9; color:var(--success); padding:10px 4px;">NET DP</th><th style="background:#e3f2fd; color:var(--primary); padding:10px 4px;">EMI</th><th style="background:#e3f2fd; color:var(--primary); padding:10px 4px;">M</th><th style="padding:10px 4px;">ACT</th></tr>`
-            : `<tr><th style="background:#e3f2fd; padding:10px 4px;">T/A</th><th style="background:#e3f2fd; padding:10px 4px;">LTV%</th><th style="background:#e3f2fd; padding:10px 4px;">FIXED EMI</th><th style="background:#e3f2fd; padding:10px 4px;">DBD%</th><th style="background:#e3f2fd; padding:10px 4px;">ROI%</th><th style="background:#e3f2fd; padding:10px 4px;">PF</th></tr>`;
+            ? `<tr><th style="background:#e3f2fd; padding:10px 4px;">LTV%</th><th style="background:#e8f5e9; color:var(--success); padding:10px 4px;">LOAN</th><th style="background:#fff3e0; color:#d35400; padding:10px 4px;">DIFF</th><th style="background:#e8f5e9; color:var(--success); padding:10px 4px;">NET DP</th><th style="background:#e3f2fd; color:var(--primary); padding:10px 4px;">EMI</th><th style="background:#e3f2fd; color:var(--primary); padding:10px 4px;">M</th><th style="background:#e3f2fd; padding:10px 4px;">T/A</th><th style="padding:10px 4px;">ACT</th></tr>`
+            : `<tr><th style="background:#e3f2fd; padding:10px 4px;">LTV%</th><th style="background:#e3f2fd; padding:10px 4px;">FIXED EMI</th><th style="background:#e3f2fd; padding:10px 4px;">DBD%</th><th style="background:#e3f2fd; padding:10px 4px;">ROI%</th><th style="background:#e3f2fd; padding:10px 4px;">PF</th><th style="background:#e3f2fd; padding:10px 4px;">T/A</th></tr>`;
 
         // Toggleable Control Grid HTML 
         let controlGridHtml = prod.isEditOpen ? `
@@ -998,12 +998,23 @@ function renderDictionaryQueue() {
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
                 <h4 style="margin: 0; color: var(--indigo); font-size: 16px; flex: 1; min-width: 250px;">📱 ${prod.name}</h4>
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <input type="number" placeholder="Invoice Amt" value="${prod.inv}" onchange="updateDictVal(${pIdx}, 'inv', this.value)" style="padding: 8px; width: 110px; border: 1px solid #0984e3; border-radius: 4px; font-weight: bold; background: #f0f8ff;" title="Invoice Amount" />
-                    <input type="number" placeholder="Max Loan" value="${inp.maxLoan || ''}" onchange="updateDictVal(${pIdx}, 'maxLoan', this.value)" style="padding: 8px; width: 100px; border: 1px solid #d35400; border-radius: 4px; font-weight: bold; background: #fff3e0;" title="Maximum Loan Amount" />
                     
-                    <button onclick="copyDictImage('${cardId}', this)" style="background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px;">📋 COPY IMAGE</button>
-                    <button onclick="toggleDictEdit(${pIdx})" style="background: var(--warning); color: black; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px;">✏️ EDIT</button>
-                    <button onclick="removeDictProduct(${pIdx})" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">✖</button>
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <label style="font-size: 9px; font-weight: 900; color: var(--indigo);">INVOICE AMOUNT</label>
+                        <input type="number" placeholder="E.g. 50000" value="${prod.inv}" onchange="updateDictVal(${pIdx}, 'inv', this.value)" style="padding: 8px; width: 110px; border: 1px solid #0984e3; border-radius: 4px; font-weight: bold; background: #f0f8ff;" />
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <label style="font-size: 9px; font-weight: 900; color: #d35400;">MAX LOAN AMOUNT</label>
+                        <input type="number" placeholder="Limit Loan" value="${inp.maxLoan || ''}" onchange="updateDictVal(${pIdx}, 'maxLoan', this.value)" style="padding: 8px; width: 110px; border: 1px solid #d35400; border-radius: 4px; font-weight: bold; background: #fff3e0;" />
+                    </div>
+                    
+                    <div style="display: flex; align-items: flex-end; padding-bottom: 2px; gap: 6px;">
+                        <button onclick="copyDictImage(${pIdx}, this)" style="background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px;">📋 COPY IMAGE</button>
+                        <button onclick="toggleDictEdit(${pIdx})" style="background: var(--warning); color: black; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px;">✏️ EDIT</button>
+                        <button onclick="removeDictProduct(${pIdx})" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">✖</button>
+                    </div>
+
                 </div>
             </div>
             
@@ -1027,14 +1038,94 @@ function renderDictionaryQueue() {
     container.innerHTML = html + addMoreHtml;
 }
 
-// --- IMAGE EXPORT FUNCTIONS FOR DICTIONARY ---
-function copyDictImage(cardId, btnElement) {
-    let card = document.getElementById(cardId);
-    if(!card) return;
+// --- CUSTOM 5-COLUMN IMAGE EXPORT FUNCTIONS FOR DICTIONARY ---
+function copyDictImage(pIdx, btnElement) {
+    let prod = dictProductsQueue[pIdx];
+    if(!prod) return;
+    
+    if (!prod.inv || parseFloat(prod.inv) === 0) {
+        showToast("⚠️ कृपया Image Copy करण्यासाठी Invoice Amount टाका!", "error");
+        return;
+    }
+
     let originalText = btnElement.innerHTML;
     btnElement.innerHTML = "⏳ COPYING...";
     
-    html2canvas(card, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
+    let quoteDiv = document.createElement('div');
+    quoteDiv.style.width = "650px";
+    quoteDiv.style.padding = "15px";
+    quoteDiv.style.background = "#ffffff";
+    quoteDiv.style.position = "absolute";
+    quoteDiv.style.top = "-9999px";
+    quoteDiv.style.boxSizing = "border-box";
+    quoteDiv.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+
+    let limit = zcEligibleActive && zcLimit > 0 ? zcLimit : 9999999;
+    let ltvLimit = zcEligibleActive ? zcLtv : 100;
+    let today = new Date(); today.setHours(0,0,0,0);
+    
+    let finalSchemes = prod.schemes.filter(s => {
+        let isExpired = false;
+        if(s.expiryDateStr) {
+            let p = s.expiryDateStr.trim().split('/');
+            if(p.length === 3) {
+                let expD = new Date(p[2], p[1]-1, p[0]);
+                if(expD < today) isExpired = true;
+            }
+        }
+        let curLTV = s.calcLTV || 0;
+        let isLtvB = curLTV > ltvLimit;
+        return !isExpired && !isLtvB && !s.isInvalidLoan && (s.fixedEmi > 0 || curLTV <= ltvLimit);
+    });
+    
+    finalSchemes.sort((a,b) => (a.calcDp || 0) - (b.calcDp || 0));
+
+    if (finalSchemes.length === 0) {
+        showToast("⚠️ No eligible schemes to copy!", "error");
+        btnElement.innerHTML = originalText;
+        return;
+    }
+
+    let trs = finalSchemes.map((s, i) => {
+        let bgCol = i % 2 === 0 ? '#ffffff' : '#f8fafc';
+        let displayTenure = s.currentTenure ? s.currentTenure : s.tenure;
+        let daily = s.calcEmi ? Math.round(s.calcEmi / 30) : 0;
+        return `
+        <tr style="background: ${bgCol}; border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 14px 10px; font-size: 20px; font-weight: 900; color: #059669;">₹${Math.round(s.calcDp||0).toLocaleString()}</td>
+            <td style="padding: 14px 10px; font-size: 20px; font-weight: 900; color: #095797;">₹${Math.round(s.calcEmi||0).toLocaleString()}</td>
+            <td style="padding: 14px 10px; font-size: 20px; font-weight: 900; color: #1e293b;">${s.calcInst||0}</td>
+            <td style="padding: 14px 10px; font-size: 20px; font-weight: 900; color: #0f172a;">${displayTenure}/${s.advEmi}</td>
+            <td style="padding: 14px 10px; font-size: 20px; font-weight: 900; color: #ea580c;">₹${daily.toLocaleString()}</td>
+        </tr>`;
+    }).join('');
+
+    let html = `
+    <div style="border: 2px solid #034887; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <div style="background: #034887; color: white; padding: 16px; text-align: center;">
+            <h2 style="margin: 0; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">📱 ${prod.name}</h2>
+            <div style="margin-top: 6px; font-size: 16px; font-weight: bold; opacity: 0.9;">INVOICE AMOUNT: ₹${(parseFloat(prod.inv)||0).toLocaleString()}</div>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; text-align: center;">
+            <thead style="background: #f1f5f9; color: #334155; border-bottom: 2px solid #cbd5e1;">
+                <tr>
+                    <th style="padding: 14px 10px; font-size: 16px; font-weight: 900;">NET DP</th>
+                    <th style="padding: 14px 10px; font-size: 16px; font-weight: 900;">EMI</th>
+                    <th style="padding: 14px 10px; font-size: 16px; font-weight: 900;">M</th>
+                    <th style="padding: 14px 10px; font-size: 16px; font-weight: 900;">T/A</th>
+                    <th style="padding: 14px 10px; font-size: 16px; font-weight: 900;">DAILY</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${trs}
+            </tbody>
+        </table>
+    </div>`;
+    
+    quoteDiv.innerHTML = html;
+    document.body.appendChild(quoteDiv);
+
+    html2canvas(quoteDiv, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
         canvas.toBlob(blob => {
             try {
                 navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]).then(() => {
@@ -1047,6 +1138,7 @@ function copyDictImage(cardId, btnElement) {
                 showToast("⚠️ Auto-copy blocked. Please retry.", "error");
                 btnElement.innerHTML = originalText;
             }
+            document.body.removeChild(quoteDiv);
         }, "image/png");
     });
 }
@@ -1127,10 +1219,10 @@ function renderMatrix() {
                             <th class="hidden-col" onclick="sortM(${pIdx},'extra')">EXTRA ↕</th>
                             ${isNT ? `<th style="padding:4px 1px;" onclick="sortM(${pIdx},'minLoan')">MIN ↕</th><th style="padding:4px 1px;" onclick="sortM(${pIdx},'maxLoan')">MAX ↕</th>` : `<th style="padding:4px 1px;" onclick="sortM(${pIdx},'nbfcMaxL')">LMT ↕</th>`}
                             <th style="padding:4px 1px;" onclick="sortM(${pIdx},'loan')">LOAN ↕</th>
-                            <th style="padding:4px 1px;" onclick="sortM(${pIdx},'currentTenure')">T/A ↕</th>
                             <th style="padding:4px 1px;" onclick="sortM(${pIdx},'dp')">NET DP ↕</th>
                             <th style="padding:4px 1px;" onclick="sortM(${pIdx},'emi')">EMI ↕</th>
                             <th style="padding:4px 1px;" onclick="sortM(${pIdx},'inst')">M ↕</th>
+                            <th style="padding:4px 1px;" onclick="sortM(${pIdx},'currentTenure')">T/A ↕</th>
                             <th style="padding:4px 1px;" onclick="sortM(${pIdx},'daily')">DAILY ↕</th>
                             <th style="padding:4px 1px;">ACT</th>
                         </tr>
@@ -1281,10 +1373,10 @@ function renderRows(pIdx) {
                 </div>
             </td>
 
-            <td id="ta_${pIdx}_${d.dIdx}" style="padding:4px 1px; font-weight:900; font-size:11px; white-space:nowrap;">${d.currentTenure}/${d.advEmi}${expInfo}${expiredWarning}</td>
             <td id="dp_${pIdx}_${d.dIdx}" style="padding:4px 1px; color:var(--success); font-weight:950; font-size:11px; white-space:nowrap;">₹${Math.round(d.dp).toLocaleString()}</td>
             <td id="emi_${pIdx}_${d.dIdx}" style="padding:4px 1px; color:var(--primary); font-weight:950; font-size:11px; white-space:nowrap;">₹${Math.round(d.emi).toLocaleString()}</td>
             <td id="inst_${pIdx}_${d.dIdx}" style="padding:4px 1px; font-weight:900; font-size:11px; white-space:nowrap;">${d.inst}</td>
+            <td id="ta_${pIdx}_${d.dIdx}" style="padding:4px 1px; font-weight:900; font-size:11px; color:var(--indigo); white-space:nowrap;">${d.currentTenure}/${d.advEmi}${expInfo}${expiredWarning}</td>
             <td id="day_${pIdx}_${d.dIdx}" style="padding:4px 1px; color:var(--success); font-weight:950; font-size:11px; white-space:nowrap;">₹${Math.round(d.daily).toLocaleString()}</td>
             <td style="padding:4px 1px; text-align: center; white-space:nowrap;">${actionMenuBtnHtml}</td>
         </tr>`;
@@ -1987,20 +2079,14 @@ function proceedToTargetModal() {
     }
 }
 
-// १. Invoice रक्कम टाकल्यावर लोन आणि GTL/RFC ऑटो-अपडेट
 function fcInvChanged() {
     let inv = parseFloat(document.getElementById('fcInv').value) || 0;
     document.getElementById('fcLoanInput').value = inv; 
-    
-    // GTL नियम
     let gtl = inv > 100000 ? 2398 : (inv > 50000 ? 1799 : (inv > 30000 ? 1499 : (inv > 10000 ? 1199 : (inv > 0 ? 699 : 0))));
     document.getElementById('fcGtl').value = gtl;
-    
-    // RFC नियम लागू करा
     fcCatChanged();
 }
 
-// २. कॅटेगरी बदलल्यावर RFC चा नियम लागू करणे
 function fcCatChanged() {
     let inv = parseFloat(document.getElementById('fcInv').value) || 0;
     let cat = document.getElementById('fcCat').value;
@@ -2027,7 +2113,6 @@ function fcCatChanged() {
     calculateFastData();
 }
 
-// ३. मॅन्युअल लोन ऍडजस्ट करताना 50% आणि 100% चा नियम
 function validateFastLoanMin() {
     let inv = parseFloat(document.getElementById('fcInv').value) || 0;
     let loan = parseFloat(document.getElementById('fcLoanInput').value) || 0;
@@ -2043,7 +2128,6 @@ function validateFastLoanMin() {
     calculateFastData();
 }
 
-// ४. फॉर्म रिसेट आणि थेट Eligibility विंडो उघडणे
 function resetFastCalc() {
     document.getElementById('fcInv').value = '';
     document.getElementById('fcLoanInput').value = '';
@@ -2064,7 +2148,7 @@ function resetFastCalc() {
     
     openEligibility('ZATPAT');
 }
-// रिअल-टाइम फायनल कॅल्क्युलेशन आणि LTV Rule
+
 function calculateFastData() {
     let inv = parseFloat(document.getElementById('fcInv').value) || 0;
     let loan = parseFloat(document.getElementById('fcLoanInput').value) || 0;
@@ -2103,7 +2187,6 @@ function calculateFastData() {
         actualTenure = Math.floor(loan / fixedEmi) || 1;
     }
 
-    // ⚡ LTV RULE CHECK ⚡
     let curLTV = actualTenure > 0 ? ((actualTenure - adv) / actualTenure) * 100 : 0;
     
     if (curLTV > ltvLimit) {
@@ -2115,7 +2198,6 @@ function calculateFastData() {
         return;
     }
 
-    // Passed LTV Rule -> Show Calculation
     successBox.style.display = 'block';
     errorBox.style.display = 'none';
     resBox.style.borderColor = 'var(--primary)';
@@ -2168,7 +2250,6 @@ function calculateFastData() {
     
     let daily = emi / 30;
 
-    // Displaying Real-time Output in UI
     document.getElementById('fcResInv').innerText = "₹" + inv.toLocaleString();
     document.getElementById('fcResLoan').innerText = "₹" + Math.floor(loan).toLocaleString();
     document.getElementById('fcResTa').innerText = `${actualTenure}/${adv}`;
@@ -2178,7 +2259,7 @@ function calculateFastData() {
 
     resBox.style.display = 'block';
 }
-// ६. कॉपी बटणाचे फंक्शन (नवीन फॉरमॅटनुसार)
+
 function copyFastCalcResult(btn) {
     let type = zcEligibleActive ? zcType : 'NEW';
     let limit = zcEligibleActive && zcLimit > 0 ? zcLimit.toLocaleString() : '0';
