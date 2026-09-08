@@ -715,6 +715,7 @@ function viewGlobalModel(name) {
         category: rec.category,
         schemes: schemes,
         inputs: {
+            maxLoan: "", // Default to no manual cap
             cap: zcCap || "",
             target: "",
             gtl: initGtl,
@@ -722,7 +723,8 @@ function viewGlobalModel(name) {
             exw: 0,
             margin: 0,
             dealer: 0
-        }
+        },
+        isEditOpen: false // Controls visibility of the control grid
     });
 
     dictManualSchemes = null;
@@ -730,6 +732,13 @@ function viewGlobalModel(name) {
     dictCategory = "";
 
     renderDictionaryQueue();
+}
+
+function toggleDictEdit(pIdx) {
+    if(dictProductsQueue[pIdx]) {
+        dictProductsQueue[pIdx].isEditOpen = !dictProductsQueue[pIdx].isEditOpen;
+        renderDictionaryQueue();
+    }
 }
 
 function updateDictVal(pIdx, field, val) {
@@ -746,7 +755,11 @@ function updateDictVal(pIdx, field, val) {
             prod.inputs.rfc = 0;
         }
     } else {
-        prod.inputs[field] = v;
+        if(field === 'maxLoan' && val === "") {
+            prod.inputs[field] = ""; // Allow empty string for no constraint
+        } else {
+            prod.inputs[field] = v;
+        }
     }
     renderDictionaryQueue(); 
 }
@@ -770,24 +783,26 @@ function renderDictionaryQueue() {
     
     let custType = zcEligibleActive ? zcType : 'NEW';
     let ltvLimit = zcEligibleActive ? zcLtv : 100;
-    let limit = zcEligibleActive ? zcLimit : 0;
+    let limit = zcEligibleActive && zcLimit > 0 ? zcLimit : 9999999; // Treat 0 as unlimited for inner logic
     let globalEmiCap = zcEligibleActive ? zcCap : 0;
     let today = new Date(); today.setHours(0,0,0,0);
 
     let html = dictProductsQueue.map((prod, pIdx) => {
         let cardId = `dictCard_${pIdx}`;
         let invoice = parseFloat(prod.inv) || 0;
-        let isCalculatedMode = (limit > 0 && invoice > 0);
+        let isCalculatedMode = (invoice > 0); // Always show details if invoice exists
         let fee = (custType === 'EMI CARD') ? 270 : (custType === 'W/O CARD' ? 320 : 850);
         let isPhoneWebMobile = isMobileDeviceCat(prod.category);
         let rfcSlab = getRfcSlabValue(invoice);
 
-        // Calculate based on inputs array
         let inp = prod.inputs;
         let totalFees = fee + (parseFloat(inp.margin)||0) + (parseFloat(inp.dealer)||0);
         let currentEmiCap = parseFloat(inp.cap) > 0 ? parseFloat(inp.cap) : globalEmiCap;
         let targetDp = parseFloat(inp.target) || 0;
         let insTotal = (parseFloat(inp.gtl)||0) + (parseFloat(inp.rfc)||0) + (parseFloat(inp.exw)||0);
+        
+        let userMaxLoan = parseFloat(inp.maxLoan);
+        let absoluteMaxLoan = (userMaxLoan > 0) ? userMaxLoan : 9999999;
 
         let validSchemes = prod.schemes.filter(s => {
             if(!s.expiryDateStr) return true;
@@ -834,7 +849,12 @@ function renderDictionaryQueue() {
                         finalLoan = Math.max(0, solvedTenure * s.fixedEmi);
                     }
 
-                    if (finalLoan > invoice) finalLoan = Math.floor(invoice/s.fixedEmi)*s.fixedEmi;
+                    // Apply User Max Loan & Invoice Cap
+                    let capLimit = Math.min(invoice > 0 ? invoice : 9999999, absoluteMaxLoan);
+                    if (finalLoan > capLimit) {
+                        finalLoan = Math.floor(capLimit / s.fixedEmi) * s.fixedEmi;
+                    }
+                    
                     currentTenure = Math.floor(finalLoan / s.fixedEmi) || 1;
                     inst = currentTenure - s.advEmi;
                     if(inst < 1) inst = 1;
@@ -846,7 +866,7 @@ function renderDictionaryQueue() {
                     s.currentTenure = currentTenure;
                     s.calcInst = inst;
                 } else {
-                    finalLoan = Math.min(nbfcMax, invoice);
+                    finalLoan = Math.min(nbfcMax, invoice > 0 ? invoice : 9999999);
 
                     if (targetDp > 0) {
                         let advRate = s.advEmi / s.tenure;
@@ -855,6 +875,8 @@ function renderDictionaryQueue() {
                         let solvedLoan = numerator / denominator;
                         finalLoan = Math.min(finalLoan, Math.max(0, Math.floor(solvedLoan)));
                     }
+
+                    finalLoan = Math.min(finalLoan, absoluteMaxLoan);
 
                     let baseEmi = finalLoan / s.tenure;
                     if (baseEmi > 0 && baseEmi < 900) baseEmi = 900; 
@@ -866,6 +888,7 @@ function renderDictionaryQueue() {
                         finalLoan = (currentEmiCap - (insTotal / inst)) / ((1 / s.tenure) + roiRate);
                         if(finalLoan < 0) finalLoan = 0;
                         if (invoice > 0 && finalLoan > invoice) finalLoan = invoice; 
+                        finalLoan = Math.min(finalLoan, absoluteMaxLoan);
                         
                         baseEmi = finalLoan / s.tenure;
                         if (baseEmi > 0 && baseEmi < 900) baseEmi = 900;
@@ -925,16 +948,16 @@ function renderDictionaryQueue() {
             ? `<tr><th style="background:#e3f2fd; padding:10px 4px;">T/A</th><th style="background:#e3f2fd; padding:10px 4px;">LTV%</th><th style="background:#e8f5e9; color:var(--success); padding:10px 4px;">LOAN</th><th style="background:#fff3e0; color:#d35400; padding:10px 4px;">DIFF</th><th style="background:#e8f5e9; color:var(--success); padding:10px 4px;">NET DP</th><th style="background:#e3f2fd; color:var(--primary); padding:10px 4px;">EMI</th><th style="background:#e3f2fd; color:var(--primary); padding:10px 4px;">M</th><th style="padding:10px 4px;">ACT</th></tr>`
             : `<tr><th style="background:#e3f2fd; padding:10px 4px;">T/A</th><th style="background:#e3f2fd; padding:10px 4px;">LTV%</th><th style="background:#e3f2fd; padding:10px 4px;">FIXED EMI</th><th style="background:#e3f2fd; padding:10px 4px;">DBD%</th><th style="background:#e3f2fd; padding:10px 4px;">ROI%</th><th style="background:#e3f2fd; padding:10px 4px;">PF</th></tr>`;
 
-        // Control Grid HTML 
-        let controlGridHtml = `
+        // Toggleable Control Grid HTML 
+        let controlGridHtml = prod.isEditOpen ? `
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
                 <div>
                     <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:2px;">EMI CAPPING</label>
-                    <input type="number" value="${inp.cap}" placeholder="MAX" oninput="updateDictVal(${pIdx},'cap',this.value)" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
+                    <input type="number" value="${inp.cap}" placeholder="MAX" onchange="updateDictVal(${pIdx},'cap',this.value)" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
                 </div>
                 <div>
                     <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:2px;">TARGET DP</label>
-                    <input type="number" value="${inp.target}" placeholder="0" oninput="updateDictVal(${pIdx},'target',this.value)" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
+                    <input type="number" value="${inp.target}" placeholder="0" onchange="updateDictVal(${pIdx},'target',this.value)" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
                 </div>
                 <div>
                     <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:2px;">GTL</label>
@@ -957,26 +980,29 @@ function renderDictionaryQueue() {
                 </div>
                 <div>
                     <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:2px;">EXW</label>
-                    <input type="number" value="${inp.exw}" placeholder="0" oninput="updateDictVal(${pIdx},'exw',this.value)" ${isPhoneWebMobile ? 'disabled style="background:#e9ecef; cursor:not-allowed;"' : ''} style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
+                    <input type="number" value="${inp.exw}" placeholder="0" onchange="updateDictVal(${pIdx},'exw',this.value)" ${isPhoneWebMobile ? 'disabled style="background:#e9ecef; cursor:not-allowed;"' : ''} style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
                 </div>
                 <div>
                     <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:2px;">MARGIN</label>
-                    <input type="number" value="${inp.margin}" placeholder="0" oninput="updateDictVal(${pIdx},'margin',this.value)" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
+                    <input type="number" value="${inp.margin}" placeholder="0" onchange="updateDictVal(${pIdx},'margin',this.value)" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
                 </div>
                 <div>
                     <label style="font-size:10px; font-weight:bold; color:var(--indigo); display:block; margin-bottom:2px;">DEALER</label>
-                    <input type="number" value="${inp.dealer}" placeholder="0" oninput="updateDictVal(${pIdx},'dealer',this.value)" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
+                    <input type="number" value="${inp.dealer}" placeholder="0" onchange="updateDictVal(${pIdx},'dealer',this.value)" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; font-size:12px; box-sizing:border-box;">
                 </div>
             </div>
-        `;
+        ` : '';
 
         return `
         <div id="${cardId}" style="background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
                 <h4 style="margin: 0; color: var(--indigo); font-size: 16px; flex: 1; min-width: 250px;">📱 ${prod.name}</h4>
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <input type="number" placeholder="Enter Invoice" value="${prod.inv}" oninput="updateDictVal(${pIdx}, 'inv', this.value)" style="padding: 8px; width: 140px; border: 1px solid #0984e3; border-radius: 4px; font-weight: bold; background: #f0f8ff;" />
+                    <input type="number" placeholder="Invoice Amt" value="${prod.inv}" onchange="updateDictVal(${pIdx}, 'inv', this.value)" style="padding: 8px; width: 110px; border: 1px solid #0984e3; border-radius: 4px; font-weight: bold; background: #f0f8ff;" title="Invoice Amount" />
+                    <input type="number" placeholder="Max Loan" value="${inp.maxLoan || ''}" onchange="updateDictVal(${pIdx}, 'maxLoan', this.value)" style="padding: 8px; width: 100px; border: 1px solid #d35400; border-radius: 4px; font-weight: bold; background: #fff3e0;" title="Maximum Loan Amount" />
+                    
                     <button onclick="copyDictImage('${cardId}', this)" style="background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px;">📋 COPY IMAGE</button>
+                    <button onclick="toggleDictEdit(${pIdx})" style="background: var(--warning); color: black; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px;">✏️ EDIT</button>
                     <button onclick="removeDictProduct(${pIdx})" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">✖</button>
                 </div>
             </div>
@@ -1018,7 +1044,7 @@ function copyDictImage(cardId, btnElement) {
                     showToast("📋 Image copied to clipboard!", "success");
                 });
             } catch(e) {
-                showToast("⚠️ Copy failed.", "error");
+                showToast("⚠️ Auto-copy blocked. Please retry.", "error");
                 btnElement.innerHTML = originalText;
             }
         }, "image/png");
@@ -1071,21 +1097,21 @@ function renderMatrix() {
                 <div style="display:flex; align-items:center; gap: 8px; flex-wrap:wrap;">
                     <span style="text-transform:uppercase; display:flex; align-items:center;"><span id="togIcon_${pIdx}" onclick="toggleModelView(${pIdx})" style="cursor:pointer; color:var(--primary); padding-right:6px; user-select:none;">${toggleIcon}</span>${prod.name}</span>
                     <div style="display:flex; gap:4px; align-items:center; background:#e3f2fd; padding:4px 8px; border-radius:4px; border:1px solid #0984e3;">
-                        <label style="margin:0; color:var(--primary);">MRP:</label> <input type="number" id="mrp_${pIdx}" value="${prod.inputs.mrp}" style="width:60px; padding:4px;" oninput="updateVal(${pIdx},'mrp',this.value)">
-                        <label style="margin:0; color:var(--primary);">INV:</label> <input type="number" id="inv_${pIdx}" value="${prod.inputs.inv}" style="width:60px; padding:4px;" oninput="updateVal(${pIdx},'inv',this.value)">
+                        <label style="margin:0; color:var(--primary);">MRP:</label> <input type="number" id="mrp_${pIdx}" value="${prod.inputs.mrp}" style="width:60px; padding:4px;" onchange="updateVal(${pIdx},'mrp',this.value)">
+                        <label style="margin:0; color:var(--primary);">INV:</label> <input type="number" id="inv_${pIdx}" value="${prod.inputs.inv}" style="width:60px; padding:4px;" onchange="updateVal(${pIdx},'inv',this.value)">
                         <label style="margin:0; color:var(--primary);">VAR:</label> <input type="number" id="surch_${pIdx}" value="${prod.inputs.surch}" style="width:60px; padding:4px; background:#e8e8e8; border:1px dashed #aaa; color:var(--danger); cursor:not-allowed;" readonly>
                     </div>
                 </div>
                 <div style="display:flex; gap:6px;"><button onclick="instantSingleQuote(${pIdx})" style="background:var(--bajaj-blue); color:white; box-shadow:0 1px 3px rgba(0,0,0,0.2);">🖼️ QUOTE</button><button onclick="document.getElementById('tw_${pIdx}').classList.toggle('show-details-mode')" style="background:var(--warning); color:#000;">👁️ DETAILS</button><button onclick="openSchemeOnlyModal(${pIdx})" style="background:var(--success); color:white;">+ MANUAL</button><button onclick="current_products.splice(${pIdx},1);saveQueueToLocal();renderMatrix();" style="background:var(--danger); color:white;">REMOVE</button></div>
             </div>
             <div class="control-grid" id="cg_${pIdx}" style="display:${gridStyle};">
-                <div><label>EMI CAPPING</label><input type="number" id="capInp_${pIdx}" value="${prod.inputs.cap}" placeholder="MAX" oninput="updateVal(${pIdx},'cap',this.value)"></div>
-                <div><label>TARGET DP</label><input type="number" value="${prod.inputs.target}" placeholder="0" oninput="updateVal(${pIdx},'target',this.value)"></div>
+                <div><label>EMI CAPPING</label><input type="number" id="capInp_${pIdx}" value="${prod.inputs.cap}" placeholder="MAX" onchange="updateVal(${pIdx},'cap',this.value)"></div>
+                <div><label>TARGET DP</label><input type="number" value="${prod.inputs.target}" placeholder="0" onchange="updateVal(${pIdx},'target',this.value)"></div>
                 <div><label>GTL</label><select id="gtl_${pIdx}" onchange="updateVal(${pIdx},'gtl',this.value)"><option value="0" ${prod.inputs.gtl == 0 ? 'selected' : ''}>0</option><option value="699" ${prod.inputs.gtl == 699 ? 'selected' : ''}>699</option><option value="1099" ${prod.inputs.gtl == 1099 ? 'selected' : ''}>1099</option><option value="1199" ${prod.inputs.gtl == 1199 ? 'selected' : ''}>1199</option><option value="1499" ${prod.inputs.gtl == 1499 ? 'selected' : ''}>1499</option><option value="1799" ${prod.inputs.gtl == 1799 ? 'selected' : ''}>1799</option><option value="2398" ${prod.inputs.gtl == 2398 ? 'selected' : ''}>2398</option></select></div>
                 <div><label>RFC</label><select id="rfc_${pIdx}" onchange="updateVal(${pIdx},'rfc',this.value)" ${isPhoneWebMobile ? '' : 'disabled style="background:#e9ecef; cursor:not-allowed;"'}><option value="0">0</option>${isPhoneWebMobile ? `<option id="rfc_opt_${pIdx}" value="${rfcSlab}" ${prod.inputs.rfc > 0 ? 'selected' : ''}>${rfcSlab}</option>` : ''}</select></div>
-                <div><label>EXW</label><input type="number" id="exw_${pIdx}" value="${prod.inputs.exw}" placeholder="0" oninput="updateVal(${pIdx},'exw',this.value)" ${isPhoneWebMobile ? 'disabled style="background:#e9ecef; cursor:not-allowed;"' : 'style="background:#fff;"'}></div>
-                <div><label>MARGIN</label><input type="number" value="${prod.inputs.margin}" placeholder="0" oninput="updateVal(${pIdx},'margin',this.value)"></div>
-                <div><label>DEALER</label><input type="number" value="${prod.inputs.dealer}" placeholder="0" oninput="updateVal(${pIdx},'dealer',this.value)"></div>
+                <div><label>EXW</label><input type="number" id="exw_${pIdx}" value="${prod.inputs.exw}" placeholder="0" onchange="updateVal(${pIdx},'exw',this.value)" ${isPhoneWebMobile ? 'disabled style="background:#e9ecef; cursor:not-allowed;"' : 'style="background:#fff;"'}></div>
+                <div><label>MARGIN</label><input type="number" value="${prod.inputs.margin}" placeholder="0" onchange="updateVal(${pIdx},'margin',this.value)"></div>
+                <div><label>DEALER</label><input type="number" value="${prod.inputs.dealer}" placeholder="0" onchange="updateVal(${pIdx},'dealer',this.value)"></div>
             </div>
             <div class="table-wrapper" id="tw_${pIdx}" style="display:${displayStyle}; overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse;">
