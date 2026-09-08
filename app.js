@@ -256,11 +256,13 @@ let tempFgDealerName = "";
 let tempFgModel = ""; 
 let tempFgBitly = ""; 
 
-let currentViewedModel = "";
 let productSearchMode = 'MATRIX';
 let dictIsNonTieup = false;
 let dictCategory = "";
 let dictManualSchemes = null;
+
+// DICTIONARY MULTI-PRODUCT VARIABLES
+let dictProductsQueue = [];
 
 function cleanPureShopName(raw) { if(!raw) return ""; return raw.split('#')[0].split('|')[0].split('(')[0].trim().toUpperCase(); }
 function parseDealerObj(d) {
@@ -502,6 +504,16 @@ window.onload = async function() {
     }
 };
 
+/* ==============================================================
+   MISSING FUNCTIONS FIX (To prevent ReferenceError crash)
+   ============================================================== */
+function renderCustomerQueue() {
+    try { console.log("Customer Queue Rendered. Size:", customerQueue.length); } catch (e) {}
+}
+function updateUniversalActionButtons() {
+    try { console.log("Universal Action Buttons Updated."); } catch (e) {}
+}
+
 function openFlyerGenModal() { document.getElementById('fgSalesName').value = ''; document.getElementById('fgSalesMobile').value = ''; document.getElementById('fgDealerSearch').value = ''; document.getElementById('fgDealerList').innerHTML = ''; tempFgDealerId = ""; tempFgDealerName = ""; tempFgBitly = ""; clearFgModel(); document.getElementById('fgOfferType').value = 'NONE'; toggleFgOfferInput(); document.getElementById('fgSelectedDealerBox').style.display = 'none'; document.getElementById('flyerGeneratedLinkBox').style.display = 'none'; document.getElementById('flyerGenModal').style.display = 'flex'; }
 function toggleFgOfferInput() { let type = document.getElementById('fgOfferType').value; let box = document.getElementById('fgOfferValBox'); let label = document.getElementById('fgOfferValLabel'); let inp = document.getElementById('fgOfferValue'); if(type === "NONE") { box.style.display = 'none'; inp.value = ''; } else if(type === "FREEBIE") { box.style.display = 'block'; label.innerText = "ENTER GIFT NAME"; inp.placeholder = "E.g. Earbuds / Smartwatch"; } else { box.style.display = 'block'; label.innerText = "ENTER UPTO AMOUNT (₹)"; inp.placeholder = "E.g. 2500"; } }
 function searchFgDealer() { let q = document.getElementById('fgDealerSearch').value.toLowerCase().trim(); let list = document.getElementById('fgDealerList'); if(!q) { list.innerHTML = ''; return; } let matches = dealer_records.map(d => parseDealerObj(d)).filter(p => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q) || p.city.toLowerCase().includes(q)).slice(0, 10); list.innerHTML = matches.map(p => { let displayStr = `${p.name}${p.city ? ' - ' + p.city : ''} (${p.code})`; return `<div onclick="selectFgDealer('${p.code}', '${p.name.replace(/'/g, "\\'")}', '${p.city.replace(/'/g, "\\'")}', '${encodeURIComponent(p.bitly||'')}')" style="padding:8px; border-bottom:1px solid #eee; cursor:pointer; background:#fff; font-size:12px; font-weight:bold; color:var(--bajaj-blue);">🏪 ${displayStr}</div>`; }).join(''); }
@@ -559,14 +571,12 @@ function doSearch(id, ddId) {
     
     if(!q) { dd.style.display='none'; return; }
 
-    // १. चेक करा की मास्टर डेटा लोड झालाय का?
     if (!db_records || db_records.length === 0) {
         dd.innerHTML = `<div style="padding:12px; color:#dc2626; font-size:13px; font-weight:bold; text-align:center;">⚠️ Master Data Load झाला नाही किंवा सर्व मॉडेल्सची Expiry Date संपली आहे.</div>`; 
         dd.style.display = 'block'; 
         return; 
     }
 
-    // स्पेशल कॅरेक्टर्स (-, /) काढून फक्त अक्षरे आणि अंक शोधणे 
     let searchTerms = q.replace(/[^A-Z0-9]/g, ' ').split(/\s+/).filter(t => t);
     let validRecords = db_records.filter(r => r.model !== SPECIAL_MODEL); 
     
@@ -581,14 +591,12 @@ function doSearch(id, ddId) {
     
     matches = [...new Set(matches)].slice(0, 15);
 
-    // २. रिझल्ट न मिळाल्यास
     if (matches.length === 0) { 
         dd.innerHTML = `<div style="padding:12px; color:#dc2626; font-size:13px; font-weight:bold; text-align:center;">⚠️ No matching models found.<br><span style="font-size:10px; color:#666;">(Excel मध्ये मॉडेल आहे का आणि Expiry Date संपलेली नाही ना, हे तपासा.)</span></div>`; 
         dd.style.display = 'block'; 
         return; 
     }
     
-    // ३. रिझल्ट्स दाखवा
     dd.innerHTML = matches.map(m => { 
         let rec = validRecords.find(x => String(x.model) === m); 
         let brandTag = rec && rec.brand ? `<span style="font-size:10px; background:#eff6ff; color:#1d4ed8; padding:3px 6px; border-radius:4px; font-weight:900; margin-right:8px; border:1px solid #bfdbfe;">${rec.brand}</span>` : ''; 
@@ -604,6 +612,7 @@ function doSearch(id, ddId) {
     dd.style.zIndex = "100020";
     dd.style.display = 'block';
 }
+
 function selectModel(name) { 
     document.getElementById('modalMatrixSearchDropdown').style.display = 'none'; 
     document.getElementById('modalMatrixSearch').value = ''; 
@@ -650,10 +659,6 @@ function quickNonTieup() {
     }
 }
 
-// -------------------------------------------------------------
-// END UPDATED SEARCH LOGIC
-// -------------------------------------------------------------
-
 function selectCategory(catName) { 
     document.getElementById('catSelectionModal').style.display = 'none'; 
     let displayName = (catName === 'PHONE(WEB-MOBILE)') ? 'PHONE / TABLET / SMART WATCH' : catName; 
@@ -671,245 +676,276 @@ function selectCategory(catName) {
     finalizeProductAddition(); 
 }
 
+/* ==============================================================
+   DICTIONARY MULTI-PRODUCT LOGIC (UPDATED)
+   ============================================================== */
 function viewGlobalModel(name) {
-    currentViewedModel = name;
     let displayTitle = name;
-    
     if (name === SPECIAL_MODEL && dictIsNonTieup) displayTitle = SPECIAL_MODEL + " - " + dictCategory;
-    if (dictManualSchemes) displayTitle = name; 
-    
-    let displayEl = document.getElementById('dictSelectedModelDisplay');
-    if(displayEl) displayEl.innerText = "📱 " + displayTitle;
+    if (dictManualSchemes) displayTitle = name;
 
     let rec;
-    if (dictManualSchemes) {
-        rec = { mrp: "" };
-    } else if (dictIsNonTieup) {
-        rec = db_records.find(r => r.model === SPECIAL_MODEL && r.category === dictCategory);
-    } else {
-        rec = db_records.find(r => r.model === name);
-    }
-
-    if(rec && rec.mrp > 0) {
-        document.getElementById('calcInvoice').value = rec.mrp;
-    } else {
-        document.getElementById('calcInvoice').value = "";
-    }
-
-    recalcCurrentModel();
-
-    setTimeout(() => {
-        let resultArea = document.getElementById('schemeResultArea');
-        if(resultArea) resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
-}
-
-function recalcCurrentModel() {
-    if(currentViewedModel !== "") {
-        renderTableModel();
-    }
-}
-
-function renderTableModel() {
     let schemes = [];
+    
     if (dictManualSchemes) {
+        rec = { model: name, category: "MANUAL", mrp: "" };
         schemes = dictManualSchemes;
     } else if (dictIsNonTieup) {
+        rec = db_records.find(r => r.model === SPECIAL_MODEL && r.category === dictCategory) || { category: dictCategory, mrp: "" };
         schemes = db_records.filter(r => r.model === SPECIAL_MODEL && r.category === dictCategory);
     } else {
-        schemes = db_records.filter(r => r.model === currentViewedModel);
+        rec = db_records.find(r => r.model === name) || { category: "OTHER", mrp: "" };
+        schemes = db_records.filter(r => r.model === name);
     }
 
-    if(schemes.length === 0) return;
-    
-    let displayTitle = currentViewedModel;
-    if (currentViewedModel === SPECIAL_MODEL && dictIsNonTieup) displayTitle = SPECIAL_MODEL + " - " + dictCategory;
-    
-    document.getElementById('globalViewerTitle').innerText = '📱 ' + displayTitle;
+    if(schemes.length === 0 && !dictManualSchemes) {
+        showToast("⚠️ No active schemes found!", "warning");
+        return;
+    }
+
+    // Add to dictionary queue at the top
+    dictProductsQueue.unshift({
+        id: Date.now(),
+        name: displayTitle,
+        inv: rec.mrp || "",
+        isNonTieup: dictIsNonTieup,
+        category: rec.category,
+        schemes: schemes
+    });
+
+    dictManualSchemes = null;
+    dictIsNonTieup = false;
+    dictCategory = "";
+
+    renderDictionaryQueue();
+}
+
+function updateDictInv(index, val) {
+    dictProductsQueue[index].inv = val;
+    renderDictionaryQueue(); 
+}
+
+function removeDictProduct(index) {
+    dictProductsQueue.splice(index, 1);
+    renderDictionaryQueue();
+}
+
+function renderDictionaryQueue() {
+    let container = document.getElementById('schemeResultArea');
+    if (!container) return;
+
+    if (dictProductsQueue.length === 0) {
+        container.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    container.style.display = 'block';
     
     let custType = zcEligibleActive ? zcType : 'NEW';
     let ltvLimit = zcEligibleActive ? zcLtv : 100;
     let limit = zcEligibleActive ? zcLimit : 0;
-    let invoice = parseFloat(document.getElementById('calcInvoice').value) || 0;
-    let margin = parseFloat(document.getElementById('calcMargin').value) || 0;
-    let targetDp = parseFloat(document.getElementById('calcTarget').value) || 0;
     let emiCap = zcEligibleActive ? zcCap : 0;
-    
-    let gtl = invoice > 100000 ? 2398 : (invoice > 50000 ? 1799 : (invoice > 30000 ? 1499 : (invoice > 10000 ? 1199 : (invoice > 0 ? 699 : 0))));
-    
-    let isCalculatedMode = (limit > 0 && invoice > 0);
-    let fee = (custType === 'EMI CARD') ? 270 : (custType === 'W/O CARD' ? 320 : 850);
-
-    let validSchemes = schemes.filter(s => s.tenure > 0 || s.fixedEmi > 0);
     let today = new Date(); today.setHours(0,0,0,0);
-    validSchemes = validSchemes.filter(s => {
-        if(!s.expiryDateStr) return true;
-        let p = s.expiryDateStr.trim().split('/');
-        if(p.length === 3) {
-            let expD = new Date(p[2], p[1]-1, p[0]);
-            if(expD < today) return false;
-        }
-        return true;
-    });
-    
-    let thead = document.getElementById('tableHead');
-    if (isCalculatedMode) {
-        thead.innerHTML = `<tr>
-            <th style="display: table-cell !important; background:#e3f2fd; padding:10px 4px; font-size:12px;">T/A</th>
-            <th style="background:#e3f2fd; padding:10px 4px; font-size:12px;">LTV%</th>
-            <th style="background:#e8f5e9; color:var(--success); padding:10px 4px; font-size:12px;">LOAN</th>
-            <th style="background:#fff3e0; color:#d35400; padding:10px 4px; font-size:12px;">DIFF</th>
-            <th style="background:#e8f5e9; color:var(--success); padding:10px 4px; font-size:12px;">NET DP</th>
-            <th style="background:#e3f2fd; color:var(--primary); padding:10px 4px; font-size:12px;">EMI</th>
-            <th style="background:#e3f2fd; color:var(--primary); padding:10px 4px; font-size:12px;">M</th>
-            <th style="padding:10px 4px; font-size:12px;">ACT</th>
-        </tr>`;
-    } else {
-        thead.innerHTML = `<tr>
-            <th style="display: table-cell !important; background:#e3f2fd;">T/A</th>
-            <th style="background:#e3f2fd;">LTV%</th>
-            <th style="background:#e3f2fd;">FIXED EMI</th>
-            <th style="background:#e3f2fd;">DBD%</th>
-            <th style="background:#e3f2fd;">ROI%</th>
-            <th style="background:#e3f2fd;">PF</th>
-        </tr>`;
-    }
 
-    validSchemes.forEach(s => { 
-        s.calcLTV = s.tenure > 0 ? ((s.tenure - s.advEmi)/s.tenure)*100 : 0; 
-        let dynamicPf = s.pf;
-        if (dictIsNonTieup) {
-            let checkAmount = invoice > 0 ? invoice : (limit < 9999999 && limit > 0 ? limit : 0);
-            let slabPf = getNonTieupPfValue(dictCategory, checkAmount);
-            if (slabPf !== null) dynamicPf = slabPf;
-        }
-        s.displayPf = dynamicPf;
-        
-        if (isCalculatedMode) {
-            let nbfcMax = (limit * s.tenure) / (s.tenure - s.advEmi || 1);
-            let finalLoan = 0, emi = 0, dp = 0, diff = 0;
-            let dbdRate = (s.dbd * 1.18 / 100);
-            let roiRate = s.roi / 1200;
-            let roiRateDP = roiRate * s.advEmi;
-            let inst = s.tenure - s.advEmi;
-            if (inst < 1) inst = 1;
-            
-            if (s.fixedEmi > 0) {
-                let maxTotalTenure = Math.floor(limit / s.fixedEmi) + s.advEmi;
-                let currentTenure = Math.floor(invoice / s.fixedEmi);
-                if(currentTenure > maxTotalTenure) currentTenure = maxTotalTenure;
-                if(currentTenure < 1) currentTenure = 1;
-                
-                finalLoan = currentTenure * s.fixedEmi;
-                
-                if (targetDp > 0) {
-                    let numerator = targetDp - invoice - (s.fixedEmi * s.advEmi) - dynamicPf - fee - margin;
-                    let denominator = dbdRate + roiRateDP - 1;
-                    let solvedLoan = numerator / denominator;
-                    let solvedTenure = Math.floor(solvedLoan / s.fixedEmi);
-                    if (solvedTenure > maxTotalTenure) solvedTenure = maxTotalTenure;
-                    finalLoan = Math.max(0, solvedTenure * s.fixedEmi);
-                }
-                
-                if (finalLoan > invoice) finalLoan = Math.floor(invoice/s.fixedEmi)*s.fixedEmi;
-                currentTenure = Math.floor(finalLoan / s.fixedEmi) || 1;
-                inst = currentTenure - s.advEmi;
-                if(inst < 1) inst = 1;
-                
-                let roiInEmi = finalLoan * roiRate;
-                emi = s.fixedEmi + (gtl / inst) + roiInEmi;
-                
-                let roiInDp = finalLoan * roiRateDP;
-                dp = invoice - finalLoan + (s.fixedEmi * s.advEmi) + dynamicPf + fee + (finalLoan * dbdRate) + margin + roiInDp;
-                s.currentTenure = currentTenure;
-                s.calcInst = inst;
-            } else {
-                finalLoan = Math.min(nbfcMax, invoice);
-                
-                if (targetDp > 0) {
-                    let advRate = s.advEmi / s.tenure; 
-                    let numerator = targetDp - invoice - dynamicPf - fee - margin; 
-                    let denominator = advRate + dbdRate + roiRateDP - 1; 
-                    let solvedLoan = numerator / denominator; 
-                    finalLoan = Math.min(finalLoan, Math.max(0, Math.floor(solvedLoan)));
-                }
+    let html = dictProductsQueue.map((prod, pIdx) => {
+        let cardId = `dictCard_${pIdx}`;
+        let invoice = parseFloat(prod.inv) || 0;
+        let isCalculatedMode = (limit > 0 && invoice > 0);
+        let gtl = invoice > 100000 ? 2398 : (invoice > 50000 ? 1799 : (invoice > 30000 ? 1499 : (invoice > 10000 ? 1199 : (invoice > 0 ? 699 : 0))));
+        let fee = (custType === 'EMI CARD') ? 270 : (custType === 'W/O CARD' ? 320 : 850);
 
-                if (invoice > 0 && finalLoan > invoice) {
-                    finalLoan = invoice;
-                }
-                
-                let baseEmi = finalLoan / s.tenure;
-                if (baseEmi > 0 && baseEmi < 900) baseEmi = 900; 
-
-                let roiInEmi = finalLoan * roiRate;
-                emi = baseEmi + (gtl / inst) + roiInEmi;
-                
-                if (emiCap > 0 && emi > emiCap) {
-                    finalLoan = (emiCap - (gtl / inst)) / ((1 / s.tenure) + roiRate);
-                    if(finalLoan < 0) finalLoan = 0;
-                    if (invoice > 0 && finalLoan > invoice) finalLoan = invoice; 
-                    
-                    baseEmi = finalLoan / s.tenure;
-                    if (baseEmi > 0 && baseEmi < 900) baseEmi = 900;
-
-                    roiInEmi = finalLoan * roiRate;
-                    emi = baseEmi + (gtl / inst) + roiInEmi;
-                }
-
-                let roiInDp = finalLoan * roiRateDP;
-                dp = invoice - finalLoan + (baseEmi * s.advEmi) + dynamicPf + fee + (finalLoan * dbdRate) + margin + roiInDp;
-                s.currentTenure = s.tenure;
-                s.calcInst = inst;
+        let validSchemes = prod.schemes.filter(s => {
+            if(!s.expiryDateStr) return true;
+            let p = s.expiryDateStr.trim().split('/');
+            if(p.length === 3) {
+                let expD = new Date(p[2], p[1]-1, p[0]);
+                if(expD < today) return false;
             }
+            return true;
+        });
+
+        validSchemes.forEach(s => { 
+            s.calcLTV = s.tenure > 0 ? ((s.tenure - s.advEmi)/s.tenure)*100 : 0; 
+            let dynamicPf = s.pf;
+            if (prod.isNonTieup) {
+                let checkAmount = invoice > 0 ? invoice : (limit < 9999999 && limit > 0 ? limit : 0);
+                let slabPf = getNonTieupPfValue(prod.category, checkAmount);
+                if (slabPf !== null) dynamicPf = slabPf;
+            }
+            s.displayPf = dynamicPf;
             
-            s.calcLoan = finalLoan;
-            s.isInvalidLoan = (isCalculatedMode && invoice > 0 && (finalLoan < (invoice * 0.5)));
+            if (isCalculatedMode) {
+                let nbfcMax = (limit * s.tenure) / (s.tenure - s.advEmi || 1);
+                let finalLoan = 0, emi = 0, dp = 0, diff = 0;
+                let dbdRate = (s.dbd * 1.18 / 100);
+                let roiRate = s.roi / 1200;
+                let roiRateDP = roiRate * s.advEmi;
+                let inst = s.tenure - s.advEmi;
+                if (inst < 1) inst = 1;
+                
+                if (s.fixedEmi > 0) {
+                    let maxTotalTenure = Math.floor(limit / s.fixedEmi) + s.advEmi;
+                    let currentTenure = Math.floor(invoice / s.fixedEmi);
+                    if(currentTenure > maxTotalTenure) currentTenure = maxTotalTenure;
+                    if(currentTenure < 1) currentTenure = 1;
+                    
+                    finalLoan = currentTenure * s.fixedEmi;
+                    if (finalLoan > invoice) finalLoan = Math.floor(invoice/s.fixedEmi)*s.fixedEmi;
+                    currentTenure = Math.floor(finalLoan / s.fixedEmi) || 1;
+                    inst = currentTenure - s.advEmi;
+                    if(inst < 1) inst = 1;
+                    
+                    let roiInEmi = finalLoan * roiRate;
+                    emi = s.fixedEmi + (gtl / inst) + roiInEmi;
+                    let roiInDp = finalLoan * roiRateDP;
+                    dp = invoice - finalLoan + (s.fixedEmi * s.advEmi) + dynamicPf + fee + (finalLoan * dbdRate) + roiInDp;
+                    s.currentTenure = currentTenure;
+                    s.calcInst = inst;
+                } else {
+                    finalLoan = Math.min(nbfcMax, invoice);
+                    let baseEmi = finalLoan / s.tenure;
+                    if (baseEmi > 0 && baseEmi < 900) baseEmi = 900; 
 
-            diff = invoice - finalLoan;
-            s.calcDiff = diff > 0 ? diff : 0;
-            s.calcDp = Math.ceil(dp/10)*10;
-            s.calcEmi = emi;
-        }
-    });
+                    let roiInEmi = finalLoan * roiRate;
+                    emi = baseEmi + (gtl / inst) + roiInEmi;
+                    
+                    if (emiCap > 0 && emi > emiCap) {
+                        finalLoan = (emiCap - (gtl / inst)) / ((1 / s.tenure) + roiRate);
+                        if(finalLoan < 0) finalLoan = 0;
+                        if (invoice > 0 && finalLoan > invoice) finalLoan = invoice; 
+                        
+                        baseEmi = finalLoan / s.tenure;
+                        if (baseEmi > 0 && baseEmi < 900) baseEmi = 900;
 
-    validSchemes = validSchemes.filter(s => (s.fixedEmi > 0 || s.calcLTV <= ltvLimit) && !s.isInvalidLoan);
+                        roiInEmi = finalLoan * roiRate;
+                        emi = baseEmi + (gtl / inst) + roiInEmi;
+                    }
 
-    if (isCalculatedMode) {
-        validSchemes.sort((a,b) => a.calcDp - b.calcDp);
-    } else {
-        validSchemes.sort((a,b) => b.calcLTV - a.calcLTV);
-    }
-    
-    let tbody = document.getElementById('globalViewerBody');
-    tbody.innerHTML = validSchemes.map(s => {
-        let displayTenure = s.currentTenure ? s.currentTenure : s.tenure;
-        if (isCalculatedMode) {
-            return `<tr>
-                <td style="display: table-cell !important; font-weight:900; color:var(--indigo); border-bottom:1px solid #eee; padding:10px 4px; font-size:13px;">${displayTenure}/${s.advEmi}</td>
-                <td style="font-weight:bold; color:var(--bajaj-blue); border-bottom:1px solid #eee; padding:10px 4px; font-size:13px;">${Math.round(s.calcLTV)}%</td>
-                <td style="border-bottom:1px solid #eee; background:#f4fcf6; color:var(--success); font-weight:900; padding:10px 4px; font-size:13px;">₹${Math.floor(s.calcLoan).toLocaleString()}</td>
-                <td style="border-bottom:1px solid #eee; background:#fff3e0; color:#d35400; font-weight:900; padding:10px 4px; font-size:13px;">₹${Math.floor(s.calcDiff).toLocaleString()}</td>
-                <td style="border-bottom:1px solid #eee; background:#f4fcf6; color:var(--success); font-weight:900; padding:10px 4px; font-size:13px;">₹${Math.round(s.calcDp).toLocaleString()}</td>
-                <td style="border-bottom:1px solid #eee; background:#eef6ff; color:var(--primary); font-weight:900; padding:10px 4px; font-size:13px;">₹${Math.round(s.calcEmi).toLocaleString()}</td>
-                <td style="font-weight:900; color:var(--primary); background:#eef6ff; border-bottom:1px solid #eee; padding:10px 4px; font-size:13px;">${s.calcInst}</td>
-                <td style="border-bottom:1px solid #eee; padding:10px 4px;"><button style="padding:4px 6px; font-size:10px !important; background:var(--primary); color:white; border:none; border-radius:3px; cursor:pointer;" onclick="copySingleScheme('${displayTenure}', '${s.advEmi}', '${s.calcLoan}', '${s.calcDp}', '${s.calcEmi}', '${s.fixedEmi}', '${s.dbd}', '${s.roi}', '${s.displayPf}', this)">COPY</button></td>
-            </tr>`;
-        } else {
-            let dbdAmtPreview = invoice > 0 ? invoice * (s.dbd * 1.18 / 100) : 0;
-            let dbdStr = invoice > 0 ? `${+parseFloat(s.dbd).toFixed(3)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(dbdAmtPreview).toLocaleString()}</span>` : `${+parseFloat(s.dbd).toFixed(3)}%`;
+                    let roiInDp = finalLoan * roiRateDP;
+                    dp = invoice - finalLoan + (baseEmi * s.advEmi) + dynamicPf + fee + (finalLoan * dbdRate) + roiInDp;
+                    s.currentTenure = s.tenure;
+                    s.calcInst = inst;
+                }
+                
+                s.calcLoan = finalLoan;
+                s.isInvalidLoan = (isCalculatedMode && invoice > 0 && (finalLoan < (invoice * 0.5)));
+                diff = invoice - finalLoan;
+                s.calcDiff = diff > 0 ? diff : 0;
+                s.calcDp = Math.ceil(dp/10)*10;
+                s.calcEmi = emi;
+            }
+        });
 
-            return `<tr>
-                <td style="display: table-cell !important; font-weight:900; color:var(--indigo); border-bottom:1px solid #eee;">${displayTenure}/${s.advEmi}</td>
-                <td style="font-weight:bold; color:var(--bajaj-blue); border-bottom:1px solid #eee;">${Math.round(s.calcLTV)}%</td>
-                <td style="font-weight:900; color:var(--primary); border-bottom:1px solid #eee;">${s.fixedEmi > 0 ? '₹'+s.fixedEmi : 'N/A'}</td>
-                <td style="border-bottom:1px solid #eee;">${dbdStr}</td>
-                <td style="border-bottom:1px solid #eee;">${+parseFloat(s.roi).toFixed(2)}%</td>
-                <td style="font-weight:900; border-bottom:1px solid #eee;">₹${s.displayPf}</td>
-            </tr>`;
-        }
+        validSchemes = validSchemes.filter(s => (s.fixedEmi > 0 || s.calcLTV <= ltvLimit) && !s.isInvalidLoan);
+        if (isCalculatedMode) { validSchemes.sort((a,b) => a.calcDp - b.calcDp); } 
+        else { validSchemes.sort((a,b) => b.calcLTV - a.calcLTV); }
+
+        let tbodyHtml = validSchemes.map(s => {
+            let displayTenure = s.currentTenure ? s.currentTenure : s.tenure;
+            if (isCalculatedMode) {
+                return `<tr>
+                    <td style="font-weight:900; color:var(--indigo); padding:10px 4px; border-bottom:1px solid #eee;">${displayTenure}/${s.advEmi}</td>
+                    <td style="font-weight:bold; color:var(--bajaj-blue); padding:10px 4px; border-bottom:1px solid #eee;">${Math.round(s.calcLTV)}%</td>
+                    <td style="background:#f4fcf6; color:var(--success); font-weight:900; padding:10px 4px; border-bottom:1px solid #eee;">₹${Math.floor(s.calcLoan).toLocaleString()}</td>
+                    <td style="background:#fff3e0; color:#d35400; font-weight:900; padding:10px 4px; border-bottom:1px solid #eee;">₹${Math.floor(s.calcDiff).toLocaleString()}</td>
+                    <td style="background:#f4fcf6; color:var(--success); font-weight:900; padding:10px 4px; border-bottom:1px solid #eee;">₹${Math.round(s.calcDp).toLocaleString()}</td>
+                    <td style="background:#eef6ff; color:var(--primary); font-weight:900; padding:10px 4px; border-bottom:1px solid #eee;">₹${Math.round(s.calcEmi).toLocaleString()}</td>
+                    <td style="font-weight:900; color:var(--primary); background:#eef6ff; padding:10px 4px; border-bottom:1px solid #eee;">${s.calcInst}</td>
+                    <td style="padding:10px 4px; border-bottom:1px solid #eee;"><button style="padding:4px 6px; font-size:10px; background:var(--primary); color:white; border:none; border-radius:3px; cursor:pointer;" onclick="copySingleScheme('${displayTenure}', '${s.advEmi}', '${s.calcLoan}', '${s.calcDp}', '${s.calcEmi}', '${s.fixedEmi}', '${s.dbd}', '${s.roi}', '${s.displayPf}', this)">COPY</button></td>
+                </tr>`;
+            } else {
+                let dbdAmtPreview = invoice > 0 ? invoice * (s.dbd * 1.18 / 100) : 0;
+                let dbdStr = invoice > 0 ? `${+parseFloat(s.dbd).toFixed(3)}%<br><span style="color:var(--danger); font-weight:900;">₹${Math.round(dbdAmtPreview).toLocaleString()}</span>` : `${+parseFloat(s.dbd).toFixed(3)}%`;
+
+                return `<tr>
+                    <td style="font-weight:900; color:var(--indigo); padding:10px 4px; border-bottom:1px solid #eee;">${displayTenure}/${s.advEmi}</td>
+                    <td style="font-weight:bold; color:var(--bajaj-blue); padding:10px 4px; border-bottom:1px solid #eee;">${Math.round(s.calcLTV)}%</td>
+                    <td style="font-weight:900; color:var(--primary); padding:10px 4px; border-bottom:1px solid #eee;">${s.fixedEmi > 0 ? '₹'+s.fixedEmi : 'N/A'}</td>
+                    <td style="padding:10px 4px; border-bottom:1px solid #eee;">${dbdStr}</td>
+                    <td style="padding:10px 4px; border-bottom:1px solid #eee;">${+parseFloat(s.roi).toFixed(2)}%</td>
+                    <td style="font-weight:900; padding:10px 4px; border-bottom:1px solid #eee;">₹${s.displayPf}</td>
+                </tr>`;
+            }
+        }).join('');
+
+        let theadHtml = isCalculatedMode 
+            ? `<tr><th style="background:#e3f2fd; padding:10px 4px;">T/A</th><th style="background:#e3f2fd; padding:10px 4px;">LTV%</th><th style="background:#e8f5e9; color:var(--success); padding:10px 4px;">LOAN</th><th style="background:#fff3e0; color:#d35400; padding:10px 4px;">DIFF</th><th style="background:#e8f5e9; color:var(--success); padding:10px 4px;">NET DP</th><th style="background:#e3f2fd; color:var(--primary); padding:10px 4px;">EMI</th><th style="background:#e3f2fd; color:var(--primary); padding:10px 4px;">M</th><th style="padding:10px 4px;">ACT</th></tr>`
+            : `<tr><th style="background:#e3f2fd; padding:10px 4px;">T/A</th><th style="background:#e3f2fd; padding:10px 4px;">LTV%</th><th style="background:#e3f2fd; padding:10px 4px;">FIXED EMI</th><th style="background:#e3f2fd; padding:10px 4px;">DBD%</th><th style="background:#e3f2fd; padding:10px 4px;">ROI%</th><th style="background:#e3f2fd; padding:10px 4px;">PF</th></tr>`;
+
+        return `
+        <div id="${cardId}" style="background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                <h4 style="margin: 0; color: var(--indigo); font-size: 16px; flex: 1; min-width: 250px;">📱 ${prod.name}</h4>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <input type="number" placeholder="Enter Invoice" value="${prod.inv}" oninput="updateDictInv(${pIdx}, this.value)" style="padding: 8px; width: 140px; border: 1px solid #0984e3; border-radius: 4px; font-weight: bold; background: #f0f8ff;" />
+                    <button onclick="copyDictImage('${cardId}', this)" style="background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px;">📋 COPY IMAGE</button>
+                    <button onclick="downloadDictImage('${cardId}', '${prod.name.replace(/'/g, "\\'")}')" style="background: var(--success); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px;">⬇️ DOWNLOAD</button>
+                    <button onclick="removeDictProduct(${pIdx})" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">✖</button>
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13px;">
+                    <thead>${theadHtml}</thead>
+                    <tbody>${tbodyHtml || '<tr><td colspan="8" style="padding: 15px; color: red; font-weight: bold;">No eligible schemes found!</td></tr>'}</tbody>
+                </table>
+            </div>
+        </div>`;
     }).join('');
+
+    let addMoreHtml = `
+    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+        <button onclick="openAddProductModal('DICT')" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">+ ADD NEW PRODUCT</button>
+        <button onclick="openDictManualModal()" style="background: var(--warning); color: black; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">+ ADD MANUAL SCHEME</button>
+    </div>`;
+
+    container.innerHTML = html + addMoreHtml;
+}
+
+// --- IMAGE EXPORT FUNCTIONS FOR DICTIONARY ---
+function copyDictImage(cardId, btnElement) {
+    let card = document.getElementById(cardId);
+    if(!card) return;
+    let originalText = btnElement.innerHTML;
+    btnElement.innerHTML = "⏳ COPYING...";
     
-    document.getElementById('schemeResultArea').style.display = 'block';
+    html2canvas(card, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
+        canvas.toBlob(blob => {
+            try {
+                navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]).then(() => {
+                    btnElement.innerHTML = "✅ COPIED";
+                    btnElement.style.background = "var(--success)";
+                    setTimeout(() => { btnElement.innerHTML = originalText; btnElement.style.background = "var(--primary)"; }, 2000);
+                    showToast("📋 Image copied to clipboard!", "success");
+                });
+            } catch(e) {
+                showToast("⚠️ Copy failed. Try downloading.", "error");
+                btnElement.innerHTML = originalText;
+            }
+        }, "image/png");
+    });
+}
+
+function downloadDictImage(cardId, modelName) {
+    let card = document.getElementById(cardId);
+    if(!card) return;
+    
+    html2canvas(card, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
+        let a = document.createElement("a");
+        a.href = canvas.toDataURL("image/png");
+        let safeName = modelName.replace(/[^a-zA-Z0-9]/g, "_");
+        a.download = `Smart_Scheme_${safeName}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast("✅ Image Downloaded!", "success");
+    });
+}
+
+// --- DICTIONARY MANUAL SCHEME LOGIC ---
+function openDictManualModal() {
+    document.getElementById('targetPIdx').value = "DICT_NEW"; 
+    document.getElementById('manualSchemeModal').style.display = 'flex';
 }
 
 function compMrpChanged() { let mrp = parseFloat(document.getElementById('compMrp').value) || 0; document.getElementById('compInv').value = mrp; let gtl = mrp > 100000 ? 2398 : (mrp > 50000 ? 1799 : (mrp > 30000 ? 1499 : (mrp > 10000 ? 1199 : (mrp > 0 ? 699 : 0)))); document.getElementById('compGtl').value = gtl; let rfcSlab = getRfcSlabValue(mrp); let rfcOpt = document.getElementById('compRfcOpt'); if(rfcOpt) { rfcOpt.value = rfcSlab; rfcOpt.innerText = rfcSlab; } if (isMobileDeviceCat(currentModalCategory)) { document.getElementById('compRfc').value = rfcSlab; } else { document.getElementById('compRfc').value = "0"; } }
@@ -1261,9 +1297,31 @@ async function toggleInactive(pIdx, dIdx) { let prod = current_products[pIdx]; l
 
 async function executeManualAction() {
     let mode = document.getElementById('targetPIdx').value; 
-    let scheme = { tenure: parseInt(document.getElementById('manTen').value), advEmi: parseInt(document.getElementById('manAdv').value), dbd: parseFloat(document.getElementById('manDbd').value)||0, pf: parseInt(document.getElementById('manPf').value)||0, roi: parseFloat(document.getElementById('manRoi').value)||0, fixedEmi: parseInt(document.getElementById('manFixed').value)||0, minLoan: 0, maxLoan: 9999999, category: "MANUAL", inactive: false, isExpired: false, expiryDateStr: "" };
+    let scheme = { tenure: parseInt(document.getElementById('manTen').value)||0, advEmi: parseInt(document.getElementById('manAdv').value)||0, dbd: parseFloat(document.getElementById('manDbd').value)||0, pf: parseInt(document.getElementById('manPf').value)||0, roi: parseFloat(document.getElementById('manRoi').value)||0, fixedEmi: parseInt(document.getElementById('manFixed').value)||0, minLoan: 0, maxLoan: 9999999, category: "MANUAL", inactive: false, isExpired: false, expiryDateStr: "" };
+    
+    if(mode === "DICT_NEW") {
+        let name = document.getElementById('manName').value.toUpperCase() || "MANUAL MODEL";
+        dictManualSchemes = [scheme];
+        viewGlobalModel(name);
+        closeManualModal();
+        return;
+    }
+    
     let cCap = customerQueue[activeCustomerIndex]?.cap || "";
-    if(mode === "NEW") { let name = document.getElementById('manName').value.toUpperCase() || "MANUAL MODEL"; let comp = customerQueue[activeCustomerIndex].components || {}; current_products.push({ name: name, schemes: [scheme], category: "MANUAL", inputs: { mrp: "", inv: "", cap: cCap, target: "", gtl: 0, rfc: 0, exw: comp.exw||"", margin: comp.margin||"", dealer: comp.dealer||"", surch: 0, manualLoans: {} }, isManual: true }); sortConfigs.push({ key: 'dp', dir: 'asc' }); customerQueue[activeCustomerIndex].products = current_products; customerQueue[activeCustomerIndex].sortConfigs = sortConfigs; await saveQueueToLocal(); renderMatrix(); } else { current_products[mode].schemes.push(scheme); recalcModel(parseInt(mode)); } closeManualModal();
+    if(mode === "NEW") { 
+        let name = document.getElementById('manName').value.toUpperCase() || "MANUAL MODEL"; 
+        let comp = customerQueue[activeCustomerIndex].components || {}; 
+        current_products.push({ name: name, schemes: [scheme], category: "MANUAL", inputs: { mrp: "", inv: "", cap: cCap, target: "", gtl: 0, rfc: 0, exw: comp.exw||"", margin: comp.margin||"", dealer: comp.dealer||"", surch: 0, manualLoans: {} }, isManual: true }); 
+        sortConfigs.push({ key: 'dp', dir: 'asc' }); 
+        customerQueue[activeCustomerIndex].products = current_products; 
+        customerQueue[activeCustomerIndex].sortConfigs = sortConfigs; 
+        await saveQueueToLocal(); 
+        renderMatrix(); 
+    } else { 
+        current_products[mode].schemes.push(scheme); 
+        recalcModel(parseInt(mode)); 
+    } 
+    closeManualModal();
 }
 
 function openQuoteSelectionModal() {
@@ -1798,24 +1856,22 @@ function proceedToTargetModal() {
             document.getElementById('dictDispLimit').innerText = "₹" + zcLimit;
             document.getElementById('dictDispLtv').innerText = zcLtv + "%";
             document.getElementById('dictDispCap').innerText = zcCap > 0 ? "₹" + zcCap : "NONE";
-            document.getElementById('dictBanner').style.display = 'block';
+            document.getElementById('dictBanner').style.display = 'flex';
         } else {
             document.getElementById('dictBanner').style.display = 'none';
         }
         
-        let dictDisplay = document.getElementById('dictSelectedModelDisplay');
-        if (dictDisplay) dictDisplay.innerText = "🔍 Click to Search or Add...";
-        
         document.getElementById('schemeResultArea').style.display = 'none';
         document.getElementById('dictionarySearchModal').style.display = 'flex'; 
         
-        currentViewedModel = "";
+        // Resetting Dictionary State
+        dictProductsQueue = []; // Clear array
         dictManualSchemes = null;
         dictIsNonTieup = false;
+        dictCategory = "";
         
-        recalcCurrentModel();
+        renderDictionaryQueue();
 
-        // 🔥 हा नवीन कोड ऍड केला आहे, ज्यामुळे Apply किंवा Skip केल्यावर लगेच ADD NEW PRODUCT उघडेल
         setTimeout(() => {
             openAddProductModal('DICT');
         }, 150);
@@ -2035,30 +2091,5 @@ function copyFastCalcResult(btn) {
         navigator.clipboard.writeText(text).then(() => showToast("📋 Calculation Copied!", "success")).catch(() => fallbackCopy(text, () => showToast("📋 Calculation Copied!", "success")));
     } else {
         fallbackCopy(text, () => showToast("📋 Calculation Copied!", "success"));
-    }
-}
-/* ==============================================================
-   MISSING FUNCTIONS FIX (To prevent ReferenceError)
-   ============================================================== */
-
-function renderCustomerQueue() {
-    try {
-        // कस्टमर लिस्ट UI वर अपडेट करण्याचा मूळ कोड इथे असायला हवा.
-        // सध्या JavaScript क्रॅश होऊ नये म्हणून हे फंक्शन असणे आवश्यक आहे.
-        console.log("Customer Queue Rendered. Total customers: ", customerQueue.length);
-        
-        // जर तुमच्या HTML मध्ये queue दाखवण्यासाठी काही IDs असतील, तर तुम्ही इथे कोड लिहू शकता.
-        // उदा. document.getElementById('queueCountBadge').innerText = customerQueue.length;
-    } catch (e) {
-        console.error("Error in renderCustomerQueue:", e);
-    }
-}
-
-function updateUniversalActionButtons() {
-    try {
-        // ॲक्शन बटन्स (उदा. Sync, Save) अपडेट करण्यासाठी हे फंक्शन आहे.
-        console.log("Universal Action Buttons Updated.");
-    } catch (e) {
-        console.error("Error in updateUniversalActionButtons:", e);
     }
 }
